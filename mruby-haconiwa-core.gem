@@ -1,0 +1,6 @@
+name: mruby-haconiwa-core
+description: Haconiwa class
+author: Uchio Kondo
+website: https://github.com/udzura/mruby-haconiwa-core
+protocol: git
+repository: https://github.com/udzura/mruby-haconiwa-core.git
