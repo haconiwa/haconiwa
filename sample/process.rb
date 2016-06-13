@@ -1,11 +1,10 @@
 Namespace.unshare(Namespace::CLONE_NEWNS)
+Namespace.unshare(Namespace::CLONE_NEWPID)
 
 m = Mount.new
 
 m.make_private "/"
 m.bind_mount "/var/lib/myroot", "/var/lib/haconiwa/root"
-
-Namespace.unshare(Namespace::CLONE_NEWPID)
 
 Dir.chroot "/var/lib/haconiwa"
 Dir.chdir "/"
