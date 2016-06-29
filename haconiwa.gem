@@ -1,0 +1,6 @@
+name: haconiwa
+description: Ruby on Container
+author: Uchio Kondo
+website: https://github.com/haconiwa/haconiwa
+protocol: git
+repository: https://github.com/haconiwa/haconiwa.git

@@ -1,20 +1,33 @@
+def gem_config(conf)
+  conf.gembox 'default'
+
+  # be sure to include this gem (the cli app)
+  conf.gem File.expand_path(File.dirname(__FILE__))
+end
+
 MRuby::Build.new do |conf|
   toolchain :gcc
-  conf.gembox 'full-core'
 
-  conf.gem :github => 'matsumoto-r/mruby-cgroup'
-  conf.gem :github => 'matsumoto-r/mruby-capability'
-  conf.gem :github => 'harasou/mruby-resource'
-  conf.gem :github => 'iij/mruby-process'
-  conf.gem :github => 'iij/mruby-dir'
-  conf.gem :github => 'haconiwa/mruby-exec'
-  conf.gem :github => 'haconiwa/mruby-namespace'
-  conf.gem :github => 'haconiwa/mruby-mount'
+  conf.enable_bintest
+  #conf.enable_debug
+  conf.enable_test
 
-  conf.gem '.'
-
-  conf.cc do |cc|
-    cc.defines = %w(DEBUG) if ENV['DEBUG']
-    cc.option_define = '-D%s'
-  end
+  gem_config(conf)
 end
+
+# Just build for Linux...
+MRuby::Build.new('x86_64-pc-linux-gnu') do |conf|
+  toolchain :gcc
+
+  gem_config(conf)
+end
+
+# MRuby::CrossBuild.new('i686-pc-linux-gnu') do |conf|
+#   toolchain :gcc
+
+#   [conf.cc, conf.cxx, conf.linker].each do |cc|
+#     cc.flags << "-m32"
+#   end
+
+#   gem_config(conf)
+# end
