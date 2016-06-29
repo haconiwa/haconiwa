@@ -1,7 +1,8 @@
 def __main__(argv)
   if argv[1] == "version"
-    puts "v#{Haconiwa::VERSION}"
+    puts "haconiwa: v#{Haconiwa::VERSION}"
   else
-    puts "Hello World"
+    argv.shift
+    Haconiwa::Cli.run(argv)
   end
 end
