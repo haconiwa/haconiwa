@@ -1,8 +1,16 @@
 def __main__(argv)
-  if argv[1] == "version"
+  argv.shift
+  case argv.shift
+  when "version"
     puts "haconiwa: v#{Haconiwa::VERSION}"
-  else
-    argv.shift
+  when "run"
     Haconiwa::Cli.run(argv)
+  else
+    puts <<-USAGE
+haconiwa - The MRuby on Container
+commands:
+    run     - run the container
+    version - show version
+    USAGE
   end
 end

@@ -6,6 +6,7 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
 
   spec.add_dependency 'mruby-process'   , :mgem => 'mruby-process'
   spec.add_dependency 'mruby-io'        , :mgem => 'mruby-io'
+  spec.add_dependency 'mruby-argtable'  , :mgem => 'mruby-argtable'
   spec.add_dependency 'mruby-eval'      , :core => 'mruby-eval'
   spec.add_dependency 'mruby-bin-mirb'  , :core => 'mruby-bin-mirb'
   spec.add_dependency 'mruby-bin-mruby' , :core => 'mruby-bin-mruby'
