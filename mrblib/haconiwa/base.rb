@@ -1,13 +1,14 @@
 module Haconiwa
   class Base
     attr_accessor :name,
-                  :init_command,
                   :container_pid_file,
                   :filesystem,
                   :cgroup,
                   :namespace,
                   :capabilities,
                   :attached_capabilities
+
+    attr_reader   :init_command
 
     def self.define(&b)
       base = new
@@ -22,9 +23,17 @@ module Haconiwa
       @capabilities = Capabilities.new
       @attached_capabilities = nil
       @name = "haconiwa-#{Time.now.to_i}"
-      @init_command = "/bin/bash" # FIXME: maybe /sbin/init is better
+      @init_command = ["/bin/bash"] # FIXME: maybe /sbin/init is better
       @container_pid_file = nil
       @pid = nil
+    end
+
+    def init_command=(cmd)
+      if cmd.is_a?(Array)
+        @init_command = cmd
+      else
+        @init_command = [cmd]
+      end
     end
 
     # aliases

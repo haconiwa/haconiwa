@@ -17,7 +17,7 @@ module Haconiwa
         apply_capability(base)
         do_chroot(base)
 
-        Exec.exec(base.init_command || "/bin/bash")
+        Exec.exec(*base.init_command)
       end
 
       pid, status = Process.waitpid2 pid
