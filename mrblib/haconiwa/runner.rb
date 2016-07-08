@@ -46,7 +46,6 @@ module Haconiwa
         when mp.fs
           m.mount mp.src, mp.dest, type: mp.fs
         else
-          p "mount: #{mp.inspect}"
           m.bind_mount mp.src, mp.dest
         end
       end
