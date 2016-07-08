@@ -54,7 +54,21 @@ module Haconiwa
     def apply_cgroup(base)
     end
 
+    # TODO: check inheritable
+    #       and handling when it is non-root
     def apply_capability(base)
+      if base.capabilities.acts_as_whitelist?
+        ids = base.capabilities.whitelist_ids
+        (0..38).each do |cap|
+          break unless ::Capability.supported? cap
+          next if ids.include?(cap)
+          ::Capability.drop_bound cap
+        end
+      else
+        base.capabilities.blacklist_ids.each do |cap|
+          ::Capability.drop_bound cap
+        end
+      end
     end
 
     def do_chroot(base)

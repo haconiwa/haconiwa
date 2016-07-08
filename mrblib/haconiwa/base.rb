@@ -93,11 +93,18 @@ module Haconiwa
       end
     end
 
+    def whitelist_ids
+      @whitelist.map{|n| ::Capability.from_name(n) }
+    end
+
+    def blacklist_ids
+      @blacklist.map{|n| ::Capability.from_name(n) }
+    end
+
     def drop(*keys)
       @blacklist.concat(keys)
     end
 
-    private
     def acts_as_whitelist?
       ! @whitelist.empty?
     end
