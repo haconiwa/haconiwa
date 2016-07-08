@@ -21,6 +21,7 @@ module Haconiwa
       end
 
       pid, status = Process.waitpid2 pid
+      cleanup_cgroup(base)
       if status.success?
         puts "Container successfullly exited: #{status.inspect}"
       else
@@ -51,7 +52,36 @@ module Haconiwa
       end
     end
 
+    CG_MAPPING = {
+      "cpu"     => Cgroup::CPU,
+      "cpuset"  => Cgroup::CPUSET,
+      "cpuacct" => Cgroup::CPUACCT,
+      "blkio"   => Cgroup::BLKIO,
+      "memory"  => Cgroup::MEMORY,
+      "pids"    => Cgroup::PIDS,
+    }
     def apply_cgroup(base)
+      base.cgroup.controllers.each do |controller|
+        raise("Invalid or unsupported controller name: #{controller}") unless CG_MAPPING.has_key?(controller)
+
+        c = CG_MAPPING[controller].new(base.name)
+        base.cgroup.groups_by_controller[controller].each do |pair|
+          key, attr = pair
+          value = base.cgroup[key]
+          c.send "#{attr}=", value
+        end
+        c.create
+        c.attach
+      end
+    end
+
+    def cleanup_cgroup(base)
+      base.cgroup.controllers.each do |controller|
+        raise("Invalid or unsupported controller name: #{controller}") unless CG_MAPPING.has_key?(controller)
+
+        c = CG_MAPPING[controller].new(base.name)
+        c.delete
+      end
     end
 
     # TODO: check inheritable

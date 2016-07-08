@@ -17,5 +17,8 @@ Haconiwa.define do |config|
   config.namespace.unshare "uts"
   config.namespace.unshare "pid"
 
+  config.cgroup["cpu.cfs_quota_us"] = 30000
+  config.cgroup["cpuset.cpus"] = "0"
+
   config.capabilities.drop 'cap_sys_time'
 end

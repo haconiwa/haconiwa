@@ -62,8 +62,9 @@ module Haconiwa
   class CGroup
     def initialize
       @groups = {}
+      @groups_by_controller = {}
     end
-    attr_reader :groups
+    attr_reader :groups, :groups_by_controller
 
     def [](key)
       @groups[key]
@@ -71,12 +72,17 @@ module Haconiwa
 
     def []=(key, value)
       @groups[key] = value
+      c, attr = key.split('.')
+      raise("Invalid cgroup name #{key}") unless attr
+      @groups_by_controller[c] ||= Array.new
+      @groups_by_controller[c] << [key, attr]
+      return value
     end
 
-    def to_dirs
-      groups.keys.map{|k| k.split('.').first }.uniq
+    def to_controllers
+      @groups_by_controller.keys.uniq
     end
-    alias dirs to_dirs
+    alias controllers to_controllers
   end
 
   class Capabilities
