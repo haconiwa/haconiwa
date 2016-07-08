@@ -4,11 +4,11 @@ Haconiwa.define do |config|
   config.init_command = "/bin/sh" # to be first process
 
   root = "/var/haconiwa/root/"
-  config.add_mount_point "/var/haconiwa/rootfs", to: root, readonly: true
+  config.add_mount_point "/var/lib/haconiwa", to: root, readonly: true
   config.add_mount_point "/lib64", to: root + "lib64", readonly: true
   config.add_mount_point "/usr/bin", to: root + "usr/bin", readonly: true
   config.add_mount_point "tmpfs", to: root + "tmp", fs: "tmpfs"
-  config.add_mount_point "/var/haconiwa/user_homes/hakoniwa-test001/home/hakoniwa", to: root + "home/hakoniwa"
+  config.add_mount_point "/var/haconiwa/user_homes", to: root + "home/haconiwa"
   config.mount_independent_procfs
   config.chroot_to root
 

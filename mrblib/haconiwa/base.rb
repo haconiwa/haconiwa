@@ -165,6 +165,7 @@ module Haconiwa
       @fs = options.delete(:fs)
       @options = options
     end
+    attr_accessor :src, :dest, :fs
   end
 
   def self.define(&b)
