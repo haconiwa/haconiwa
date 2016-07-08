@@ -2,7 +2,7 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.license = 'GPL v3'
   spec.authors = 'Uchio Kondo'
 
-  spec.bins = ["haconiwa", "mirb", "mruby"]
+  spec.bins = ["haconiwa"]
 
   spec.add_dependency 'mruby-process'   , :mgem => 'mruby-process'
   spec.add_dependency 'mruby-io'        , :mgem => 'mruby-io'
