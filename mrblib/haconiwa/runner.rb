@@ -16,6 +16,7 @@ module Haconiwa
         apply_cgroup(base)
         apply_capability(base)
         do_chroot(base)
+        ::Procutil.sethostname(base.name)
 
         Exec.exec(*base.init_command)
       end
