@@ -69,3 +69,9 @@ desc "cleanup"
 task :clean do
   sh "rake deep_clean"
 end
+
+desc "install"
+task :install do
+  target = ENV['INSTALL_TARGET'] || "/usr/local/bin"
+  sh "install build/x86_64-pc-linux-gnu/bin/haconiwa #{target}"
+end
