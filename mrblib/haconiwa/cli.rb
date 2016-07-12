@@ -28,12 +28,12 @@ module Haconiwa
 
       base, exe = get_script_and_eval(opt.catchall.values)
 
-      base.pid  = opt['t'].value if opt['t'].count > 0
-      base.name = opt['n'].value if opt['n'].count > 0
-      if opt['A'].count > 0 or opt['D'].count > 0
+      base.pid  = opt['t'].value if opt['t'].exist?
+      base.name = opt['n'].value if opt['n'].exist?
+      if opt['A'].exist? or opt['D'].exist?
         base.attached_capabilities = Capabilities.new
-        base.attached_capabilities.allow(*opt['A'].value.split(',')) if opt['A'].count > 0
-        base.attached_capabilities.drop(*opt['D'].value.split(','))  if opt['D'].count > 0
+        base.attached_capabilities.allow(*opt['A'].value.split(',')) if opt['A'].exist?
+        base.attached_capabilities.drop(*opt['D'].value.split(','))  if opt['D'].exist?
       end
 
       base.attach(*exe)
