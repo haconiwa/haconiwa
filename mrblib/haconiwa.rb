@@ -1,15 +1,18 @@
 def __main__(argv)
   argv.shift
-  case argv.shift
+  case argv[0]
   when "version"
     puts "haconiwa: v#{Haconiwa::VERSION}"
   when "run"
     Haconiwa::Cli.run(argv)
+  when "attach"
+    Haconiwa::Cli.attach(argv)
   else
     puts <<-USAGE
 haconiwa - The MRuby on Container
 commands:
     run     - run the container
+    attach  - attach to existing container
     version - show version
     USAGE
   end

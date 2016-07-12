@@ -14,19 +14,51 @@ module Haconiwa
         apply_namespace(base)
         apply_filesystem(base)
         apply_cgroup(base)
-        apply_capability(base)
+        apply_capability(base.capabilities)
         do_chroot(base)
         ::Procutil.sethostname(base.name)
 
         Exec.exec(*base.init_command)
       end
+      File.open(base.container_pid_file, 'w') {|f| f.write pid }
 
       pid, status = Process.waitpid2 pid
       cleanup_cgroup(base)
+      File.unlink base.container_pid_file
       if status.success?
         puts "Container successfullly exited: #{status.inspect}"
       else
         puts "Container failed: #{status.inspect}"
+      end
+    end
+
+    def attach(exe)
+      base = @base
+      if !base.pid
+        if File.exist? base.container_pid_file
+          base.pid = File.read(base.container_pid_file).to_i
+        else
+          raise "PID file #{base.container_pid_file} doesn't exist. You may be specifying container PID by -t option"
+        end
+      end
+
+      if base.namespace.use_pid_ns
+        ::Namespace.setns(::Namespace::CLONE_NEWPID, pid: base.pid)
+      end
+      pid = Process.fork do
+        ::Namespace.setns(base.namespace.to_flag_without_pid, pid: base.pid)
+
+        apply_cgroup(base)
+        apply_capability(base.attached_capabilities)
+        do_chroot(base, false)
+        Exec.exec(*exe)
+      end
+
+      pid, status = Process.waitpid2 pid
+      if status.success?
+        puts "Process successfullly exited: #{status.inspect}"
+      else
+        puts "Process failed: #{status.inspect}"
       end
     end
 
@@ -37,7 +69,7 @@ module Haconiwa
     end
 
     def apply_namespace(base)
-      ::Namespace.unshare(base.namespace.to_ns_flag)
+      ::Namespace.unshare(base.namespace.to_flag_without_pid)
     end
 
     def apply_filesystem(base)
@@ -87,25 +119,25 @@ module Haconiwa
 
     # TODO: check inheritable
     #       and handling when it is non-root
-    def apply_capability(base)
-      if base.capabilities.acts_as_whitelist?
-        ids = base.capabilities.whitelist_ids
+    def apply_capability(capabilities)
+      if capabilities.acts_as_whitelist?
+        ids = capabilities.whitelist_ids
         (0..38).each do |cap|
           break unless ::Capability.supported? cap
           next if ids.include?(cap)
           ::Capability.drop_bound cap
         end
       else
-        base.capabilities.blacklist_ids.each do |cap|
+        capabilities.blacklist_ids.each do |cap|
           ::Capability.drop_bound cap
         end
       end
     end
 
-    def do_chroot(base)
+    def do_chroot(base, remount_procfs=true)
       Dir.chroot base.filesystem.chroot
       Dir.chdir "/"
-      if base.filesystem.mount_independent_procfs
+      if remount_procfs && base.filesystem.mount_independent_procfs
         Mount.new.mount("proc", "/proc", type: "proc")
       end
     end

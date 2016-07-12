@@ -6,7 +6,8 @@ module Haconiwa
                   :cgroup,
                   :namespace,
                   :capabilities,
-                  :attached_capabilities
+                  :attached_capabilities,
+                  :pid
 
     attr_reader   :init_command
 
@@ -57,7 +58,6 @@ module Haconiwa
     end
     alias run start
 
-    # XXX: not yet
     def attach(*run_command)
       self.container_pid_file ||= default_container_pid_file
       LinuxRunner.new(self).attach(run_command)
@@ -149,9 +149,8 @@ module Haconiwa
              end
       if flag == ::Namespace::CLONE_NEWPID
         @use_pid_ns = true
-      else
-        @use_ns << flag
       end
+      @use_ns << flag
     end
     attr_reader :use_pid_ns
 
@@ -159,14 +158,14 @@ module Haconiwa
       @netns_name = name
     end
 
-    def use_ns_all
-      @use_ns.uniq + (@use_pid_ns ? [::Namespace::CLONE_NEWPID] : [])
-    end
-
-    def to_ns_flag
+    def to_flag
       @use_ns.inject(0x00000000) { |dst, flag|
         dst |= flag
       }
+    end
+
+    def to_flag_without_pid
+      to_flag & (~(::Namespace::CLONE_NEWPID))
     end
   end
 
