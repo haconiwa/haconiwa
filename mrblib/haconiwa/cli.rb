@@ -1,36 +1,43 @@
 module Haconiwa
   module Cli
     def self.run(args)
+      args.shift
       base, init = get_script_and_eval(args)
       base.run(*init)
     end
 
-    # def self.attach(args)
-    #   require 'optparse'
-    #   opt = OptionParser.new
-    #   pid = nil
-    #   name = nil
-    #   allow = nil
-    #   drop = nil
+    def self.attach(args)
+      opt = Argtable.new
+      opt.integer('t', 'target', 'PID', "Container's PID to attatch.")
+      opt.string('n', 'name', 'CONTAINER_NAME', "Container's name. Set if the name is dynamically defined")
+      opt.string('A', 'allow', 'CAPS[,CAPS...]', "Capabilities to allow attached process. Independent container's own caps")
+      opt.string('D', 'drop', 'CAPS[,CAPS...]', "Capabilities to drop from attached process. Independent container's own caps")
+      opt.literal('h', 'help', "Show help")
+      opt.enable_catchall('HACO_FILE [-- COMMAND...]', '', 32)
+      e = opt.parse(args)
 
-    #   opt.program_name = "haconiwa attach"
-    #   opt.on('-t', '--target PID', "Container's PID to attatch. If not set, use pid file of definition") {|v| pid = v }
-    #   opt.on('-n', '--name CONTAINER_NAME', "Container's name. Set if the name is dynamically defined") {|v| name = v }
-    #   opt.on('--allow CAPS[,CAPS...]', "Capabilities to allow attached process. Independent container's own caps") {|v| allow = v.split(',') }
-    #   opt.on('--drop CAPS[,CAPS...]', "Capabilities to drop from attached process. Independent container's own caps") {|v| drop = v.split(',') }
-    #   args = opt.parse(args)
+      if opt['h'].count > 0
+        opt.glossary
+        exit
+      end
 
-    #   base, exe = get_script_and_eval(args)
-    #   base.pid = pid if pid
-    #   base.name = name if name
-    #   if allow || drop
-    #     base.attached_capabilities = Capabilities.new
-    #     base.attached_capabilities.allow(*allow) if allow
-    #     base.attached_capabilities.drop(*drop) if drop
-    #   end
+      if e > 0
+        opt.glossary
+        exit 1
+      end
 
-    #   base.attach(*exe)
-    # end
+      base, exe = get_script_and_eval(opt.catchall.values)
+
+      base.pid  = opt['t'].value if opt['t'].count > 0
+      base.name = opt['n'].value if opt['n'].count > 0
+      if opt['A'].count > 0 or opt['D'].count > 0
+        base.attached_capabilities = Capabilities.new
+        base.attached_capabilities.allow(*opt['A'].value.split(',')) if opt['A'].count > 0
+        base.attached_capabilities.drop(*opt['D'].value.split(','))  if opt['D'].count > 0
+      end
+
+      base.attach(*exe)
+    end
 
     private
 

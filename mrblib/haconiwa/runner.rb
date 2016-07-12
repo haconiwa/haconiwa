@@ -30,6 +30,24 @@ module Haconiwa
       end
     end
 
+    def attach(exe)
+      base = @base
+      pid = Process.fork do
+        ::Namespace.setns(base.namespace.to_flag, pid: base.pid)
+
+        apply_cgroup(base)
+        do_chroot(base, false)
+        Exec.exec(*exe)
+      end
+
+      pid, status = Process.waitpid2 pid
+      if status.success?
+        puts "Process successfullly exited: #{status.inspect}"
+      else
+        puts "Process failed: #{status.inspect}"
+      end
+    end
+
     def jail_pid(base)
       if base.namespace.use_pid_ns
         ::Namespace.unshare(::Namespace::CLONE_NEWPID)
@@ -37,7 +55,7 @@ module Haconiwa
     end
 
     def apply_namespace(base)
-      ::Namespace.unshare(base.namespace.to_ns_flag)
+      ::Namespace.unshare(base.namespace.to_flag_without_pid)
     end
 
     def apply_filesystem(base)
@@ -102,10 +120,10 @@ module Haconiwa
       end
     end
 
-    def do_chroot(base)
+    def do_chroot(base, remount_procfs=true)
       Dir.chroot base.filesystem.chroot
       Dir.chdir "/"
-      if base.filesystem.mount_independent_procfs
+      if remount_procfs && base.filesystem.mount_independent_procfs
         Mount.new.mount("proc", "/proc", type: "proc")
       end
     end
