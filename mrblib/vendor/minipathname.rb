@@ -4,7 +4,7 @@ class Pathname
   end
 
   def join(*paths)
-    @path = clean_slashes([@path, *paths].flatten.join('/'))
+    Pathname.new clean_slashes([@path, *paths].flatten.join('/'))
   end
 
   def to_s
