@@ -179,14 +179,13 @@ module Haconiwa
   end
 
   class MountPoint
-    def initialize(point, options)
+    def initialize(point, options={})
       @src = point
       @dest = options.delete(:to)
-      @readonly = options.delete(:readonly)
       @fs = options.delete(:fs)
       @options = options
     end
-    attr_accessor :src, :dest, :fs
+    attr_accessor :src, :dest, :fs, :options
   end
 
   def self.define(&b)

@@ -78,9 +78,9 @@ module Haconiwa
       base.filesystem.mount_points.each do |mp|
         case
         when mp.fs
-          m.mount mp.src, mp.dest, type: mp.fs
+          m.mount mp.src, mp.dest, mp.options.merge(type: mp.fs)
         else
-          m.bind_mount mp.src, mp.dest
+          m.bind_mount mp.src, mp.dest, mp.options
         end
       end
     end
