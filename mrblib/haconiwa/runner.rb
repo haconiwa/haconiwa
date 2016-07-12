@@ -14,7 +14,7 @@ module Haconiwa
         apply_namespace(base)
         apply_filesystem(base)
         apply_cgroup(base)
-        apply_capability(base)
+        apply_capability(base.capabilities)
         do_chroot(base)
         ::Procutil.sethostname(base.name)
 
@@ -49,6 +49,7 @@ module Haconiwa
         ::Namespace.setns(base.namespace.to_flag_without_pid, pid: base.pid)
 
         apply_cgroup(base)
+        apply_capability(base.attached_capabilities)
         do_chroot(base, false)
         Exec.exec(*exe)
       end
@@ -118,16 +119,16 @@ module Haconiwa
 
     # TODO: check inheritable
     #       and handling when it is non-root
-    def apply_capability(base)
-      if base.capabilities.acts_as_whitelist?
-        ids = base.capabilities.whitelist_ids
+    def apply_capability(capabilities)
+      if capabilities.acts_as_whitelist?
+        ids = capabilities.whitelist_ids
         (0..38).each do |cap|
           break unless ::Capability.supported? cap
           next if ids.include?(cap)
           ::Capability.drop_bound cap
         end
       else
-        base.capabilities.blacklist_ids.each do |cap|
+        capabilities.blacklist_ids.each do |cap|
           ::Capability.drop_bound cap
         end
       end
