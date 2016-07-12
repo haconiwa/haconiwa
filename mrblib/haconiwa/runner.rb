@@ -42,8 +42,11 @@ module Haconiwa
         end
       end
 
+      if base.namespace.use_pid_ns
+        ::Namespace.setns(::Namespace::CLONE_NEWPID, pid: base.pid)
+      end
       pid = Process.fork do
-        ::Namespace.setns(base.namespace.to_flag, pid: base.pid)
+        ::Namespace.setns(base.namespace.to_flag_without_pid, pid: base.pid)
 
         apply_cgroup(base)
         do_chroot(base, false)
