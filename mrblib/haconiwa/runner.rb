@@ -20,9 +20,11 @@ module Haconiwa
 
         Exec.exec(*base.init_command)
       end
+      File.open(base.container_pid_file, 'w') {|f| f.write pid }
 
       pid, status = Process.waitpid2 pid
       cleanup_cgroup(base)
+      File.unlink base.container_pid_file
       if status.success?
         puts "Container successfullly exited: #{status.inspect}"
       else
@@ -32,6 +34,14 @@ module Haconiwa
 
     def attach(exe)
       base = @base
+      if !base.pid
+        if File.exist? base.container_pid_file
+          base.pid = File.read(base.container_pid_file).to_i
+        else
+          raise "PID file #{base.container_pid_file} doesn't exist. You may be specifying container PID by -t option"
+        end
+      end
+
       pid = Process.fork do
         ::Namespace.setns(base.namespace.to_flag, pid: base.pid)
 
