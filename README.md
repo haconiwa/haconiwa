@@ -13,7 +13,7 @@ Install them and then download from [latest](https://github.com/haconiwa/haconiw
 ```bash
 sudo yum install libcap argtable
 # For Ubuntu or Debian it may be:
-#     sudo apt-get install libcap2 libargtable2
+#     sudo apt-get install libcap2 libargtable2-0
 
 VERSION=0.1.0
 wget https://github.com/haconiwa/haconiwa/releases/download/v${VERSION}/haconiwa-v${VERSION}.x86_64-pc-linux-gnu.tgz
