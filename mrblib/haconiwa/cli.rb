@@ -39,6 +39,12 @@ module Haconiwa
       base.attach(*exe)
     end
 
+    def self.revisions
+      puts "mgem and mruby revisions:"
+      puts "--------"
+      puts Haconiwa.mrbgem_revisions.to_a.map{|a| sprintf "%-24s%s", *a }.join("\n")
+    end
+
     private
 
     def self.get_script_and_eval(args)

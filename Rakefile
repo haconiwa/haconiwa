@@ -1,11 +1,14 @@
 require 'fileutils'
 
-MRUBY_VERSION="1.2.0"
+MRUBY_VERSION=ENV["MRUBY_VERSION"] || "1.2.0"
 
 file :mruby do
-  #sh "git clone --depth=1 https://github.com/mruby/mruby"
-  sh "curl -L --fail --retry 3 --retry-delay 1 https://github.com/mruby/mruby/archive/1.2.0.tar.gz -s -o - | tar zxf -"
-  FileUtils.mv("mruby-1.2.0", "mruby")
+  cmd =  "git clone --depth=1 git://github.com/mruby/mruby.git"
+  if MRUBY_VERSION != 'master'
+    cmd << " && cd mruby"
+    cmd << " && git fetch --tags && git checkout $(git rev-parse #{MRUBY_VERSION})"
+  end
+  sh cmd
 end
 
 APP_NAME=ENV["APP_NAME"] || "haconiwa"
