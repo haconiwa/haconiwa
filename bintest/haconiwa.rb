@@ -1,6 +1,6 @@
 require 'open3'
 
-load File.join(File.dirname(__FILE__), "../../mrblib/haconiwa/version.rb")
+load File.join(File.dirname(__FILE__), "../mrblib/haconiwa/version.rb")
 
 BIN_PATH = File.join(File.dirname(__FILE__), "../mruby/bin/haconiwa")
 
