@@ -30,8 +30,8 @@ module Haconiwa
 
       base.pid  = opt['t'].value if opt['t'].exist?
       base.name = opt['n'].value if opt['n'].exist?
+      base.attached_capabilities = Capabilities.new
       if opt['A'].exist? or opt['D'].exist?
-        base.attached_capabilities = Capabilities.new
         base.attached_capabilities.allow(*opt['A'].value.split(',')) if opt['A'].exist?
         base.attached_capabilities.drop(*opt['D'].value.split(','))  if opt['D'].exist?
       end
