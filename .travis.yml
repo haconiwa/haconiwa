@@ -14,6 +14,6 @@ branches:
 before_install:
     - sudo apt-get -qq update
 install:
-    - sudo apt-get -qq install rake bison git gperf libcap-dev libargtable2-dev
+    - sudo apt-get -qq install rake bison git gperf libcap-dev libcgroup-dev libargtable2-dev
 script:
   - rake test
