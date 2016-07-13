@@ -50,8 +50,4 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   end
 
   spec.save_dependent_mgem_revisions
-
-  if system("test -f /etc/lsb-release")
-    spec.linker.libraries << 'libcgroup'
-  end
 end
