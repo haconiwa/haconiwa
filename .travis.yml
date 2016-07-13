@@ -2,14 +2,18 @@ language: c
 compiler:
   - gcc
   - clang
+env:
+  - MRUBY_VERSION=1.2.0
+  - MRUBY_VERSION=master
+matrix:
+  allow_failures:
+    - env: MRUBY_VERSION=master
+branches:
+  only:
+    - master
 before_install:
     - sudo apt-get -qq update
 install:
-    - sudo apt-get -qq install rake bison git gperf
-before_script:
-  - cd ../
-  - git clone https://github.com/mruby/mruby.git
-  - cd mruby
-  - cp -fp ../mruby-haconiwa-core/.travis_build_config.rb build_config.rb
+    - sudo apt-get -qq install rake bison git gperf cgroup-lite libpam0g-dev autotools-dev libcap-dev libargtable2-dev
 script:
-  - make all test
+  - rake test
