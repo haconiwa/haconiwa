@@ -1,3 +1,6 @@
+DEFS_FILE = File.expand_path('../src/REVISIONS.defs', __FILE__) unless defined?(DEFS_FILE)
+system "rm -rf #{DEFS_FILE}"
+
 MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.license = 'GPL v3'
   spec.authors = 'Uchio Kondo'
@@ -24,4 +27,26 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.add_dependency 'mruby-namespace' , :github => 'haconiwa/mruby-namespace'
   spec.add_dependency 'mruby-mount'     , :github => 'haconiwa/mruby-mount'
 
+  def spec.save_dependent_mgem_revisions
+    file DEFS_FILE do
+      f = open(DEFS_FILE, 'w')
+      corerev = `git rev-parse HEAD`.chomp
+      f.puts %Q<{"MRUBY_CORE_REVISION", "#{corerev}"},>
+      `find ./build/mrbgems -type d -name 'mruby-*'`.each_line do |l|
+        l = l.chomp
+        if File.directory? "#{l}/.git"
+          gemname = l.split('/').last
+          rev = `git --git-dir #{l}/.git rev-parse HEAD`.chomp
+          f.puts %Q<{"#{gemname}", "#{rev}"},>
+        end
+      end
+      f.close
+      puts "GEN\t#{DEFS_FILE}"
+    end
+
+    libmruby_a = libfile("#{build.build_dir}/lib/libmruby")
+    file libmruby_a => DEFS_FILE
+  end
+
+  spec.save_dependent_mgem_revisions
 end
