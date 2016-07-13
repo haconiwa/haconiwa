@@ -42,6 +42,10 @@ module Haconiwa
         end
       end
 
+      if exe.empty?
+        exe = "/bin/bash"
+      end
+
       if base.namespace.use_pid_ns
         ::Namespace.setns(::Namespace::CLONE_NEWPID, pid: base.pid)
       end
