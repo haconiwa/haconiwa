@@ -1,5 +1,7 @@
 require 'open3'
 
+load File.join(File.dirname(__FILE__), "../../mrblib/haconiwa/version.rb")
+
 BIN_PATH = File.join(File.dirname(__FILE__), "../mruby/bin/haconiwa")
 
 assert('revision') do
@@ -13,7 +15,7 @@ assert('version') do
   output, status = Open3.capture2(BIN_PATH, "version")
 
   assert_true status.success?, "Process did not exit cleanly"
-  assert_include output, "v0.0.9"
+  assert_include output, "v#{Haconiwa::VERSION}"
 end
 
 assert('show help') do
