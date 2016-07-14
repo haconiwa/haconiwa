@@ -99,8 +99,10 @@ namespace :release do
   end
 
   task :run_ghr do
-    sh "cd #{pwd} && git fetch origin"
+    sh "cd #{pwd} && test \"$(git rev-parse --abbrev-ref HEAD)\" = 'master'"
+    sh "cd #{pwd} && git pull --rebase --prune origin master"
     sh "cd #{pwd} && ghr -u haconiwa v#{Haconiwa::VERSION} pkg/"
+    sh "cd #{pwd} && git fetch origin"
   end
 
   task :shipit => [:tarball, :run_ghr]
