@@ -3,10 +3,11 @@ module Haconiwa
     def self.run(args)
       opt = Argtable.new
       opt.literal('D', 'daemon', "Force the container to be daemon")
+      opt.literal('h', 'help', "Show help")
       opt.enable_catchall('HACO_FILE [-- COMMAND...]', '', 32)
       e = opt.parse(args)
 
-      if opt['h'].count > 0
+      if opt['h'].exist?
         opt.glossary
         exit
       end
@@ -30,7 +31,7 @@ module Haconiwa
       opt.enable_catchall('HACO_FILE [-- COMMAND...]', '', 32)
       e = opt.parse(args)
 
-      if opt['h'].count > 0
+      if opt['h'].exist?
         opt.glossary
         exit
       end
