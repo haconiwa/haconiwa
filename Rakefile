@@ -26,8 +26,9 @@ desc "compile binary"
 task :compile => [:all] do
   bins = ["mruby", "mirb", APP_NAME]
   bins.each do |binname|
-    bin = %Q(#{mruby_root}/build/x86_64-pc-linux-gnu/bin/#{binname})
-    sh "strip --strip-unneeded #{bin}" if File.exist?(bin)
+    %W(#{mruby_root}/build/x86_64-pc-linux-gnu/bin/#{binname} #{mruby_root}/build/x86_64-pc-linux-gnu_mirb/bin/#{binname}).each do |bin|
+      sh "strip --strip-unneeded #{bin}" if File.exist?(bin)
+    end
   end
 end
 
@@ -89,9 +90,9 @@ namespace :release do
   end
 
   task :copy => ["release:clean", :compile] do
-    sh "cp #{mruby_root}/build/x86_64-pc-linux-gnu/bin/mruby    #{pwd}/tmp/hacorb"
-    sh "cp #{mruby_root}/build/x86_64-pc-linux-gnu/bin/mirb     #{pwd}/tmp/hacoirb"
-    sh "cp #{mruby_root}/build/x86_64-pc-linux-gnu/bin/haconiwa #{pwd}/tmp/haconiwa"
+    sh "cp #{mruby_root}/build/x86_64-pc-linux-gnu/bin/mruby     #{pwd}/tmp/hacorb"
+    sh "cp #{mruby_root}/build/x86_64-pc-linux-gnu_mirb/bin/mirb #{pwd}/tmp/hacoirb"
+    sh "cp #{mruby_root}/build/x86_64-pc-linux-gnu/bin/haconiwa  #{pwd}/tmp/haconiwa"
   end
 
   task :tarball => :copy do
