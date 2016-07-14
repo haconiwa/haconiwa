@@ -20,6 +20,14 @@ MRuby::Build.new('x86_64-pc-linux-gnu') do |conf|
   gem_config(conf)
 end
 
+MRuby::Build.new('x86_64-pc-linux-gnu_mirb') do |conf|
+  toolchain :gcc
+
+  gem_config(conf)
+  conf.gem core: 'mruby-bin-mirb'
+  conf.bins = ["mirb"]
+end
+
 # MRuby::CrossBuild.new('i686-pc-linux-gnu') do |conf|
 #   toolchain :gcc
 

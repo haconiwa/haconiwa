@@ -10,7 +10,7 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.add_dependency 'mruby-process'   , :mgem => 'mruby-process'
   spec.add_dependency 'mruby-io'        , :mgem => 'mruby-io'
   spec.add_dependency 'mruby-eval'      , :core => 'mruby-eval'
-  spec.add_dependency 'mruby-bin-mirb'  , :core => 'mruby-bin-mirb'
+  #spec.add_dependency 'mruby-bin-mirb'  , :core => 'mruby-bin-mirb'
   spec.add_dependency 'mruby-bin-mruby' , :core => 'mruby-bin-mruby'
   spec.add_dependency 'mruby-print'     , :core => 'mruby-print'
   spec.add_dependency 'mruby-array-ext' , :core => 'mruby-array-ext'
@@ -19,7 +19,7 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.add_dependency 'mruby-sprintf'   , :core => 'mruby-sprintf'
 
   spec.add_dependency 'mruby-cgroup'    , :github => 'matsumoto-r/mruby-cgroup'
-  spec.add_dependency 'mruby-capability', :github => 'matsumoto-r/mruby-capability'
+  spec.add_dependency 'mruby-capability', :github => 'haconiwa/mruby-capability', :branch => 'static-link'
   spec.add_dependency 'mruby-resource'  , :github => 'harasou/mruby-resource'
   spec.add_dependency 'mruby-dir'       , :github => 'iij/mruby-dir' # with Dir#chroot
   spec.add_dependency 'mruby-procutil'  , :github => 'haconiwa/mruby-procutil'
