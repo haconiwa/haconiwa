@@ -8,7 +8,7 @@ module Haconiwa
     end
 
     def run(init_command)
-      wrap_daemonize do |base|
+      wrap_daemonize do |base, notifier|
         jail_pid(base)
         pid = Process.fork do
           apply_namespace(base)
@@ -22,6 +22,9 @@ module Haconiwa
         end
         File.open(base.container_pid_file, 'w') {|f| f.write pid }
 
+        notifier.puts pid.to_s
+        notifier.close # notify container is up
+
         pid, status = Process.waitpid2 pid
         cleanup_cgroup(base)
         File.unlink base.container_pid_file
@@ -34,37 +37,36 @@ module Haconiwa
     end
 
     def attach(exe)
-      wrap_daemonize do |base|
-        if !base.pid
-          if File.exist? base.container_pid_file
-            base.pid = File.read(base.container_pid_file).to_i
-          else
-            raise "PID file #{base.container_pid_file} doesn't exist. You may be specifying container PID by -t option"
-          end
-        end
-
-        if exe.empty?
-          exe = "/bin/bash"
-        end
-
-        if base.namespace.use_pid_ns
-          ::Namespace.setns(::Namespace::CLONE_NEWPID, pid: base.pid)
-        end
-        pid = Process.fork do
-          ::Namespace.setns(base.namespace.to_flag_without_pid, pid: base.pid)
-
-          apply_cgroup(base)
-          apply_capability(base.attached_capabilities)
-          do_chroot(base, false)
-          Exec.exec(*exe)
-        end
-
-        pid, status = Process.waitpid2 pid
-        if status.success?
-          puts "Process successfullly exited: #{status.inspect}"
+      base = @base
+      if !base.pid
+        if File.exist? base.container_pid_file
+          base.pid = File.read(base.container_pid_file).to_i
         else
-          puts "Process failed: #{status.inspect}"
+          raise "PID file #{base.container_pid_file} doesn't exist. You may be specifying container PID by -t option"
         end
+      end
+
+      if exe.empty?
+        exe = "/bin/bash"
+      end
+
+      if base.namespace.use_pid_ns
+        ::Namespace.setns(::Namespace::CLONE_NEWPID, pid: base.pid)
+      end
+      pid = Process.fork do
+        ::Namespace.setns(base.namespace.to_flag_without_pid, pid: base.pid)
+
+        apply_cgroup(base)
+        apply_capability(base.attached_capabilities)
+        do_chroot(base, false)
+        Exec.exec(*exe)
+      end
+
+      pid, status = Process.waitpid2 pid
+      if status.success?
+        puts "Process successfullly exited: #{status.inspect}"
+      else
+        puts "Process failed: #{status.inspect}"
       end
     end
 
@@ -72,11 +74,15 @@ module Haconiwa
 
     def wrap_daemonize(&b)
       if @base.daemon?
-        Process.fork do
-          b.call(@base)
+        r, w = IO.pipe
+        ppid = Process.fork do
+          b.call(@base, w)
         end
+        w.close
+        pid = r.read
+        puts "Container successfullly up. PID={container: #{pid.chomp}, supervisor: #{ppid}}"
       else
-        b.call(@base)
+        b.call(@base, nil)
       end
     end
 
