@@ -54,6 +54,30 @@ module Haconiwa
       base.attach(*exe)
     end
 
+    def self.kill(args)
+      opt = Argtable.new
+      opt.integer('t', 'target', 'PID', "Container's PID to kill.")
+      opt.string('s', 'signal', 'SIGFOO', "Signal name. default to TERM")
+      opt.literal('h', 'help', "Show help")
+      opt.enable_catchall('[HACO_FILE]', '', 1)
+      e = opt.parse(args)
+
+      if opt['h'].exist?
+        opt.glossary
+        exit
+      end
+
+      if e > 0
+        opt.glossary
+        exit 1
+      end
+
+      base, _  = get_script_and_eval(opt.catchall.values)
+      base.pid = opt['t'].value if opt['t'].exist?
+      signame  = opt['s'].exist? ? opt['s'].value : "TERM"
+      base.kill(signame)
+    end
+
     def self.revisions
       puts "mgem and mruby revisions:"
       puts "--------"

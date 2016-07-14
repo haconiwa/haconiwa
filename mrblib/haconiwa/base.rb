@@ -64,6 +64,11 @@ module Haconiwa
       LinuxRunner.new(self).attach(run_command)
     end
 
+    def kill(signame)
+      self.container_pid_file ||= default_container_pid_file
+      LinuxRunner.new(self).kill(signame)
+    end
+
     def default_container_pid_file
       "/var/run/haconiwa-#{@name}.pid"
     end

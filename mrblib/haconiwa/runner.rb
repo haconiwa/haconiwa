@@ -70,6 +70,38 @@ module Haconiwa
       end
     end
 
+    def kill(sigtype)
+      if !@base.pid
+        if File.exist? @base.container_pid_file
+          @base.pid = File.read(@base.container_pid_file).to_i
+        else
+          raise "PID file #{@base.container_pid_file} doesn't exist. You may be specifying container PID by -t option - or the container is already killed."
+        end
+      end
+
+      case sigtype.to_s
+      when "INT"
+        Process.kill :INT, @base.pid
+      when "TERM"
+        Process.kill :TERM, @base.pid
+      when "KILL"
+        Process.kill :KILL, @base.pid
+      else
+        raise "Invalid or unsupported signal type: #{sigtype}"
+      end
+
+      10.times do
+        sleep 0.1
+        unless File.exist?(@base.container_pid_file)
+          puts "Kill success"
+          Process.exit 0
+        end
+      end
+
+      puts "Killing seemd to be failed in 1 second"
+      Process.exit 1
+    end
+
     private
 
     def wrap_daemonize(&b)
