@@ -6,16 +6,14 @@
 
 ## Install binary
 
-Pre-required package: `libcap`.
-
-Install them and then download from [latest](https://github.com/haconiwa/haconiwa/releases):
+Just download from [latest](https://github.com/haconiwa/haconiwa/releases):
 
 ```bash
 sudo yum install libcap
 # For Ubuntu or Debian it may be:
 #     sudo apt-get install libcap2
 
-VERSION=0.1.0
+VERSION=0.1.2
 wget https://github.com/haconiwa/haconiwa/releases/download/v${VERSION}/haconiwa-v${VERSION}.x86_64-pc-linux-gnu.tgz
 tar xzf haconiwa-v${VERSION}.x86_64-pc-linux-gnu.tgz
 sudo install hacorb hacoirb haconiwa /usr/local/bin
@@ -27,6 +25,9 @@ haconiwa
 #     version   - show version
 #     revisions - show mgem/mruby revisions which haconiwa bin uses
 ```
+
+NOTE: If you'd like using cgroup-related features, install cgroup package such as `cgroup-lite` (Ubuntu) or `cgroup-bin` (Debian).
+If you would not, these installation are not required.
 
 ## Example
 
