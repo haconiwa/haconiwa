@@ -8,61 +8,75 @@ module Haconiwa
     end
 
     def run(init_command)
-      base = @base
-      jail_pid(base)
-      pid = Process.fork do
-        apply_namespace(base)
-        apply_filesystem(base)
-        apply_cgroup(base)
-        apply_capability(base.capabilities)
-        do_chroot(base)
-        ::Procutil.sethostname(base.name)
+      wrap_daemonize do |base|
+        jail_pid(base)
+        pid = Process.fork do
+          apply_namespace(base)
+          apply_filesystem(base)
+          apply_cgroup(base)
+          apply_capability(base.capabilities)
+          do_chroot(base)
+          ::Procutil.sethostname(base.name)
 
-        Exec.exec(*base.init_command)
-      end
-      File.open(base.container_pid_file, 'w') {|f| f.write pid }
+          Exec.exec(*base.init_command)
+        end
+        File.open(base.container_pid_file, 'w') {|f| f.write pid }
 
-      pid, status = Process.waitpid2 pid
-      cleanup_cgroup(base)
-      File.unlink base.container_pid_file
-      if status.success?
-        puts "Container successfullly exited: #{status.inspect}"
-      else
-        puts "Container failed: #{status.inspect}"
+        pid, status = Process.waitpid2 pid
+        cleanup_cgroup(base)
+        File.unlink base.container_pid_file
+        if status.success?
+          puts "Container successfullly exited: #{status.inspect}"
+        else
+          puts "Container failed: #{status.inspect}"
+        end
       end
     end
 
     def attach(exe)
-      base = @base
-      if !base.pid
-        if File.exist? base.container_pid_file
-          base.pid = File.read(base.container_pid_file).to_i
+      wrap_daemonize do |base|
+        if !base.pid
+          if File.exist? base.container_pid_file
+            base.pid = File.read(base.container_pid_file).to_i
+          else
+            raise "PID file #{base.container_pid_file} doesn't exist. You may be specifying container PID by -t option"
+          end
+        end
+
+        if exe.empty?
+          exe = "/bin/bash"
+        end
+
+        if base.namespace.use_pid_ns
+          ::Namespace.setns(::Namespace::CLONE_NEWPID, pid: base.pid)
+        end
+        pid = Process.fork do
+          ::Namespace.setns(base.namespace.to_flag_without_pid, pid: base.pid)
+
+          apply_cgroup(base)
+          apply_capability(base.attached_capabilities)
+          do_chroot(base, false)
+          Exec.exec(*exe)
+        end
+
+        pid, status = Process.waitpid2 pid
+        if status.success?
+          puts "Process successfullly exited: #{status.inspect}"
         else
-          raise "PID file #{base.container_pid_file} doesn't exist. You may be specifying container PID by -t option"
+          puts "Process failed: #{status.inspect}"
         end
       end
+    end
 
-      if exe.empty?
-        exe = "/bin/bash"
-      end
+    private
 
-      if base.namespace.use_pid_ns
-        ::Namespace.setns(::Namespace::CLONE_NEWPID, pid: base.pid)
-      end
-      pid = Process.fork do
-        ::Namespace.setns(base.namespace.to_flag_without_pid, pid: base.pid)
-
-        apply_cgroup(base)
-        apply_capability(base.attached_capabilities)
-        do_chroot(base, false)
-        Exec.exec(*exe)
-      end
-
-      pid, status = Process.waitpid2 pid
-      if status.success?
-        puts "Process successfullly exited: #{status.inspect}"
+    def wrap_daemonize(&b)
+      if @base.daemon?
+        Process.fork do
+          b.call(@base)
+        end
       else
-        puts "Process failed: #{status.inspect}"
+        b.call(@base)
       end
     end
 
