@@ -76,6 +76,8 @@ module Haconiwa
       if @base.daemon?
         r, w = IO.pipe
         ppid = Process.fork do
+          # TODO: logging
+          Haconiwa.daemon_fd_reopen
           b.call(@base, w)
         end
         w.close
