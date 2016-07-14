@@ -1,8 +1,22 @@
 module Haconiwa
   module Cli
     def self.run(args)
-      args.shift
-      base, init = get_script_and_eval(args)
+      opt = Argtable.new
+      opt.literal('D', 'daemon', "Force the container to be daemon")
+      opt.enable_catchall('HACO_FILE [-- COMMAND...]', '', 32)
+      e = opt.parse(args)
+
+      if opt['h'].count > 0
+        opt.glossary
+        exit
+      end
+
+      if e > 0
+        opt.glossary
+        exit 1
+      end
+      base, init = get_script_and_eval(opt.catchall.values)
+      base.daemonize! if opt['D'].exist?
       base.run(*init)
     end
 
