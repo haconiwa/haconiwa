@@ -8,6 +8,10 @@ module Haconiwa
     end
 
     def run(init_command)
+      if File.exist? @base.container_pid_file
+        raise "PID file #{@base.container_pid_file} exists. You may be creating the container with existing name #{@base.name}!"
+      end
+
       wrap_daemonize do |base, notifier|
         jail_pid(base)
         pid = Process.fork do
