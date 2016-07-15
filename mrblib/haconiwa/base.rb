@@ -27,6 +27,7 @@ module Haconiwa
       @init_command = ["/bin/bash"] # FIXME: maybe /sbin/init is better
       @container_pid_file = nil
       @pid = nil
+      @daemon = false
     end
 
     def init_command=(cmd)
@@ -63,8 +64,21 @@ module Haconiwa
       LinuxRunner.new(self).attach(run_command)
     end
 
+    def kill(signame)
+      self.container_pid_file ||= default_container_pid_file
+      LinuxRunner.new(self).kill(signame)
+    end
+
     def default_container_pid_file
       "/var/run/haconiwa-#{@name}.pid"
+    end
+
+    def daemonize!
+      @daemon = true
+    end
+
+    def daemon?
+      !! @daemon
     end
   end
 

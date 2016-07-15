@@ -1,8 +1,23 @@
 module Haconiwa
   module Cli
     def self.run(args)
-      args.shift
-      base, init = get_script_and_eval(args)
+      opt = Argtable.new
+      opt.literal('D', 'daemon', "Force the container to be daemon")
+      opt.literal('h', 'help', "Show help")
+      opt.enable_catchall('HACO_FILE [-- COMMAND...]', '', 32)
+      e = opt.parse(args)
+
+      if opt['h'].exist?
+        opt.glossary
+        exit
+      end
+
+      if e > 0
+        opt.glossary
+        exit 1
+      end
+      base, init = get_script_and_eval(opt.catchall.values)
+      base.daemonize! if opt['D'].exist?
       base.run(*init)
     end
 
@@ -16,7 +31,7 @@ module Haconiwa
       opt.enable_catchall('HACO_FILE [-- COMMAND...]', '', 32)
       e = opt.parse(args)
 
-      if opt['h'].count > 0
+      if opt['h'].exist?
         opt.glossary
         exit
       end
@@ -37,6 +52,30 @@ module Haconiwa
       end
 
       base.attach(*exe)
+    end
+
+    def self.kill(args)
+      opt = Argtable.new
+      opt.integer('t', 'target', 'PID', "Container's PID to kill.")
+      opt.string('s', 'signal', 'SIGFOO', "Signal name. default to TERM")
+      opt.literal('h', 'help', "Show help")
+      opt.enable_catchall('[HACO_FILE]', '', 1)
+      e = opt.parse(args)
+
+      if opt['h'].exist?
+        opt.glossary
+        exit
+      end
+
+      if e > 0
+        opt.glossary
+        exit 1
+      end
+
+      base, _  = get_script_and_eval(opt.catchall.values)
+      base.pid = opt['t'].value if opt['t'].exist?
+      signame  = opt['s'].exist? ? opt['s'].value : "TERM"
+      base.kill(signame)
     end
 
     def self.revisions

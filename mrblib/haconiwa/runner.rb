@@ -8,27 +8,35 @@ module Haconiwa
     end
 
     def run(init_command)
-      base = @base
-      jail_pid(base)
-      pid = Process.fork do
-        apply_namespace(base)
-        apply_filesystem(base)
-        apply_cgroup(base)
-        apply_capability(base.capabilities)
-        do_chroot(base)
-        ::Procutil.sethostname(base.name)
-
-        Exec.exec(*base.init_command)
+      if File.exist? @base.container_pid_file
+        raise "PID file #{@base.container_pid_file} exists. You may be creating the container with existing name #{@base.name}!"
       end
-      File.open(base.container_pid_file, 'w') {|f| f.write pid }
 
-      pid, status = Process.waitpid2 pid
-      cleanup_cgroup(base)
-      File.unlink base.container_pid_file
-      if status.success?
-        puts "Container successfullly exited: #{status.inspect}"
-      else
-        puts "Container failed: #{status.inspect}"
+      wrap_daemonize do |base, notifier|
+        jail_pid(base)
+        pid = Process.fork do
+          apply_namespace(base)
+          apply_filesystem(base)
+          apply_cgroup(base)
+          apply_capability(base.capabilities)
+          do_chroot(base)
+          ::Procutil.sethostname(base.name)
+
+          Exec.exec(*base.init_command)
+        end
+        File.open(base.container_pid_file, 'w') {|f| f.write pid }
+
+        notifier.puts pid.to_s
+        notifier.close # notify container is up
+
+        pid, status = Process.waitpid2 pid
+        cleanup_cgroup(base)
+        File.unlink base.container_pid_file
+        if status.success?
+          puts "Container successfullly exited: #{status.inspect}"
+        else
+          puts "Container failed: #{status.inspect}"
+        end
       end
     end
 
@@ -63,6 +71,56 @@ module Haconiwa
         puts "Process successfullly exited: #{status.inspect}"
       else
         puts "Process failed: #{status.inspect}"
+      end
+    end
+
+    def kill(sigtype)
+      if !@base.pid
+        if File.exist? @base.container_pid_file
+          @base.pid = File.read(@base.container_pid_file).to_i
+        else
+          raise "PID file #{@base.container_pid_file} doesn't exist. You may be specifying container PID by -t option - or the container is already killed."
+        end
+      end
+
+      case sigtype.to_s
+      when "INT"
+        Process.kill :INT, @base.pid
+      when "TERM"
+        Process.kill :TERM, @base.pid
+      when "KILL"
+        Process.kill :KILL, @base.pid
+      else
+        raise "Invalid or unsupported signal type: #{sigtype}"
+      end
+
+      10.times do
+        sleep 0.1
+        unless File.exist?(@base.container_pid_file)
+          puts "Kill success"
+          Process.exit 0
+        end
+      end
+
+      puts "Killing seemd to be failed in 1 second"
+      Process.exit 1
+    end
+
+    private
+
+    def wrap_daemonize(&b)
+      if @base.daemon?
+        r, w = IO.pipe
+        ppid = Process.fork do
+          # TODO: logging
+          Procutil.daemon_fd_reopen
+          b.call(@base, w)
+        end
+        w.close
+        pid = r.read
+        puts "Container successfullly up. PID={container: #{pid.chomp}, supervisor: #{ppid}}"
+      else
+        b.call(@base, nil)
       end
     end
 
