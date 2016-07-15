@@ -19,7 +19,7 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.add_dependency 'mruby-sprintf'   , :core => 'mruby-sprintf'
 
   spec.add_dependency 'mruby-cgroup'    , :github => 'matsumoto-r/mruby-cgroup'
-  spec.add_dependency 'mruby-capability', :github => 'haconiwa/mruby-capability', :branch => 'static-link'
+  spec.add_dependency 'mruby-capability', :github => 'matsumoto-r/mruby-capability'
   spec.add_dependency 'mruby-resource'  , :github => 'harasou/mruby-resource'
   spec.add_dependency 'mruby-dir'       , :github => 'iij/mruby-dir' # with Dir#chroot
   spec.add_dependency 'mruby-procutil'  , :github => 'haconiwa/mruby-procutil'
