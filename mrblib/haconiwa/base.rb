@@ -11,7 +11,8 @@ module Haconiwa
 
     attr_reader   :init_command,
                   :uid,
-                  :gid
+                  :gid,
+                  :groups
 
     def self.define(&b)
       base = new
@@ -30,8 +31,8 @@ module Haconiwa
       @container_pid_file = nil
       @pid = nil
       @daemon = false
-      @uid = nil
-      @gid = nil
+      @uid = @gid = nil
+      @groups = []
     end
 
     def init_command=(cmd)
@@ -71,6 +72,18 @@ module Haconiwa
       else
         @gid = newid
       end
+    end
+
+    def groups=(newgroups)
+      @groups.clear
+      newgroups.each do |newid|
+        if newid.is_a?(String)
+          @groups << ::Process::GID.from_name(newid)
+        else
+          @groups << newid
+        end
+      end
+      @groups
     end
 
     def start(*init_command)

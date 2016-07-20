@@ -208,7 +208,10 @@ module Haconiwa
     end
 
     def switch_guid(base)
-      ::Process::Sys.setgid(base.gid) if base.gid
+      if base.gid
+        ::Process::Sys.setgid(base.gid)
+        ::Process::Sys.__setgroups(base.groups + [base.gid])
+      end
       ::Process::Sys.setuid(base.uid) if base.uid
     end
 
