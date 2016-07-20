@@ -9,7 +9,9 @@ module Haconiwa
                   :attached_capabilities,
                   :pid
 
-    attr_reader   :init_command
+    attr_reader   :init_command,
+                  :uid,
+                  :gid
 
     def self.define(&b)
       base = new
@@ -28,6 +30,8 @@ module Haconiwa
       @container_pid_file = nil
       @pid = nil
       @daemon = false
+      @uid = nil
+      @gid = nil
     end
 
     def init_command=(cmd)
@@ -51,6 +55,22 @@ module Haconiwa
     def mount_independent_procfs
       self.namespace.unshare "mount"
       self.filesystem.mount_independent_procfs = true
+    end
+
+    def uid=(newid)
+      if newid.is_a?(String)
+        @uid = ::Process::UID.from_name newid
+      else
+        @uid = newid
+      end
+    end
+
+    def gid=(newid)
+      if newid.is_a?(String)
+        @gid = ::Process::GID.from_name newid
+      else
+        @gid = newid
+      end
     end
 
     def start(*init_command)

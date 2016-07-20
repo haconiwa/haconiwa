@@ -1,0 +1,20 @@
+# -*- mode: ruby -*-
+Haconiwa.define do |config|
+  config.name = "nonroot001" # to be hostname
+  config.init_command = "/bin/sh" # to be first process
+
+  root = Pathname.new("/var/haconiwa/root")
+  config.add_mount_point "/var/lib/haconiwa", to: root
+  config.add_mount_point "tmpfs", to: root.join("tmp"), fs: "tmpfs"
+  config.add_mount_point "/var/haconiwa/user_homes/", to: root.join("home/haconiwa")
+  config.mount_independent_procfs
+  config.chroot_to root
+
+  config.namespace.unshare "mount"
+  config.namespace.unshare "ipc"
+  config.namespace.unshare "uts"
+  config.namespace.unshare "pid"
+
+  config.uid = "vagrant"
+  config.gid = "vagrant"
+end

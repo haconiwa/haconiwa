@@ -22,12 +22,15 @@ module Haconiwa
           do_chroot(base)
           ::Procutil.sethostname(base.name)
 
+          switch_guid(base)
           Exec.exec(*base.init_command)
         end
         File.open(base.container_pid_file, 'w') {|f| f.write pid }
 
-        notifier.puts pid.to_s
-        notifier.close # notify container is up
+        if notifier
+          notifier.puts pid.to_s
+          notifier.close # notify container is up
+        end
 
         pid, status = Process.waitpid2 pid
         cleanup_cgroup(base)
@@ -204,6 +207,11 @@ module Haconiwa
       end
     end
 
-    # TODO: resource limit and setguid
+    def switch_guid(base)
+      ::Process::Sys.setgid(base.gid) if base.gid
+      ::Process::Sys.setuid(base.uid) if base.uid
+    end
+
+    # TODO: resource limit
   end
 end
