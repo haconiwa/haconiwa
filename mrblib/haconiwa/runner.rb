@@ -17,17 +17,21 @@ module Haconiwa
         pid = Process.fork do
           apply_namespace(base)
           apply_filesystem(base)
+          apply_rlimit(base.resource)
           apply_cgroup(base)
           apply_capability(base.capabilities)
           do_chroot(base)
           ::Procutil.sethostname(base.name)
 
+          switch_guid(base)
           Exec.exec(*base.init_command)
         end
         File.open(base.container_pid_file, 'w') {|f| f.write pid }
 
-        notifier.puts pid.to_s
-        notifier.close # notify container is up
+        if notifier
+          notifier.puts pid.to_s
+          notifier.close # notify container is up
+        end
 
         pid, status = Process.waitpid2 pid
         cleanup_cgroup(base)
@@ -196,6 +200,14 @@ module Haconiwa
       end
     end
 
+    def apply_rlimit(rlimit)
+      rlimit.limits.each do |limit|
+        type = ::Resource.const_get("RLIMIT_#{limit[0]}")
+        value = [:unlimited, :infinity].include?(limit[1]) ? ::Resource::RLIM_INFINITY : limit[1]
+        ::Resource.setrlimit(type, value)
+      end
+    end
+
     def do_chroot(base, remount_procfs=true)
       Dir.chroot base.filesystem.chroot
       Dir.chdir "/"
@@ -204,6 +216,12 @@ module Haconiwa
       end
     end
 
-    # TODO: resource limit and setguid
+    def switch_guid(base)
+      if base.gid
+        ::Process::Sys.setgid(base.gid)
+        ::Process::Sys.__setgroups(base.groups + [base.gid])
+      end
+      ::Process::Sys.setuid(base.uid) if base.uid
+    end
   end
 end

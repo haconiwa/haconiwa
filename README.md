@@ -70,6 +70,7 @@ And `attach` is not concerned with capabilities which is granted to container. S
 
 ### DSL spec
 
+* `config.resource.set_limit` - Set the resource limit of container, using `setrlimit`
 * `config.cgroup` - Assign cgroup parameters via `[]=`
 * `config.namespace.unshare` - Unshare the namespaces like `"mount"`, `"ipc"` or `"pid"`
 * `config.capabilities.allow` - Allow capabilities on container root. Setting parameters other than `:all` should make this acts as whitelist
@@ -77,6 +78,7 @@ And `attach` is not concerned with capabilities which is granted to container. S
 * `config.add_mount_point` - Add the mount point odf container
 * `config.mount_independent_procfs` - Mount the independent /proc directory in the container. Useful if `"pid"` is unshared
 * `config.chroot_to` - The new chroot root
+* `config.uid=/config.gid=` - The new container's running uid/gid. `groups=` is also respected
 
 You can pick your own parameters for your use case of container.
 e.g. just using `mount` namespace unshared, container with common filesystem, limit the cgroups for big resource job and so on.
