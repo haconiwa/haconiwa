@@ -3,6 +3,7 @@ module Haconiwa
     attr_accessor :name,
                   :container_pid_file,
                   :filesystem,
+                  :resource,
                   :cgroup,
                   :namespace,
                   :capabilities,
@@ -22,6 +23,7 @@ module Haconiwa
 
     def initialize
       @filesystem = Filesystem.new
+      @resource = Resource.new
       @cgroup = CGroup.new
       @namespace = Namespace.new
       @capabilities = Capabilities.new
@@ -112,6 +114,17 @@ module Haconiwa
 
     def daemon?
       !! @daemon
+    end
+  end
+
+  class Resource
+    def initialize
+      @limits = []
+    end
+    attr_reader :limits
+
+    def set_limit(type, value)
+      self.limits << [type, value]
     end
   end
 

@@ -17,6 +17,7 @@ module Haconiwa
         pid = Process.fork do
           apply_namespace(base)
           apply_filesystem(base)
+          apply_rlimit(base.resource)
           apply_cgroup(base)
           apply_capability(base.capabilities)
           do_chroot(base)
@@ -199,6 +200,14 @@ module Haconiwa
       end
     end
 
+    def apply_rlimit(rlimit)
+      rlimit.limits.each do |limit|
+        type = ::Resource.const_get("RLIMIT_#{limit[0]}")
+        value = [:unlimited, :infinity].include?(limit[1]) ? ::Resource::RLIM_INFINITY : limit[1]
+        ::Resource.setrlimit(type, value)
+      end
+    end
+
     def do_chroot(base, remount_procfs=true)
       Dir.chroot base.filesystem.chroot
       Dir.chdir "/"
@@ -214,7 +223,5 @@ module Haconiwa
       end
       ::Process::Sys.setuid(base.uid) if base.uid
     end
-
-    # TODO: resource limit
   end
 end
