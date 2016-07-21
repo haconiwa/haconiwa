@@ -22,6 +22,29 @@ haconiwa = Haconiwa::Base.define do |config|
   config.cgroup["cpu.cfs_quota_us"]  =  30000
 
   config.add_handler :USR1 do |b, sig|
-    File.open("/tmp/on_usr1_#{b.name}.txt", "a+") {|f| f.puts Time.now.to_s }
+    File.open("/tmp/log_#{b.name}.txt", "a+") {|f| f.puts "Hello signal: #{Time.now.to_s}" }
+  end
+
+  config.add_handler :USR2 do |b, sig|
+    cpu = ::Cgroup::CPU.new(b.name)
+    File.open("/tmp/log_#{b.name}.txt", "a+") {|f| f.puts "Current cpu.cfs_quota_us = #{cpu.cfs_quota_us}" }
+  end
+
+  config.add_handler :TTIN do |b, sig|
+    cpu = ::Cgroup::CPU.new(b.name)
+    cpu.cfs_quota_us = cpu.cfs_quota_us - 10000
+    if cpu.cfs_quota_us > 0
+      cpu.modify
+      File.open("/tmp/log_#{b.name}.txt", "a+") {|f| f.puts "Changed cpu.cfs_quota_us = #{cpu.cfs_quota_us}" }
+    end
+  end
+
+  config.add_handler :TTOU do |b, sig|
+    cpu = ::Cgroup::CPU.new(b.name)
+    cpu.cfs_quota_us = cpu.cfs_quota_us + 10000
+    if cpu.cfs_quota_us <= cpu.cfs_period_us
+      cpu.modify
+      File.open("/tmp/log_#{b.name}.txt", "a+") {|f| f.puts "Changed cpu.cfs_quota_us = #{cpu.cfs_quota_us}" }
+    end
   end
 end
