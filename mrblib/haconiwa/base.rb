@@ -27,6 +27,7 @@ module Haconiwa
       @cgroup = CGroup.new
       @namespace = Namespace.new
       @capabilities = Capabilities.new
+      @signal_handler = SignalHandler.new(self)
       @attached_capabilities = nil
       @name = "haconiwa-#{Time.now.to_i}"
       @init_command = ["/bin/bash"] # FIXME: maybe /sbin/init is better
@@ -86,6 +87,10 @@ module Haconiwa
         end
       end
       @groups
+    end
+
+    def add_handler(sig, &b)
+      @signal_handler.add_handler(sig, &b)
     end
 
     def start(*init_command)

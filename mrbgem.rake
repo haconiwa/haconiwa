@@ -28,6 +28,7 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.add_dependency 'mruby-mount'     , :github => 'haconiwa/mruby-mount'
   spec.add_dependency 'mruby-process-sys' , :github => 'haconiwa/mruby-process-sys'
   spec.add_dependency 'mruby-argtable'  , :github => 'udzura/mruby-argtable', :branch => 'static-link-argtable3'
+  spec.add_dependency 'mruby-signal'    , :github => 'ksss/mruby-signal'
 
   def spec.save_dependent_mgem_revisions
     file DEFS_FILE do
