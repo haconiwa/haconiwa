@@ -5,9 +5,9 @@ haconiwa = Haconiwa::Base.define do |config|
   config.daemonize!
 
   root = Pathname.new("/var/haconiwa/root")
-  config.add_mount_point "/var/lib/haconiwa", to: root, readonly: true
-  config.add_mount_point "/lib64", to: root.join("lib64"), readonly: true
-  config.add_mount_point "/usr/bin", to: root.join("usr/bin"), readonly: true
+  config.add_mount_point "/var/lib/haconiwa", to: root
+  #config.add_mount_point "/lib64", to: root.join("lib64"), readonly: true
+  #config.add_mount_point "/usr/bin", to: root.join("usr/bin"), readonly: true
   config.add_mount_point "tmpfs", to: root.join("tmp"), fs: "tmpfs"
   config.add_mount_point "devpts", to: root.join("dev/pts"), fs: "devpts"
   config.mount_independent_procfs
