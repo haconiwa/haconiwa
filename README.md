@@ -79,6 +79,7 @@ And `attach` is not concerned with capabilities which is granted to container. S
 * `config.mount_independent_procfs` - Mount the independent /proc directory in the container. Useful if `"pid"` is unshared
 * `config.chroot_to` - The new chroot root
 * `config.uid=/config.gid=` - The new container's running uid/gid. `groups=` is also respected
+* `config.add_handler` - Define signal handler at supervisor process(not container itself). Available signals are `SIGTTIN/SIGTTOU/SIGUSR1/SIGUSR2`. See [handler example](./sample/cpu.haco).
 
 You can pick your own parameters for your use case of container.
 e.g. just using `mount` namespace unshared, container with common filesystem, limit the cgroups for big resource job and so on.

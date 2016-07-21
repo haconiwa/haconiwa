@@ -1,13 +1,15 @@
 # -*- mode: ruby -*-
 haconiwa = Haconiwa::Base.define do |config|
   config.name = "cpu-quota001" # to be hostname
+  config.init_command = ["/usr/sbin/sshd", '-D'] # to be first process
+  config.daemonize!
 
   root = Pathname.new("/var/haconiwa/root")
-  config.add_mount_point "/var/lib/haconiwa", to: root, readonly: true
-  config.add_mount_point "/lib64", to: root.join("lib64"), readonly: true
-  config.add_mount_point "/usr/bin", to: root.join("usr/bin"), readonly: true
-  config.add_mount_point "/usr/local/rbenv", to: root.join("usr/local/rbenv")
+  config.add_mount_point "/var/lib/haconiwa", to: root
+  #config.add_mount_point "/lib64", to: root.join("lib64"), readonly: true
+  #config.add_mount_point "/usr/bin", to: root.join("usr/bin"), readonly: true
   config.add_mount_point "tmpfs", to: root.join("tmp"), fs: "tmpfs"
+  config.add_mount_point "devpts", to: root.join("dev/pts"), fs: "devpts"
   config.mount_independent_procfs
   config.chroot_to root
 
@@ -18,4 +20,31 @@ haconiwa = Haconiwa::Base.define do |config|
 
   config.cgroup["cpu.cfs_period_us"] = 100000
   config.cgroup["cpu.cfs_quota_us"]  =  30000
+
+  config.add_handler :USR1 do |b, sig|
+    File.open("/tmp/log_#{b.name}.txt", "a+") {|f| f.puts "Hello signal: #{Time.now.to_s}" }
+  end
+
+  config.add_handler :USR2 do |b, sig|
+    cpu = ::Cgroup::CPU.new(b.name)
+    File.open("/tmp/log_#{b.name}.txt", "a+") {|f| f.puts "Current cpu.cfs_quota_us = #{cpu.cfs_quota_us}" }
+  end
+
+  config.add_handler :TTIN do |b, sig|
+    cpu = ::Cgroup::CPU.new(b.name)
+    cpu.cfs_quota_us = cpu.cfs_quota_us - 10000
+    if cpu.cfs_quota_us > 0
+      cpu.modify
+      File.open("/tmp/log_#{b.name}.txt", "a+") {|f| f.puts "Changed cpu.cfs_quota_us = #{cpu.cfs_quota_us}" }
+    end
+  end
+
+  config.add_handler :TTOU do |b, sig|
+    cpu = ::Cgroup::CPU.new(b.name)
+    cpu.cfs_quota_us = cpu.cfs_quota_us + 10000
+    if cpu.cfs_quota_us <= cpu.cfs_period_us
+      cpu.modify
+      File.open("/tmp/log_#{b.name}.txt", "a+") {|f| f.puts "Changed cpu.cfs_quota_us = #{cpu.cfs_quota_us}" }
+    end
+  end
 end
