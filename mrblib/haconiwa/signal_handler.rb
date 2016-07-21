@@ -16,5 +16,14 @@ module Haconiwa
         raise TypeError, "Unsupported signal: #{sig.inspect}"
       end
     end
+
+    def register_handlers!
+      base = @base
+      @handlers.each do |sig, handler|
+        ::Signal.trap(sig) do |signo|
+          handler.call(base, signo)
+        end
+      end
+    end
   end
 end

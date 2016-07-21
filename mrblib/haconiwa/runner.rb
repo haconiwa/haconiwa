@@ -28,6 +28,8 @@ module Haconiwa
         end
         File.open(base.container_pid_file, 'w') {|f| f.write pid }
 
+        base.signal_handler.register_handlers!
+
         if notifier
           notifier.puts pid.to_s
           notifier.close # notify container is up

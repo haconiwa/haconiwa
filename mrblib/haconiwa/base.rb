@@ -8,6 +8,7 @@ module Haconiwa
                   :namespace,
                   :capabilities,
                   :attached_capabilities,
+                  :signal_handler,
                   :pid
 
     attr_reader   :init_command,
