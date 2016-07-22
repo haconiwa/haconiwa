@@ -1,12 +1,24 @@
 require 'fileutils'
 
-MRUBY_VERSION=ENV["MRUBY_VERSION"] || "1.2.0"
+if ENV["MRUBY_VERSION"] && !ENV["MRUBY_VERSION"].empty?
+  MRUBY_VERSION = ENV["MRUBY_VERSION"]
+else
+  MRUBY_VERSION = File.read(File.expand_path "../mruby_version.lock", __FILE__).chomp
+end
 
 file :mruby do
-  cmd =  "git clone --depth=1 git://github.com/mruby/mruby.git"
-  if MRUBY_VERSION != 'master'
+  cmd = "git clone --depth=1 git://github.com/mruby/mruby.git"
+  case MRUBY_VERSION
+  when /\A[a-fA-F0-9]+\z/
+    cmd << " && cd mruby"
+    cmd << " && git fetch && git checkout #{MRUBY_VERSION}"
+  when /\A\d\.\d\.\d\z/
     cmd << " && cd mruby"
     cmd << " && git fetch --tags && git checkout $(git rev-parse #{MRUBY_VERSION})"
+  when "master"
+    # skip
+  else
+    fail "Invalid MRUBY_VERSION spec: #{MRUBY_VERSION}"
   end
   sh cmd
 end
