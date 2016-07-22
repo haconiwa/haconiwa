@@ -3,6 +3,7 @@ compiler:
   - gcc
   - clang
 env:
+  - MRUBY_VERSION=""
   - MRUBY_VERSION=master
 branches:
   only:
