@@ -1,3 +1,6 @@
+package = haconiwa
+CFLAGS = -std=gnu99
+
 build:
 	rake compile
 
@@ -8,4 +11,4 @@ configure:
 	:
 
 install:
-	rake install
+	rake install prefix=$(CURDIR)/debian/$(package)/usr
