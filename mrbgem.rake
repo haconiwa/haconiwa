@@ -52,4 +52,6 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   end
 
   spec.save_dependent_mgem_revisions
+
+  spec.ss.flags << '-std=c99'
 end
