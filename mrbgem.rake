@@ -35,7 +35,7 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
       f = open(DEFS_FILE, 'w')
       corerev = `git rev-parse HEAD`.chomp
       f.puts %Q<{"MRUBY_CORE_REVISION", "#{corerev}"},>
-      `find ./build/mrbgems -type d -name 'mruby-*'`.each_line do |l|
+      `find ./build/mrbgems -type d -name 'mruby-*' | sort`.each_line do |l|
         l = l.chomp
         if File.directory? "#{l}/.git"
           gemname = l.split('/').last
