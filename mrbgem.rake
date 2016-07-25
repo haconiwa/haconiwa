@@ -53,5 +53,5 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
 
   spec.save_dependent_mgem_revisions
 
-  spec.cc.flags << '-std=c99'
+  spec.cc.flags << '-std=gnu99'
 end
