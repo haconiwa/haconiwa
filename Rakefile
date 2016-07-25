@@ -7,7 +7,7 @@ else
 end
 
 file :mruby do
-  cmd = "git clone --depth=1 git://github.com/mruby/mruby.git"
+  cmd = "git clone --depth=1 https://github.com/mruby/mruby.git"
   case MRUBY_VERSION
   when /\A[a-fA-F0-9]+\z/
     cmd << " && cd mruby"
