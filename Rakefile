@@ -91,9 +91,9 @@ end
 desc "install haconiwa here in system"
 task :install do
   target = ENV['INSTALL_TARGET'] || "#{ENV['prefix'] || ENV['PREFIX']}/bin"
-  sh "install build/x86_64-pc-linux-gnu/bin/haconiwa  #{target}"
-  sh "install build/x86_64-pc-linux-gnu_mirb/bin/mirb #{target}/hacoirb"
-  sh "install build/x86_64-pc-linux-gnu/bin/mruby     #{target}/hacorb"
+  sh "install #{mruby_root}/build/x86_64-pc-linux-gnu/bin/haconiwa  #{target}"
+  sh "install #{mruby_root}/build/x86_64-pc-linux-gnu_mirb/bin/mirb #{target}/hacoirb"
+  sh "install #{mruby_root}/build/x86_64-pc-linux-gnu/bin/mruby     #{target}/hacorb"
 end
 
 load File.expand_path("../mrblib/haconiwa/version.rb", __FILE__)
