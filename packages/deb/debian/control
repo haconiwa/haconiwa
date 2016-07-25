@@ -1,0 +1,14 @@
+Source: haconiwa
+Section: devel
+Priority: optional
+Maintainer: Uchio Kondo <udzura@udzura.jp>
+Build-Depends: debhelper (>=9), bison, flex, build-essential, git, libreadline6-dev, zlib1g-dev, libncurses5-dev, libssl-dev, rake, libpam0g-dev, autotools-dev, cgroup-lite
+Standards-Version: 3.9.6
+Homepage: https://github.com/haconiwa/haconiwa
+Vcs-Git: https://github.com/haconiwa/haconiwa.git
+#Vcs-Browser: https://anonscm.debian.org/cgit/collab-maint/haconiwa.git
+
+Package: haconiwa
+Architecture: amd64
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: The MRuby on Container
