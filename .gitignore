@@ -3,4 +3,4 @@ pkg/
 tmp/
 src/REVISIONS.defs
 
-debian/
+/debian/
