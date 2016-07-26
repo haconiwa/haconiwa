@@ -137,4 +137,8 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/haconi
 
 ## License
 
-Under the GPL v3 License: See [LICENSE](./LICENSE) file.
+Haconiwa core is under the GPL v3 License: See [LICENSE](./LICENSE) file.
+
+Bundled libraries (libcap, libcgroup, libargtable and mruby) are licensed by each authors. See `LICENSE_*` file.
+
+For other mgems' licenses, especially ones which are not bundled by mruby-core, please refer their `github.com` repository.
