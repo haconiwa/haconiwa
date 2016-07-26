@@ -30,10 +30,10 @@ rake clean
 
 %pre
 if ! %{_bindir}/getent group haconiwa >/dev/null; then
-    %{_sbindir}/addgroup --system --quiet haconiwa
+    %{_sbindir}/groupadd --system haconiwa
 fi
 if ! %{_bindir}/getent passwd haconiwa >/dev/null; then
-    %{_sbindir}/adduser --system --quiet --ingroup haconiwa haconiwa --home "/var/lib/haconiwa"
+    %{_sbindir}/useradd --system --gid haconiwa --home-dir "/var/lib/haconiwa" haconiwa
 fi
 %{_bindir}/mkdir -p /var/lib/haconiwa
 %{_bindir}/chown haconiwa: /var/lib/haconiwa
