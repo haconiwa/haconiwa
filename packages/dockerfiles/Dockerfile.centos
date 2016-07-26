@@ -12,7 +12,7 @@ RUN yum -q -y install \
 
 RUN mkdir -p /root/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 
-ENV VERSION 0.2.2
+ENV VERSION 0.2.3
 ENV USER root
 ENV HOME /root
 VOLUME /out

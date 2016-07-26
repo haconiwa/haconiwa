@@ -1,6 +1,6 @@
 Name: haconiwa
 Epoch: 1
-Version: 0.2.2
+Version: 0.2.3
 Release: 1
 Summary: MRuby on Container
 License: GPLv3+
@@ -49,5 +49,8 @@ fi
 %{_bindir}/*
 
 %changelog
+* Tue Jul 26 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.2.3-1
+- Update license
+
 * Tue Jul 26 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.2.2-1
 - The initial release of rpm package
