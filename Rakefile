@@ -7,11 +7,11 @@ else
 end
 
 file :mruby do
-  cmd = "git clone --depth=1 git://github.com/mruby/mruby.git"
+  cmd = "git clone --depth=1 https://github.com/mruby/mruby.git"
   case MRUBY_VERSION
   when /\A[a-fA-F0-9]+\z/
     cmd << " && cd mruby"
-    cmd << " && git fetch && git checkout #{MRUBY_VERSION}"
+    cmd << " && git fetch --depth=100 && git checkout #{MRUBY_VERSION}"
   when /\A\d\.\d\.\d\z/
     cmd << " && cd mruby"
     cmd << " && git fetch --tags && git checkout $(git rev-parse #{MRUBY_VERSION})"
@@ -90,8 +90,11 @@ end
 
 desc "install haconiwa here in system"
 task :install do
-  target = ENV['INSTALL_TARGET'] || "/usr/local/bin"
-  sh "install build/x86_64-pc-linux-gnu/bin/haconiwa #{target}"
+  target = ENV['INSTALL_TARGET'] || "#{ENV['prefix'] || ENV['PREFIX']}/bin"
+  FileUtils.mkdir_p target
+  sh "install #{mruby_root}/build/x86_64-pc-linux-gnu/bin/haconiwa  #{target}"
+  sh "install #{mruby_root}/build/x86_64-pc-linux-gnu_mirb/bin/mirb #{target}/hacoirb"
+  sh "install #{mruby_root}/build/x86_64-pc-linux-gnu/bin/mruby     #{target}/hacorb"
 end
 
 load File.expand_path("../mrblib/haconiwa/version.rb", __FILE__)

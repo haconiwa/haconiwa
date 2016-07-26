@@ -1,20 +1,5 @@
-compile: &defaults
+deb:
+  dockerfile: packages/dockerfiles/Dockerfile.debian
   build: .
   volumes:
-    - .:/home/mruby/code:rw
-  command: rake compile
-test:
-  <<: *defaults
-  command: rake test
-bintest:
-  <<: *defaults
-  command: rake test:bintest
-mtest:
-  <<: *defaults
-  command: rake test:mtest
-clean:
-  <<: *defaults
-  command: rake clean
-shell:
-  <<: *defaults
-  command: bash
+    - .:/out:rw
