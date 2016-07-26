@@ -24,8 +24,10 @@ case "$1" in
             addgroup --system --quiet haconiwa
         fi
         if ! getent passwd haconiwa >/dev/null; then
-            adduser --system --quiet --ingroup haconiwa haconiwa
+            adduser --system --quiet --ingroup haconiwa haconiwa --home "/var/lib/haconiwa"
         fi
+        mkdir -p /var/lib/haconiwa
+        chown haconiwa: /var/lib/haconiwa
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)

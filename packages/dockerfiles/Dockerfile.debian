@@ -25,6 +25,7 @@ RUN echo 'git checkout debian-package'         >> /libexec/builddeb.sh
 RUN echo 'rake mruby'                          >> /libexec/builddeb.sh
 RUN echo 'dh_make --multi --createorig -y'     >> /libexec/builddeb.sh
 RUN echo 'cp -v packages/deb/debian/* debian/' >> /libexec/builddeb.sh
+RUN echo 'rm -rf debian/*.ex debian/*.EX'      >> /libexec/builddeb.sh
 RUN echo 'debuild -uc -us'                     >> /libexec/builddeb.sh
 RUN echo 'cd ../'                              >> /libexec/builddeb.sh
 RUN echo 'cp *.deb /out/pkg'                   >> /libexec/builddeb.sh
