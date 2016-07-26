@@ -22,7 +22,7 @@ RUN echo '#!/bin/bash'                                        >  /libexec/buildr
 RUN echo 'set -xe'                                            >> /libexec/buildrpm.sh
 RUN echo 'git clone https://github.com/haconiwa/haconiwa.git /root/haconiwa-$VERSION' >> /libexec/buildrpm.sh
 RUN echo 'cd /root'                                           >> /libexec/buildrpm.sh
-RUN echo '( cd haconiwa-$VERSION; git checkout rpm-package )' >> /libexec/buildrpm.sh
+RUN echo '( cd haconiwa-$VERSION; git checkout $(git rev-parse v$VERSION) )' >> /libexec/buildrpm.sh
 RUN echo 'tar czf haconiwa-$VERSION.tar.gz haconiwa-$VERSION' >> /libexec/buildrpm.sh
 RUN echo 'mv /root/haconiwa-$VERSION.tar.gz /root/rpmbuild/SOURCES'  >> /libexec/buildrpm.sh
 RUN echo 'rpmbuild -bb haconiwa-$VERSION/packages/rpm/haconiwa.spec' >> /libexec/buildrpm.sh
