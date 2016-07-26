@@ -6,10 +6,14 @@
 
 ## Install binary
 
-Just download from [latest](https://github.com/haconiwa/haconiwa/releases):
+`haconiwa` packages are provided via [packagecloud](https://packagecloud.io/udzura/haconiwa).
+
+Available for: `CentOS >= 7 / Ubuntu Trusty / Ubuntu Xenial / Debian jessie` (which are supported by best effort...)
+
+Other linuxes users can just download binaries from [latest](https://github.com/haconiwa/haconiwa/releases):
 
 ```bash
-VERSION=0.1.2
+VERSION=0.2.2
 wget https://github.com/haconiwa/haconiwa/releases/download/v${VERSION}/haconiwa-v${VERSION}.x86_64-pc-linux-gnu.tgz
 tar xzf haconiwa-v${VERSION}.x86_64-pc-linux-gnu.tgz
 sudo install hacorb hacoirb haconiwa /usr/local/bin
@@ -133,4 +137,8 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/haconi
 
 ## License
 
-Under the GPL v3 License: See [LICENSE](./LICENSE) file.
+Haconiwa core is under the GPL v3 License: See [LICENSE](./LICENSE) file.
+
+Bundled libraries (libcap, libcgroup, libargtable and mruby) are licensed by each authors. See `LICENSE_*` file.
+
+For other mgems' licenses, especially ones which are not bundled by mruby-core, please refer their `github.com` repository.
