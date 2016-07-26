@@ -2,7 +2,19 @@
 
 [![Build Status](https://travis-ci.org/haconiwa/haconiwa.svg?branch=master)](https://travis-ci.org/haconiwa/haconiwa)
 
-(m)Ruby on Container / helper tools with DSL for your handmade linux containers
+mRuby on Container / helper tools with DSL for your handmade linux containers.
+
+Haconiwa (`箱庭` - a miniature garden) is a container builder DSL, by which you can choose any container-related technologies as you like:
+
+- Linux namespace
+- Linux control group(cgroup)
+- Linux capabilities
+- Bind mount / chroot
+- Resource limit(rlimit)
+- setuid/setgid
+- ...
+
+Haconiwa is written in [mruby](https://mruby.org/), so you can utilize Ruby DSL for creating your own container.
 
 ## Install binary
 
