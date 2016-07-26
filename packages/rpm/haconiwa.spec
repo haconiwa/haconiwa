@@ -11,7 +11,7 @@ BuildRequires: gcc gcc-c++ git openssl-devel zlib-devel pam-devel readline-devel
 Requires: glibc
 Requires(pre): shadow-utils
 
-Source0: https://github.com/haconiwa/haconiwa/archive/master.tar.gz
+Source0: haconiwa-%{version}.tar.gz
 
 %description
 haconiwa - The MRuby on Container
