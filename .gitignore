@@ -1,6 +1,8 @@
-mruby/
-pkg/
+/mruby/
+/pkg/
 tmp/
-src/REVISIONS.defs
+/src/REVISIONS.defs
 
 /debian/
+/vendor/
+/.bundle
