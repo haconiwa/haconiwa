@@ -1,0 +1,33 @@
+# -*- mode: dockerfile -*-
+FROM ubuntu:trusty
+MAINTAINER Uchio Kondo <udzura@udzura.jp>
+
+ENV DEBIAN_FRONTEND noninteractive
+
+RUN apt-get -qq -y update
+RUN apt-get -qq -y install \
+    debhelper devscripts bison flex \
+    automake autoconf libtool git libreadline6-dev \
+    zlib1g-dev libncurses5-dev libssl-dev libpam0g-dev \
+    rake autotools-dev cgroup-lite build-essential \
+    dh-make xz-utils
+
+ENV VERSION 0.2.2
+ENV USER root
+VOLUME /out
+
+RUN mkdir -p /libexec
+RUN echo '#!/bin/bash'                         >  /libexec/builddeb.sh
+RUN echo 'set -xe'                             >> /libexec/builddeb.sh
+RUN echo 'git clone https://github.com/haconiwa/haconiwa.git /root/haconiwa-$VERSION' >> /libexec/builddeb.sh
+RUN echo 'cd /root/haconiwa-$VERSION'          >> /libexec/builddeb.sh
+RUN echo 'git checkout debian-package'         >> /libexec/builddeb.sh
+RUN echo 'rake mruby'                          >> /libexec/builddeb.sh
+RUN echo 'dh_make --multi --createorig -y'     >> /libexec/builddeb.sh
+RUN echo 'cp -v packages/deb/debian/* debian/' >> /libexec/builddeb.sh
+RUN echo 'debuild -uc -us'                     >> /libexec/builddeb.sh
+RUN echo 'cd ../'                              >> /libexec/builddeb.sh
+RUN echo 'cp *.deb /out/pkg'                   >> /libexec/builddeb.sh
+RUN chmod a+x /libexec/builddeb.sh
+
+CMD ["/libexec/builddeb.sh"]
