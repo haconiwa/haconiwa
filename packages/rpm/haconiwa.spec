@@ -45,7 +45,7 @@ fi
 %postun
 
 %files
-%doc LICENSE README.md
+%doc LICENSE LICENSE_argtable3 LICENSE_libcap LICENSE_libcgroup LICENSE_mruby README.md
 %{_bindir}/*
 
 %changelog
