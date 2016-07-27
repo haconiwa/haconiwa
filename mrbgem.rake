@@ -17,6 +17,7 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.add_dependency 'mruby-string-ext', :core => 'mruby-string-ext'
   spec.add_dependency 'mruby-time'      , :core => 'mruby-time'
   spec.add_dependency 'mruby-sprintf'   , :core => 'mruby-sprintf'
+  spec.add_dependency 'mruby-random'    , :core => 'mruby-random'
 
   spec.add_dependency 'mruby-cgroup'    , :github => 'matsumoto-r/mruby-cgroup'
   spec.add_dependency 'mruby-capability', :github => 'matsumoto-r/mruby-capability'
