@@ -50,8 +50,8 @@ Haconiwa::Base.define do |config|
   config.name = "new-haconiwa001" # to be hostname
 
   config.cgroup["cpu.shares"] = 2048
-  config.cgroup["memory.limit_in_bytes"] = "256M"
-  config.cgroup["pid.max"] = 1024
+  config.cgroup["memory.limit_in_bytes"] = 256 * 1024 * 1024
+  config.cgroup["pids.max"] = 1024
 
   config.add_mount_point "/var/another/root/etc", to: "/var/your_rootfs/etc", readonly: true
   config.add_mount_point "/var/another/root/home", to: "/var/your_rootfs/home"
