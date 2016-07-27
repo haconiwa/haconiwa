@@ -13,7 +13,7 @@ module UUID
   def self.secure_uuid(fmt="%04x%04x-%04x-%04x-%04x-%04x%04x%04x")
     s = []
     b = File.read("/dev/urandom", 16).bytes
-    8.times {|i| s << b[i] * b[i + 8] }
+    8.times {|i| s << ((b[i] + 1) * (b[i + 8] + 1) - 1) }
     fmt % s
   end
 end
