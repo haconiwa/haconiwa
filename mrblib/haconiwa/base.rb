@@ -9,7 +9,7 @@ module Haconiwa
                   :capabilities,
                   :attached_capabilities,
                   :signal_handler,
-                  :pid
+                  :pid,
 
     attr_reader   :init_command,
                   :uid,
@@ -92,6 +92,16 @@ module Haconiwa
 
     def add_handler(sig, &b)
       @signal_handler.add_handler(sig, &b)
+    end
+
+    def bootstrap
+      @bootstrap ||= Bootstrap.new
+      yield(@bootstrap) if block_given?
+      @bootstrap
+    end
+
+    def create
+      @bootstrap.boot!(self.root)
     end
 
     def start(*init_command)

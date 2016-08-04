@@ -1,5 +1,20 @@
 module Haconiwa
   module Cli
+    def self.create(args)
+      # FIXME: to by DRY
+      opt.literal('h', 'help', "Show help")
+      opt.enable_catchall('HACO_FILE', '', 32)
+      e = opt.parse(args)
+
+      if opt['h'].exist?
+        opt.glossary
+        exit
+      end
+
+      get_base(args).create
+    end
+
+
     def self.run(args)
       opt = Argtable.new
       opt.literal('D', 'daemon', "Force the container to be daemon")
@@ -85,6 +100,11 @@ module Haconiwa
     end
 
     private
+
+    def self.get_base(args)
+      script = File.read(args[0])
+      return Kernel.eval(script)
+    end
 
     def self.get_script_and_eval(args)
       script = File.read(args[0])
