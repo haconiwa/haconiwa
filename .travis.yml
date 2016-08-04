@@ -1,4 +1,16 @@
+sudo: false
 language: c
+addons:
+  apt:
+    packages:
+      - bison
+      - git
+      - gperf
+      - cgroup-lite
+      - libpam0g-dev
+      - autotools-dev
+      - libcap-dev
+      - libargtable2-dev
 compiler:
   - gcc
   - clang
@@ -8,9 +20,6 @@ env:
 branches:
   only:
     - master
-before_install:
-    - sudo apt-get -qq update
-install:
-    - sudo apt-get -qq install rake bison git gperf cgroup-lite libpam0g-dev autotools-dev libcap-dev libargtable2-dev
+
 script:
   - rake test
