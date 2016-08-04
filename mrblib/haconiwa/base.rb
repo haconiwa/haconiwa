@@ -9,7 +9,7 @@ module Haconiwa
                   :capabilities,
                   :attached_capabilities,
                   :signal_handler,
-                  :pid,
+                  :pid
 
     attr_reader   :init_command,
                   :uid,
@@ -50,6 +50,10 @@ module Haconiwa
     # aliases
     def chroot_to(dest)
       self.filesystem.chroot = dest
+    end
+
+    def root
+      filesystem.chroot
     end
 
     def add_mount_point(point, options)

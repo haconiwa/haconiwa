@@ -2,6 +2,7 @@ module Haconiwa
   module Cli
     def self.create(args)
       # FIXME: to by DRY
+      opt = Argtable.new
       opt.literal('h', 'help', "Show help")
       opt.enable_catchall('HACO_FILE', '', 32)
       e = opt.parse(args)
@@ -11,7 +12,7 @@ module Haconiwa
         exit
       end
 
-      get_base(args).create
+      get_base(opt.catchall.values).create
     end
 
 

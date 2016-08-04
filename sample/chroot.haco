@@ -3,7 +3,14 @@ Haconiwa.define do |config|
   config.name = "chroot001" # to be hostname
   config.init_command = "/bin/sh" # to be first process
 
-  root = Pathname.new("/var/haconiwa/root")
+  root = Pathname.new("/var/lib/haconiwa-chroot001")
+
+  config.bootstrap do |b|
+    b.project_name = "chroot-boot001"
+    b.strategy = "lxc"
+    b.os_type = "alpine"
+  end
+
   config.add_mount_point "/var/lib/haconiwa", to: root, readonly: true
   config.add_mount_point "/lib64", to: root.join("lib64"), readonly: true
   config.add_mount_point "/usr/bin", to: root.join("usr/bin"), readonly: true
