@@ -11,9 +11,9 @@ Haconiwa.define do |config|
     b.os_type = "alpine"
   end
 
-  config.add_mount_point "/var/lib/haconiwa", to: root, readonly: true
-  config.add_mount_point "/lib64", to: root.join("lib64"), readonly: true
-  config.add_mount_point "/usr/bin", to: root.join("usr/bin"), readonly: true
+  config.add_mount_point root, to: root, readonly: true
+  #config.add_mount_point "/lib64", to: root.join("lib64"), readonly: true
+  #config.add_mount_point "/usr/bin", to: root.join("usr/bin"), readonly: true
   config.add_mount_point "tmpfs", to: root.join("tmp"), fs: "tmpfs"
   config.add_mount_point "/var/haconiwa/user_homes/", to: root.join("home/haconiwa")
   config.mount_independent_procfs
