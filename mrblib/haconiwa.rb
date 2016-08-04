@@ -5,7 +5,7 @@ def __main__(argv)
     puts "haconiwa: v#{Haconiwa::VERSION}"
   when "revisions"
     Haconiwa::Cli.revisions
-  when "run"
+  when "start", "run"
     Haconiwa::Cli.run(argv)
   when "attach"
     Haconiwa::Cli.attach(argv)
@@ -15,7 +15,7 @@ def __main__(argv)
     puts <<-USAGE
 haconiwa - The MRuby on Container
 commands:
-    run       - run the container
+    start     - run the container
     attach    - attach to existing container
     kill      - kill the running container
     version   - show version
