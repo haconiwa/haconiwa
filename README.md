@@ -34,8 +34,7 @@ haconiwa
 # commands:
 #     run       - run the container
 #     attach    - attach to existing container
-#     version   - show version
-#     revisions - show mgem/mruby revisions which haconiwa bin uses
+#     ...
 ```
 
 NOTE: If you'd like using cgroup-related features, install cgroup package such as `cgroup-lite` (Ubuntu) or `cgroup-bin` (Debian).
@@ -43,11 +42,22 @@ If you would not, these installation are not required.
 
 ## Example
 
+### Bootstraping container filesystem
+
 Create the file `example.haco`:
 
 ```ruby
 Haconiwa::Base.define do |config|
   config.name = "new-haconiwa001" # to be hostname
+
+  config.bootstrap do |b|
+    b.strategy = "lxc"
+    b.os_type = centos
+  end
+
+  config.provision do |p|
+    p.run_shell "yum -y install git"
+  end
 
   config.cgroup["cpu.shares"] = 2048
   config.cgroup["memory.limit_in_bytes"] = 256 * 1024 * 1024
@@ -68,12 +78,23 @@ Haconiwa::Base.define do |config|
 end
 ```
 
-Then use `haconiwa` binary installed with thie gem.
+Then run the `haconiwa create` command to set up container base root filesystem.
+
+```console
+$ haconiwa create example.haco
+Start bootstrapping rootfs with lxc-create...
+...
+```
+
+To re-run provisioning, you can use `haconiwa provision`.
+
+### Running
+
+Then use `haconiwa run` command to make container up.
 
 ```console
 $ haconiwa run example.haco
 ```
-
 
 When you want to attach existing container:
 
@@ -85,6 +106,31 @@ Note: `attach` subcommand allows to set PID(`--target`) or container name(`--nam
 And `attach` is not concerned with capabilities which is granted to container. So you can drop or allow specific caps with `--drop/--allow`.
 
 ### DSL spec
+
+#### Bootstrap
+
+`config.bootstrap` block support 2 strategy.
+
+* `strategy = "lxc"`
+  * needs `lxc-create` command
+  * `lxc.project_name` to set PJ name. default to the dirname
+  * `lxc.os_type` to set OS type installed to
+* `strategy = "debootstrap"`
+  * needs `debootstrap` command
+  * `deb.variant` to set Debian variant param to pass debootstrap
+  * `deb.debian_release` to set Debian's release name squeeze/jessie/sid and so on...
+  * `deb.mirror_url` to set mirror URL debootstrap uses
+  * `deb.components` to set components installed. eg, `'base'`
+
+#### Provision
+
+`config.provision` block support some operations(in the future. now `run_shell` only).
+
+* `run_shell` to set plane shell script(automatically `set -xe`-ed on run)
+  * We can declare `run_shell` multiple times
+  * Set name by `name:` option, then you can specify provision operation by `haconiwa provision --run-only=...`
+
+#### Running environment
 
 * `config.resource.set_limit` - Set the resource limit of container, using `setrlimit`
 * `config.cgroup` - Assign cgroup parameters via `[]=`
