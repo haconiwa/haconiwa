@@ -3,8 +3,8 @@ module Haconiwa
     def initialize
       @ops = []
     end
-    attr_accessor :root, :extra_bind # TODO
-    attr_reader   :ops
+    attr_accessor :root, :ops,
+                  :extra_bind # TODO
 
     class ProvisionOps
       def initialize(strategy, name, body)
@@ -19,6 +19,12 @@ module Haconiwa
       name = options.delete(:name)
       name ||= "shell-#{ops.size + 1}"
       ops << ProvisionOps.new("shell", name, shell)
+    end
+
+    def select_ops(selected_ops)
+      self.ops = ops.select do |op|
+        selected_ops.include? op.name
+      end
     end
 
     def provision!(r)

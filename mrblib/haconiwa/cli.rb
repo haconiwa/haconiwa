@@ -16,6 +16,22 @@ module Haconiwa
       get_base(opt.catchall.values).create(opt['N'].exist?)
     end
 
+    def self.provision(args)
+      opt = Argtable.new
+      opt.string('r', 'run-only', 'OP_NAME[,OP_NAME,...]', "Run only specified provision operations by names(splitted with ,)")
+      opt.literal('h', 'help', "Show help")
+      opt.enable_catchall('HACO_FILE', '', 32)
+      e = opt.parse(args)
+
+      if opt['h'].exist?
+        opt.glossary
+        exit
+      end
+
+      ops = opt['r'].exist? ? opt['r'].value.split(',') : []
+      get_base(opt.catchall.values).do_provision(ops)
+    end
+
     def self.run(args)
       opt = Argtable.new
       opt.literal('D', 'daemon', "Force the container to be daemon")

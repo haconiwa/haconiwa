@@ -118,6 +118,16 @@ module Haconiwa
       end
     end
 
+    def do_provision(ops)
+      unless ::File.directory?(self.root.to_s)
+        raise "Rootfs #{root} not yet bootstrapped. Run `haconiwa create' before provision."
+      end
+
+      validate_non_nil(@provision, "`config.provision' block must be defined to run provisioning")
+      @provision.select_ops(ops) unless ops.empty?
+      @provision.provision!(self.root)
+    end
+
     def start(*init_command)
       self.container_pid_file ||= default_container_pid_file
       LinuxRunner.new(self).run(init_command)
