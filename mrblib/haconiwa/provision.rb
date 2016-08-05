@@ -1,27 +1,41 @@
 module Haconiwa
   class Provision
     def initialize
+      @ops = []
     end
-    attr_accessor :root, :strategy, :extra_bind # TODO
-    attr_reader   :shell
+    attr_accessor :root, :extra_bind # TODO
+    attr_reader   :ops
 
-    def shell=(shell)
-      self.strategy = "shell"
-      @shell = shell
+    class ProvisionOps
+      def initialize(strategy, name, body)
+        @strategy = strategy
+        @name = name
+        @body = body
+      end
+      attr_reader :strategy, :name, :body
+    end
+
+    def run_shell(shell, options={})
+      name = options.delete(:name)
+      name ||= "shell-#{ops.size + 1}"
+      ops << ProvisionOps.new("shell", name, shell)
     end
 
     def provision!(r)
       self.root = Pathname.new(r.to_s)
 
       p = self
+      log "Start provisioning..."
       pid = Process.fork do
         p.chroot_into(p.root)
 
-        case strategy = p.strategy
-        when "shell"
-          p.provision_with_shell
-        else
-          raise "Unsupported: #{strategy}"
+        p.ops.each do |op|
+          case strategy = op.strategy
+          when "shell"
+            p.provision_with_shell(op)
+          else
+            raise "Unsupported: #{strategy}"
+          end
         end
       end
       pid, s = *Process.waitpid2(pid)
@@ -35,11 +49,11 @@ module Haconiwa
       end
     end
 
-    def provision_with_shell
-      cmd = RunCmd.new("provison.shell")
+    def provision_with_shell(op)
+      cmd = RunCmd.new("provison.#{op.name}")
 
-      log("Start provisioning with shell script...")
-      cmd.run_with_input("/bin/bash -xe", self.shell)
+      log("Running provisioning with shell script...")
+      cmd.run_with_input("/bin/bash -xe", op.body)
     end
 
     def chroot_into(root)

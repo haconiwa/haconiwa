@@ -14,15 +14,19 @@ Haconiwa.define do |config|
   end
 
   config.provision do |p|
-    p.shell = <<-SHELL
+    p.run_shell <<-SHELL
 export DEBIAN_FRONTEND=nonintaractive
+export LANG=C
 apt-get -y update
 apt-get -y install git openssh-server
+sed -i 's/Port.*/Port 2222/' etc/ssh/sshd_config
+    SHELL
 
+    p.run_shell <<-SHELL, name: "setup-user"
+export DEBIAN_FRONTEND=nonintaractive
+export LANG=C
 adduser haconiwa-op --disabled-password --gecos "" || true
 echo 'haconiwa-op:haconiwa' | chpasswd
-
-sed -i 's/Port.*/Port 2222/' etc/ssh/sshd_config
     SHELL
   end
 
