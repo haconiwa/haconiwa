@@ -104,8 +104,17 @@ module Haconiwa
       @bootstrap
     end
 
+    def provision
+      @provision ||= Provision.new
+      yield(@provision) if block_given?
+      @provision
+    end
+
     def create
       @bootstrap.boot!(self.root)
+      if @provision
+        @provision.provision!(self.root)
+      end
     end
 
     def start(*init_command)

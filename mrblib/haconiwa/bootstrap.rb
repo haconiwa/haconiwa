@@ -7,10 +7,10 @@ module Haconiwa
                   :arch, :variant, :components, :debian_release, :mirror_url
 
     def boot!(r)
-      self.root = Pathname.new(r)
-      self.project_name ||= File.basename(root.to_s)
-      if File.directory?(root)
-        log("Directory #{root} already bootstrapped.")
+      self.root = Pathname.new(r.to_s)
+      self.project_name ||= File.basename(root.to_str)
+      if File.directory?(root.to_str)
+        log("Directory #{root.to_str} already bootstrapped. Skip.")
         return true
       end
 

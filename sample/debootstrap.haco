@@ -12,6 +12,15 @@ Haconiwa.define do |config|
     b.mirror_url = "http://ftp.jp.debian.org/debian/"
   end
 
+  config.provision do |p|
+    p.shell = <<-SHELL
+export DEBIAN_FRONTEND=nonintaractive
+apt-get -y update
+apt-get -y install git
+adduser haconiwa-op --disabled-password --gecos ""
+    SHELL
+  end
+
   config.add_mount_point root, to: root
   config.add_mount_point "tmpfs", to: root.join("tmp"), fs: "tmpfs"
   config.add_mount_point "devtmpfs", to: root.join("dev"), fs: "devtmpfs"
