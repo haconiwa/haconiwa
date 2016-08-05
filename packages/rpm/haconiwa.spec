@@ -1,6 +1,6 @@
 Name: haconiwa
 Epoch: 1
-Version: 0.2.3
+Version: 0.2.4
 Release: 1
 Summary: MRuby on Container
 License: GPLv3+
@@ -49,6 +49,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Fri Aug  5 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.2.4-1
+- Support create/provision subcommand
+
 * Tue Jul 26 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.2.3-1
 - Update license
 

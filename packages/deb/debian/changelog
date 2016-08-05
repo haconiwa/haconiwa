@@ -1,3 +1,9 @@
+haconiwa (0.2.4-1) unstable; urgency=medium
+
+  * Support create/provision subcommand
+
+ -- Uchio Kondo <udzura@udzura.jp>  Fri,  5 Aug 2016 18:14:23 +0900
+
 haconiwa (0.2.3-1) unstable; urgency=medium
 
   * Update licenses
