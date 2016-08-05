@@ -110,9 +110,10 @@ module Haconiwa
       @provision
     end
 
-    def create
+    def create(no_provision)
+      validate_non_nil(@bootstrap, "`config.bootstrap' block must be defined to create rootfs")
       @bootstrap.boot!(self.root)
-      if @provision
+      if @provision and !no_provision
         @provision.provision!(self.root)
       end
     end
@@ -143,6 +144,12 @@ module Haconiwa
 
     def daemon?
       !! @daemon
+    end
+
+    def validate_non_nil(obj, msg)
+      unless obj
+        raise(msg)
+      end
     end
   end
 

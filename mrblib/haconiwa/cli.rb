@@ -3,6 +3,7 @@ module Haconiwa
     def self.create(args)
       # FIXME: to by DRY
       opt = Argtable.new
+      opt.literal('N', 'no-provision', "Bootstrap but no provisioning")
       opt.literal('h', 'help', "Show help")
       opt.enable_catchall('HACO_FILE', '', 32)
       e = opt.parse(args)
@@ -12,9 +13,8 @@ module Haconiwa
         exit
       end
 
-      get_base(opt.catchall.values).create
+      get_base(opt.catchall.values).create(opt['N'].exist?)
     end
-
 
     def self.run(args)
       opt = Argtable.new
