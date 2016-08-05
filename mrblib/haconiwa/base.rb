@@ -52,6 +52,10 @@ module Haconiwa
       self.filesystem.chroot = dest
     end
 
+    def root
+      filesystem.chroot
+    end
+
     def add_mount_point(point, options)
       self.namespace.unshare "mount"
       self.filesystem.mount_points << MountPoint.new(point, options)
@@ -94,6 +98,36 @@ module Haconiwa
       @signal_handler.add_handler(sig, &b)
     end
 
+    def bootstrap
+      @bootstrap ||= Bootstrap.new
+      yield(@bootstrap) if block_given?
+      @bootstrap
+    end
+
+    def provision
+      @provision ||= Provision.new
+      yield(@provision) if block_given?
+      @provision
+    end
+
+    def create(no_provision)
+      validate_non_nil(@bootstrap, "`config.bootstrap' block must be defined to create rootfs")
+      @bootstrap.boot!(self.root)
+      if @provision and !no_provision
+        @provision.provision!(self.root)
+      end
+    end
+
+    def do_provision(ops)
+      unless ::File.directory?(self.root.to_s)
+        raise "Rootfs #{root} not yet bootstrapped. Run `haconiwa create' before provision."
+      end
+
+      validate_non_nil(@provision, "`config.provision' block must be defined to run provisioning")
+      @provision.select_ops(ops) unless ops.empty?
+      @provision.provision!(self.root)
+    end
+
     def start(*init_command)
       self.container_pid_file ||= default_container_pid_file
       LinuxRunner.new(self).run(init_command)
@@ -120,6 +154,12 @@ module Haconiwa
 
     def daemon?
       !! @daemon
+    end
+
+    def validate_non_nil(obj, msg)
+      unless obj
+        raise(msg)
+      end
     end
   end
 

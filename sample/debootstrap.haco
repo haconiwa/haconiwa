@@ -1,0 +1,45 @@
+# -*- mode: ruby -*-
+Haconiwa.define do |config|
+  config.name = "deb001" # to be hostname
+  config.init_command = ["/usr/sbin/sshd", "-D"] # to be first process
+  config.daemonize!
+
+  root = Pathname.new("/var/lib/haconiwa-deb001")
+
+  config.bootstrap do |b|
+    b.strategy = "debootstrap"
+    b.variant = "minbase"
+    b.debian_release = "jessie"
+    b.mirror_url = "http://ftp.jp.debian.org/debian/"
+  end
+
+  config.provision do |p|
+    p.run_shell <<-SHELL
+export DEBIAN_FRONTEND=nonintaractive
+export LANG=C
+apt-get -y update
+apt-get -y install git openssh-server
+sed -i 's/Port.*/Port 2222/' etc/ssh/sshd_config
+    SHELL
+
+    p.run_shell <<-SHELL, name: "setup-user"
+export DEBIAN_FRONTEND=nonintaractive
+export LANG=C
+adduser haconiwa-op --disabled-password --gecos "" || true
+echo 'haconiwa-op:haconiwa' | chpasswd
+    SHELL
+  end
+
+  config.add_mount_point root, to: root
+  config.add_mount_point "tmpfs", to: root.join("tmp"), fs: "tmpfs"
+  config.add_mount_point "devtmpfs", to: root.join("dev"), fs: "devtmpfs"
+  config.add_mount_point "devpts", to: root.join("dev/pts"), fs: "devpts"
+  config.add_mount_point "sysfs", to: root.join("sys"), fs: "sysfs"
+  config.mount_independent_procfs
+  config.chroot_to root
+
+  config.namespace.unshare "mount"
+  config.namespace.unshare "ipc"
+  config.namespace.unshare "uts"
+  config.namespace.unshare "pid"
+end

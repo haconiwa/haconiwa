@@ -1,6 +1,6 @@
 class Pathname
   def initialize(path)
-    @path = path
+    @path = clean_slashes(path.to_s)
   end
 
   def join(*paths)
