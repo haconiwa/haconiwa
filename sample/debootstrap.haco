@@ -1,7 +1,8 @@
 # -*- mode: ruby -*-
 Haconiwa.define do |config|
   config.name = "deb001" # to be hostname
-  config.init_command = "/bin/sh" # to be first process
+  config.init_command = ["/usr/sbin/sshd", "-D"] # to be first process
+  config.daemonize!
 
   root = Pathname.new("/var/lib/haconiwa-deb001")
 
@@ -16,14 +17,19 @@ Haconiwa.define do |config|
     p.shell = <<-SHELL
 export DEBIAN_FRONTEND=nonintaractive
 apt-get -y update
-apt-get -y install git
-adduser haconiwa-op --disabled-password --gecos ""
+apt-get -y install git openssh-server
+
+adduser haconiwa-op --disabled-password --gecos "" || true
+echo 'haconiwa-op:haconiwa' | chpasswd
+
+sed -i 's/Port.*/Port 2222/' etc/ssh/sshd_config
     SHELL
   end
 
   config.add_mount_point root, to: root
   config.add_mount_point "tmpfs", to: root.join("tmp"), fs: "tmpfs"
   config.add_mount_point "devtmpfs", to: root.join("dev"), fs: "devtmpfs"
+  config.add_mount_point "devpts", to: root.join("dev/pts"), fs: "devpts"
   config.add_mount_point "sysfs", to: root.join("sys"), fs: "sysfs"
   config.mount_independent_procfs
   config.chroot_to root
