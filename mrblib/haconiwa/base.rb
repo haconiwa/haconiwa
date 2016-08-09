@@ -243,31 +243,53 @@ module Haconiwa
 
     def initialize
       @use_ns = []
-      @netns_name = nil
+      @ns_to_path = {}
     end
 
     def unshare(ns)
-      flag = case ns
-             when String, Symbol
-               NS_MAPPINGS[ns.to_s]
-             when Integer
-               ns
-             end
+      flag = to_bit(ns)
       if flag == ::Namespace::CLONE_NEWPID
         @use_pid_ns = true
       end
       @use_ns << flag
     end
-    attr_reader :use_pid_ns
+
+    def enter(ns, path)
+      flag = to_bit(ns)
+      unshare(flag)
+      @ns_to_path[flag] = path
+    end
+    attr_reader :use_pid_ns, :ns_to_path
 
     def use_netns(name)
-      @netns_name = name
+      enter("net", "/var/run/netns/#{name}")
+    end
+
+    def setns_on_run?
+      !@ns_to_path.empty?
+    end
+
+    def to_bit(ns)
+      case ns
+      when String, Symbol
+        NS_MAPPINGS[ns.to_s]
+      when Integer
+        ns
+      end
     end
 
     def to_flag
       @use_ns.inject(0x00000000) { |dst, flag|
         dst |= flag
       }
+    end
+
+    def to_flag_for_unshare
+      f = to_flag_without_pid
+      @ns_to_path.keys.each do |mask|
+        f &= (~mask)
+      end
+      f
     end
 
     def to_flag_without_pid
