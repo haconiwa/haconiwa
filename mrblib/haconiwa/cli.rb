@@ -6,12 +6,6 @@ module Haconiwa
         o.string('r', 'root', 'ROOTFS_LOC', "Specify the rootfs location to generate on host")
       end
 
-      unless opt.catchall.exist?
-        raise "Please specify newly creating haco file name"
-        opt.glossary
-        exit 1
-      end
-
       haconame = opt['n'].exist? ? opt['n'].value : nil
       root     = opt['r'].exist? ? opt['r'].value : nil
 
@@ -103,6 +97,12 @@ module Haconiwa
       end
 
       if e > 0
+        opt.glossary
+        exit 1
+      end
+
+      unless opt.catchall.exist?
+        STDERR.puts "Please specify haco file name"
         opt.glossary
         exit 1
       end
