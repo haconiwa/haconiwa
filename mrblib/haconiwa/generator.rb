@@ -83,8 +83,8 @@ end
       root     ||= gen_root(id)
 
       template = BASE_TEMPLATE
-      template = template.sub('!__NAME__!', haconame)
-      template = template.sub('!__ROOT__!', root)
+      template = template.sub('!__NAME__!', haconame.inspect)
+      template = template.sub('!__ROOT__!', root.inspect)
 
       File.open(hacofile, "w") do |f|
         f.puts template
