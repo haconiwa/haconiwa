@@ -254,7 +254,14 @@ module Haconiwa
       @use_ns << flag
     end
 
-    def enter(ns, path)
+    def enter(ns, path_or_opt)
+      path = case path_or_opt
+             when Hash
+               path_or_opt.delete(:via)
+             else
+               path_or_opt
+             end
+      raise("Invalid option") unless path
       flag = to_bit(ns)
       unshare(flag)
       @ns_to_path[flag] = path
