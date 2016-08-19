@@ -149,6 +149,33 @@ namespace :release do
   task :shipit => [:tarball, :run_ghr]
 end
 
+desc "Re-gen package required filez"
+task :package_regen do
+  require 'time'
+  require 'yaml'
+  require 'erb'
+  Dir.chdir pwd do
+    data = YAML.load_file("packages/templates/changelog.yml")
+    @latest = data["latest"]
+    @changelog = data["changelog"]
+
+    deb = ERB.new(File.read("packages/templates/deb-changelog.erb")).result(binding).strip
+    File.write("packages/deb/debian/changelog", deb)
+
+    rpm = ERB.new(File.read("packages/templates/rpm-spec.erb")).result(binding).strip
+    File.write("packages/rpm/haconiwa.spec", rpm)
+
+    docker_deb = ERB.new(File.read("packages/templates/Dockerfile.debian.erb")).result(binding)
+    File.write("packages/dockerfiles/Dockerfile.debian", docker_deb)
+
+    docker_rpm = ERB.new(File.read("packages/templates/Dockerfile.centos.erb")).result(binding)
+    File.write("packages/dockerfiles/Dockerfile.centos", docker_rpm)
+
+    STDERR.puts "regen successful! please commit all files to git tree"
+  end
+end
+
+
 desc "release the binary (using ghr(2))"
 task :release => "release:shipit"
 task :default => :test
