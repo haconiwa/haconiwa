@@ -63,7 +63,12 @@ module Haconiwa
 
     def mount_independent_procfs
       self.namespace.unshare "mount"
-      self.filesystem.mount_independent_procfs = true
+      self.filesystem.mount_independent("procfs")
+    end
+
+    def mount_independent(fs)
+      self.namespace.unshare "mount"
+      self.filesystem.mount_independent(fs)
     end
 
     def uid=(newid)
@@ -307,10 +312,25 @@ module Haconiwa
   class Filesystem
     def initialize
       @mount_points = []
-      @mount_independent_procfs = false
+      @independent_mount_points = []
     end
     attr_accessor :chroot, :mount_points,
-                  :mount_independent_procfs
+                  :independent_mount_points
+
+    FS_TO_MOUNT = {
+      "procfs" => ["proc", "proc", "/proc"],
+      "sysfs"  => ["sysfs", "sysfs", "/sys"],
+      "devtmpfs" => ["devtmpfs", "devtmpfs", "/dev"],
+      "devpts" => ["devpts", "devpts", "/dev/pts"],
+      "shm"    => ["tmpfs", "tmpfs", "/dev/shm"],
+    }
+
+    def mount_independent(fs)
+      params = FS_TO_MOUNT[fs]
+      raise("Unsupported: #{fs}") unless params
+
+      self.independent_mount_points << MountPoint.new(params[1], to: params[2], fs: params[0])
+    end
   end
 
   class MountPoint

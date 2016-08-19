@@ -42,8 +42,13 @@ apk add --update bash
   # config.add_mount_point root, to: root, readonly: true
   # config.add_mount_point "/lib64", to: root.join("lib64"), readonly: true
 
-  # This is recommended when PID namespace is unshared:
-  config.mount_independent_procfs
+  # Re-mount specific filesystems under new container namespace
+  # These are recommended when namespaces such as pid and net are unshared:
+  config.mount_independent "procfs"
+  config.mount_independent "sysfs"
+  config.mount_independent "devtmpfs"
+  config.mount_independent "devpts"
+  config.mount_independent "shm"
 
   # The namespaces to unshare:
   config.namespace.unshare "mount"

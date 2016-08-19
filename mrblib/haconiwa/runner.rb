@@ -218,11 +218,14 @@ module Haconiwa
       end
     end
 
-    def do_chroot(base, remount_procfs=true)
+    def do_chroot(base, init_mount=true)
       Dir.chroot base.filesystem.chroot
       Dir.chdir "/"
-      if remount_procfs && base.filesystem.mount_independent_procfs
-        Mount.new.mount("proc", "/proc", type: "proc")
+      if init_mount
+        m = Mount.new
+        base.filesystem.independent_mount_points.each do |mp|
+          m.mount mp.src, mp.dest, type: mp.fs
+        end
       end
     end
 

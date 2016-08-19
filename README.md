@@ -65,7 +65,8 @@ Haconiwa::Base.define do |config|
 
   config.add_mount_point "/var/another/root/etc", to: "/var/your_rootfs/etc", readonly: true
   config.add_mount_point "/var/another/root/home", to: "/var/your_rootfs/home"
-  config.mount_independent_procfs
+  config.mount_independent "procfs"
+  config.mount_independent "sysfs"
   config.chroot_to "/var/your_rootfs"
 
   config.namespace.unshare "ipc"
@@ -138,7 +139,7 @@ And `attach` is not concerned with capabilities which is granted to container. S
 * `config.capabilities.allow` - Allow capabilities on container root. Setting parameters other than `:all` should make this acts as whitelist
 * `config.capabilities.drop` - Drop capabilities of container root. Default to act as blacklist
 * `config.add_mount_point` - Add the mount point odf container
-* `config.mount_independent_procfs` - Mount the independent /proc directory in the container. Useful if `"pid"` is unshared
+* `config.mount_independent` - Mount the independent filesystems: `"procfs", "sysfs", "devtmpfs", "devpts" and "shm"` in the newborn container. Useful if `"pid"` or `"net"` are unshared
 * `config.chroot_to` - The new chroot root
 * `config.uid=/config.gid=` - The new container's running uid/gid. `groups=` is also respected
 * `config.add_handler` - Define signal handler at supervisor process(not container itself). Available signals are `SIGTTIN/SIGTTOU/SIGUSR1/SIGUSR2`. See [handler example](./sample/cpu.haco).
