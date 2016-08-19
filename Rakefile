@@ -30,12 +30,37 @@ mruby_root=File.expand_path(ENV["MRUBY_ROOT"] || "#{APP_ROOT}/mruby")
 mruby_config=File.expand_path(ENV["MRUBY_CONFIG"] || "build_config.rb")
 ENV['MRUBY_ROOT'] = mruby_root
 ENV['MRUBY_CONFIG'] = mruby_config
-Rake::Task[:mruby].invoke unless Dir.exist?(mruby_root)
+if !Dir.exist?(mruby_root) or !File.exist?("#{mruby_root}/Rakefile")
+  FileUtils.rm_rf mruby_root
+  Rake::Task[:mruby].invoke
+end
+
 Dir.chdir(mruby_root)
 load "#{mruby_root}/Rakefile"
 
-desc "compile binary"
-task :compile => [:all] do
+desc "Make conistent mruby version"
+task :consistent do
+  match = system %q(test "$(cat ../mruby_version.lock)" = "$( git rev-parse HEAD )")
+  if match
+    STDERR.puts "mruby version is consistent to mruby_version.lock"
+  else
+    STDERR.puts "making mruby version consistent to mruby_version.lock..."
+    Dir.chdir("../") do
+      FileUtils.rm_rf mruby_root
+      Rake::Task[:mruby].invoke
+    end
+  end
+end
+
+bin_path = ENV['INSTALL_DIR'] || "#{MRUBY_ROOT}/bin"
+exes = %w(mruby mrbc mrbtest haconiwa).map{|bin| MRuby.targets['host'].exefile("#{bin_path}/#{bin}") }
+desc "compile host binary"
+task :compile => exes do
+  MRuby.targets['host'].print_build_summary
+end
+
+desc "compile all binary"
+task :compile_all => [:all] do
   bins = ["mruby", "mirb", APP_NAME]
   bins.each do |binname|
     %W(#{mruby_root}/build/x86_64-pc-linux-gnu/bin/#{binname} #{mruby_root}/build/x86_64-pc-linux-gnu_mirb/bin/#{binname}).each do |bin|
@@ -104,7 +129,7 @@ namespace :release do
     sh "rm -rf #{pwd}/tmp/* #{pwd}/pkg/*"
   end
 
-  task :copy => ["release:clean", :compile] do
+  task :copy => ["release:clean", :compile_all] do
     sh "cp #{mruby_root}/build/x86_64-pc-linux-gnu/bin/mruby     #{pwd}/tmp/hacorb"
     sh "cp #{mruby_root}/build/x86_64-pc-linux-gnu_mirb/bin/mirb #{pwd}/tmp/hacoirb"
     sh "cp #{mruby_root}/build/x86_64-pc-linux-gnu/bin/haconiwa  #{pwd}/tmp/haconiwa"

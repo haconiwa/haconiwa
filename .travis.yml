@@ -16,10 +16,14 @@ compiler:
   - clang
 env:
   - MRUBY_VERSION=""
-  - MRUBY_VERSION=master
+  # - MRUBY_VERSION=master
 branches:
   only:
     - master
+cache:
+  directories:
+    - mruby
 
 script:
+  - rake consistent
   - rake test
