@@ -1,0 +1,17 @@
+latest: 0.2.4
+changelog:
+  - version: 0.2.4
+    messages:
+      - Support create/provision subcommand
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Fri,  5 Aug 2016 18:14:23 +0900
+  - version: 0.2.3
+    messages:
+      - Update licenses
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Tue, 26 Jul 2016 15:42:10 +0900
+  - version: 0.2.2
+    messages:
+      - Initial release of haconiwa package
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Fri, 22 Jul 2016 16:30:00 +0900
