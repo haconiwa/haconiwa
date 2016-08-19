@@ -20,7 +20,12 @@ Haconiwa.define do |config|
   config.bootstrap do |b|
     b.strategy = "lxc"
     b.os_type  = "alpine"
+
+    # b.strategy = "debootstrap"
+    # b.variant = "minbase"
+    # b.debian_release = "jessie"
   end
+  # Check that the required binary is installed(lxc-create / debootstrap)
 
   # The provisioning process...
   # You can declare run_shell step by step:
