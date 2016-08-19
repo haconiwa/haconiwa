@@ -7,18 +7,20 @@ module Haconiwa
                   :extra_bind # TODO
 
     class ProvisionOps
-      def initialize(strategy, name, body)
+      def initialize(strategy, name, body, sh)
         @strategy = strategy
         @name = name
         @body = body
+        @sh = sh
       end
-      attr_reader :strategy, :name, :body
+      attr_reader :strategy, :name, :body, :sh
     end
 
-    def run_shell(shell, options={})
+    def run_shell(body, options={})
       name = options.delete(:name)
+      sh   = options.delete(:sh)   || "/bin/sh"
       name ||= "shell-#{ops.size + 1}"
-      ops << ProvisionOps.new("shell", name, shell)
+      ops << ProvisionOps.new("shell", name, body, sh)
     end
 
     def select_ops(selected_ops)
@@ -59,7 +61,7 @@ module Haconiwa
       cmd = RunCmd.new("provison.#{op.name}")
 
       log("Running provisioning with shell script...")
-      cmd.run_with_input("/bin/bash -xe", op.body)
+      cmd.run_with_input("#{op.sh} -xe", op.body)
     end
 
     def chroot_into(root)

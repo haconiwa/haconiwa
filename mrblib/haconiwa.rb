@@ -5,6 +5,8 @@ def __main__(argv)
     puts "haconiwa: v#{Haconiwa::VERSION}"
   when "revisions"
     Haconiwa::Cli.revisions
+  when "new", "init"
+    Haconiwa::Cli.init(argv)
   when "create"
     Haconiwa::Cli.create(argv)
   when "provision"
@@ -19,6 +21,7 @@ def __main__(argv)
     puts <<-USAGE
 haconiwa - The MRuby on Container
 commands:
+    new       - generate haconiwa's config DSL file template
     create    - create the container rootfs
     provision - provision already booted container rootfs
     start     - run the container

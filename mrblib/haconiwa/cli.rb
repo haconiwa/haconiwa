@@ -1,5 +1,30 @@
 module Haconiwa
   module Cli
+    def self.init(args)
+      opt = Argtable.new
+      opt.string('n', 'name', 'CONTAINER_NAME', "Specify the container name if you want")
+      opt.string('r', 'root', 'ROOTFS_LOC', "Specify the rootfs location to generate on host")
+      opt.literal('h', 'help', "Show help")
+      opt.enable_catchall('HACO_FILE', '', 32)
+      e = opt.parse(args)
+
+      if opt['h'].exist?
+        opt.glossary
+        exit
+      end
+
+      unless opt.catchall.exist?
+        raise "Please specify newly creating haco file name"
+        opt.glossary
+        exit 1
+      end
+
+      haconame = opt['n'].exist? ? opt['n'].value : nil
+      root     = opt['r'].exist? ? opt['r'].value : nil
+
+      Haconiwa::Generator.generate_hacofile(opt.catchall.value(0), haconame, root)
+    end
+
     def self.create(args)
       # FIXME: to by DRY
       opt = Argtable.new

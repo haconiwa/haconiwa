@@ -6,3 +6,5 @@ tmp/
 /debian/
 /vendor/
 /.bundle
+
+/*.haco
