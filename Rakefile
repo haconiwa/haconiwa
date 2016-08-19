@@ -52,8 +52,14 @@ task :consistent do
   end
 end
 
-desc "compile binary"
-task :compile => [:all] do
+bin_path = ENV['INSTALL_DIR'] || "#{MRUBY_ROOT}/bin"
+desc "compile host binary"
+task :compile => MRuby.targets['host'].exefile("#{bin_path}/haconiwa") do
+  MRuby.targets['host'].print_build_summary
+end
+
+desc "compile all binary"
+task :compile_all => [:all] do
   bins = ["mruby", "mirb", APP_NAME]
   bins.each do |binname|
     %W(#{mruby_root}/build/x86_64-pc-linux-gnu/bin/#{binname} #{mruby_root}/build/x86_64-pc-linux-gnu_mirb/bin/#{binname}).each do |bin|
@@ -122,7 +128,7 @@ namespace :release do
     sh "rm -rf #{pwd}/tmp/* #{pwd}/pkg/*"
   end
 
-  task :copy => ["release:clean", :compile] do
+  task :copy => ["release:clean", :compile_all] do
     sh "cp #{mruby_root}/build/x86_64-pc-linux-gnu/bin/mruby     #{pwd}/tmp/hacorb"
     sh "cp #{mruby_root}/build/x86_64-pc-linux-gnu_mirb/bin/mirb #{pwd}/tmp/hacoirb"
     sh "cp #{mruby_root}/build/x86_64-pc-linux-gnu/bin/haconiwa  #{pwd}/tmp/haconiwa"
