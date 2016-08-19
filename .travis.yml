@@ -20,6 +20,10 @@ env:
 branches:
   only:
     - master
+cache:
+  directories:
+    - mruby
 
 script:
+  - rake consistent
   - rake test
