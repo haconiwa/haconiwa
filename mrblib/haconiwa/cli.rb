@@ -1,16 +1,9 @@
 module Haconiwa
   module Cli
     def self.init(args)
-      opt = Argtable.new
-      opt.string('n', 'name', 'CONTAINER_NAME', "Specify the container name if you want")
-      opt.string('r', 'root', 'ROOTFS_LOC', "Specify the rootfs location to generate on host")
-      opt.literal('h', 'help', "Show help")
-      opt.enable_catchall('HACO_FILE', '', 32)
-      e = opt.parse(args)
-
-      if opt['h'].exist?
-        opt.glossary
-        exit
+      opt = parse_opts(args) do |o|
+        o.string('n', 'name', 'CONTAINER_NAME', "Specify the container name if you want")
+        o.string('r', 'root', 'ROOTFS_LOC', "Specify the rootfs location to generate on host")
       end
 
       unless opt.catchall.exist?
@@ -26,31 +19,16 @@ module Haconiwa
     end
 
     def self.create(args)
-      # FIXME: to by DRY
-      opt = Argtable.new
-      opt.literal('N', 'no-provision', "Bootstrap but no provisioning")
-      opt.literal('h', 'help', "Show help")
-      opt.enable_catchall('HACO_FILE', '', 32)
-      e = opt.parse(args)
-
-      if opt['h'].exist?
-        opt.glossary
-        exit
+      opt = parse_opts(args) do |o|
+        o.literal('N', 'no-provision', "Bootstrap but no provisioning")
       end
 
       get_base(opt.catchall.values).create(opt['N'].exist?)
     end
 
     def self.provision(args)
-      opt = Argtable.new
-      opt.string('r', 'run-only', 'OP_NAME[,OP_NAME,...]', "Run only specified provision operations by names(splitted with ,)")
-      opt.literal('h', 'help', "Show help")
-      opt.enable_catchall('HACO_FILE', '', 32)
-      e = opt.parse(args)
-
-      if opt['h'].exist?
-        opt.glossary
-        exit
+      opt = parse_opts(args) do |o|
+        o.string('r', 'run-only', 'OP_NAME[,OP_NAME,...]', "Run only specified provision operations by names(splitted with ,)")
       end
 
       ops = opt['r'].exist? ? opt['r'].value.split(',') : []
@@ -58,44 +36,21 @@ module Haconiwa
     end
 
     def self.run(args)
-      opt = Argtable.new
-      opt.literal('D', 'daemon', "Force the container to be daemon")
-      opt.literal('h', 'help', "Show help")
-      opt.enable_catchall('HACO_FILE [-- COMMAND...]', '', 32)
-      e = opt.parse(args)
-
-      if opt['h'].exist?
-        opt.glossary
-        exit
+      opt = parse_opts(args, 'HACO_FILE [-- COMMAND...]') do |o|
+        o.literal('D', 'daemon', "Force the container to be daemon")
       end
 
-      if e > 0
-        opt.glossary
-        exit 1
-      end
       base, init = get_script_and_eval(opt.catchall.values)
       base.daemonize! if opt['D'].exist?
       base.run(*init)
     end
 
     def self.attach(args)
-      opt = Argtable.new
-      opt.integer('t', 'target', 'PID', "Container's PID to attatch.")
-      opt.string('n', 'name', 'CONTAINER_NAME', "Container's name. Set if the name is dynamically defined")
-      opt.string('A', 'allow', 'CAPS[,CAPS...]', "Capabilities to allow attached process. Independent container's own caps")
-      opt.string('D', 'drop', 'CAPS[,CAPS...]', "Capabilities to drop from attached process. Independent container's own caps")
-      opt.literal('h', 'help', "Show help")
-      opt.enable_catchall('HACO_FILE [-- COMMAND...]', '', 32)
-      e = opt.parse(args)
-
-      if opt['h'].exist?
-        opt.glossary
-        exit
-      end
-
-      if e > 0
-        opt.glossary
-        exit 1
+      opt = parse_opts(args, 'HACO_FILE [-- COMMAND...]') do |o|
+        o.integer('t', 'target', 'PID', "Container's PID to attatch.")
+        o.string('n', 'name', 'CONTAINER_NAME', "Container's name. Set if the name is dynamically defined")
+        o.string('A', 'allow', 'CAPS[,CAPS...]', "Capabilities to allow attached process. Independent container's own caps")
+        o.string('D', 'drop', 'CAPS[,CAPS...]', "Capabilities to drop from attached process. Independent container's own caps")
       end
 
       base, exe = get_script_and_eval(opt.catchall.values)
@@ -112,21 +67,9 @@ module Haconiwa
     end
 
     def self.kill(args)
-      opt = Argtable.new
-      opt.integer('t', 'target', 'PID', "Container's PID to kill.")
-      opt.string('s', 'signal', 'SIGFOO', "Signal name. default to TERM")
-      opt.literal('h', 'help', "Show help")
-      opt.enable_catchall('[HACO_FILE]', '', 1)
-      e = opt.parse(args)
-
-      if opt['h'].exist?
-        opt.glossary
-        exit
-      end
-
-      if e > 0
-        opt.glossary
-        exit 1
+      opt = parse_opts(args) do |o|
+        o.integer('t', 'target', 'PID', "Container's PID to kill.")
+        o.string('s', 'signal', 'SIGFOO', "Signal name. default to TERM")
       end
 
       base, _  = get_script_and_eval(opt.catchall.values)
@@ -142,6 +85,30 @@ module Haconiwa
     end
 
     private
+
+    def self.parse_opts(args, hacofile_opt='HACO_FILE', &b)
+      opt = Argtable.new
+      b.call(opt)
+
+      # The default options
+      opt.literal('h', 'help', "Show help")
+      opt.enable_catchall(hacofile_opt, 'Put the config file at the end of command', 32)
+
+      # The defaut behabiours
+      e = opt.parse(args)
+
+      if opt['h'].exist?
+        opt.glossary
+        exit
+      end
+
+      if e > 0
+        opt.glossary
+        exit 1
+      end
+
+      return opt
+    end
 
     def self.get_base(args)
       script = File.read(args[0])
