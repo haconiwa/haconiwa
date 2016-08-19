@@ -20,7 +20,7 @@ haconiwa - The MRuby on Container
 %setup -q
 
 %build
-rake compile
+rake compile_all
 
 %install
 rake install prefix=%{buildroot}/usr
