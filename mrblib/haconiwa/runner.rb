@@ -15,7 +15,7 @@ module Haconiwa
       wrap_daemonize do |base, notifier|
         jail_pid(base)
         pid = Process.fork do
-          apply_namespace(base)
+          apply_namespace(base.namespace)
           apply_filesystem(base)
           apply_rlimit(base.resource)
           apply_cgroup(base)
@@ -136,8 +136,16 @@ module Haconiwa
       end
     end
 
-    def apply_namespace(base)
-      ::Namespace.unshare(base.namespace.to_flag_without_pid)
+    def apply_namespace(namespace)
+      ::Namespace.unshare(namespace.to_flag_for_unshare)
+
+      if namespace.setns_on_run?
+        namespace.ns_to_path.each do |ns, path|
+          f = File.open(path)
+          ::Namespace.setns(ns, fd: f.fileno)
+          f.close
+        end
+      end
     end
 
     def apply_filesystem(base)
