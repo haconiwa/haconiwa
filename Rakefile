@@ -34,6 +34,20 @@ Rake::Task[:mruby].invoke unless Dir.exist?(mruby_root)
 Dir.chdir(mruby_root)
 load "#{mruby_root}/Rakefile"
 
+desc "Make conistent mruby version"
+task :consistent do
+  match = system %q(test "$(cat ../mruby_version.lock)" = "$( git rev-parse HEAD )")
+  if match
+    STDERR.puts "mruby version is consistent to mruby_version.lock"
+  else
+    STDERR.puts "making mruby version consistent to mruby_version.lock..."
+    Dir.chdir("../") do
+      FileUtils.rm_rf mruby_root
+      Rake::Task[:mruby].invoke
+    end
+  end
+end
+
 desc "compile binary"
 task :compile => [:all] do
   bins = ["mruby", "mirb", APP_NAME]
