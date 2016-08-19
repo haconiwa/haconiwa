@@ -1,5 +1,12 @@
-latest: 0.2.4
+latest: 0.3.0
 changelog:
+  - version: 0.3.0
+    messages:
+      - Support new subcommand to generate DSL boilerplate
+      - Support entering existing namespace(useful with netns)
+      - Add mount_independent, deprecate mount_independent_procfs
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Fri, 19 Aug 2016 19:03:53 +0900
   - version: 0.2.4
     messages:
       - Support create/provision subcommand
