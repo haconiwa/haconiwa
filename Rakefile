@@ -53,8 +53,9 @@ task :consistent do
 end
 
 bin_path = ENV['INSTALL_DIR'] || "#{MRUBY_ROOT}/bin"
+exes = %w(mruby mrbc mrbtest haconiwa).map{|bin| MRuby.targets['host'].exefile("#{bin_path}/#{bin}") }
 desc "compile host binary"
-task :compile => MRuby.targets['host'].exefile("#{bin_path}/haconiwa") do
+task :compile => exes do
   MRuby.targets['host'].print_build_summary
 end
 
