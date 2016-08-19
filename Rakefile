@@ -30,7 +30,11 @@ mruby_root=File.expand_path(ENV["MRUBY_ROOT"] || "#{APP_ROOT}/mruby")
 mruby_config=File.expand_path(ENV["MRUBY_CONFIG"] || "build_config.rb")
 ENV['MRUBY_ROOT'] = mruby_root
 ENV['MRUBY_CONFIG'] = mruby_config
-Rake::Task[:mruby].invoke unless Dir.exist?(mruby_root)
+if !Dir.exist?(mruby_root) or !File.exist?("#{mruby_root}/Rakefile")
+  FileUtils.rm_rf mruby_root
+  Rake::Task[:mruby].invoke
+end
+
 Dir.chdir(mruby_root)
 load "#{mruby_root}/Rakefile"
 
