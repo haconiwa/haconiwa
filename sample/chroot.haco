@@ -16,7 +16,11 @@ Haconiwa.define do |config|
   #config.add_mount_point "/usr/bin", to: root.join("usr/bin"), readonly: true
   config.add_mount_point "tmpfs", to: root.join("tmp"), fs: "tmpfs"
   config.add_mount_point "/var/haconiwa/user_homes/", to: root.join("home/haconiwa")
-  config.mount_independent_procfs
+  config.mount_independent("procfs")
+  config.mount_independent("sysfs")
+  config.mount_independent("devtmpfs")
+  config.mount_independent("devpts")
+  config.mount_independent("shm")
   config.chroot_to root
 
   config.namespace.unshare "mount"
