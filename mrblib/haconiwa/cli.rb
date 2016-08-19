@@ -94,7 +94,7 @@ module Haconiwa
       opt.literal('h', 'help', "Show help")
       opt.enable_catchall(hacofile_opt, 'Put the config file at the end of command', 32)
 
-      # The defaut behabiours
+      # The defaut behaviours
       e = opt.parse(args)
 
       if opt['h'].exist?
