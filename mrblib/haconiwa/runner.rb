@@ -5,6 +5,9 @@ module Haconiwa
   class LinuxRunner < Runner
     def initialize(base)
       @base = base
+      if Haconiwa.config.etcd_available?
+        @etcd = Etcd::Client.new(Haconiwa.config.etcd_url)
+      end
     end
 
     def run(init_command)
@@ -124,6 +127,14 @@ module Haconiwa
         end
         w.close
         pid = r.read
+
+        base.created_at = Time.now
+        base.pid = pid
+        base.supervisor_pid = ppid
+        if @etcd
+          @etcd.set "haconinwa.mruby.org/localhost/#{base.name}", base.to_container_json
+        end
+
         puts "Container successfullly up. PID={container: #{pid.chomp}, supervisor: #{ppid}}"
       else
         b.call(@base, nil)

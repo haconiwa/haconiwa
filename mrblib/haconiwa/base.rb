@@ -9,7 +9,8 @@ module Haconiwa
                   :capabilities,
                   :attached_capabilities,
                   :signal_handler,
-                  :pid
+                  :pid,
+                  :supervisor_pid
 
     attr_reader   :init_command,
                   :uid,
@@ -159,6 +160,19 @@ module Haconiwa
 
     def daemon?
       !! @daemon
+    end
+
+    def to_container_json
+      {
+        name: self.name,
+        root: self.filesystem.chroot,
+        command: self.init_command.join(" "),
+        created_at: self.created_at,
+        status: "running", # TODO: support status
+        metadata: {dummy: "dummy"}, # TODO: support metadata/tagging
+        pid: self.pid,
+        supervisor_pid: self.supervisor_pid,
+      }.to_json
     end
 
     def validate_non_nil(obj, msg)

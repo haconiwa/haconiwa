@@ -31,6 +31,7 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.add_dependency 'mruby-process-sys' , :github => 'haconiwa/mruby-process-sys'
   spec.add_dependency 'mruby-argtable'  , :github => 'udzura/mruby-argtable', :branch => 'static-link-argtable3'
   spec.add_dependency 'mruby-signal'    , :github => 'ksss/mruby-signal'
+  spec.add_dependency 'mruby-etcd'      , :github => 'udzura/mruby-etcd'
 
   def spec.save_dependent_mgem_revisions
     file DEFS_FILE do
