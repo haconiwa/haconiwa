@@ -1,5 +1,5 @@
 module Haconiwa
-  class Process
+  class ProcessList
     def initialize
       if Haconiwa.config.etcd_available?
         @etcd = Etcd::Client.new(Haconiwa.config.etcd_url)
@@ -8,9 +8,9 @@ module Haconiwa
       end
     end
 
-    LIST_FORMAT = "%-16s\t%-16s\t%-16s\t%-16s\t%-30s\t%-8s\t%5s\t%5s"
+    LIST_FORMAT = "%-16s\t%-16s\t%-16s\t%-16s\t%-30s\t%-8s\t%-5s\t%-5s"
 
-    def show_list
+    def show
       puts sprintf(LIST_FORMAT, *(%w(NAME HOST ROOTFS COMMAND CREATED_AT STATUS PID SPID)))
       puts containers.map{|c| sprintf(LIST_FORMAT, *to_array(c)) }.join("\n")
     end

@@ -41,6 +41,9 @@ module Haconiwa
 
         pid, status = Process.waitpid2 pid
         cleanup_cgroup(base)
+        if @etcd
+          @etcd.delete base.etcd_key
+        end
         File.unlink base.container_pid_file
         if status.success?
           puts "Container successfullly exited: #{status.inspect}"
@@ -107,9 +110,6 @@ module Haconiwa
       10.times do
         sleep 0.1
         unless File.exist?(@base.container_pid_file)
-          if @etcd
-            @etcd.delete @base.etcd_key
-          end
           puts "Kill success"
           Process.exit 0
         end

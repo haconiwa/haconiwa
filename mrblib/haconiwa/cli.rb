@@ -73,7 +73,7 @@ module Haconiwa
         exit
       end
 
-      Haconiwa::Process.new.show_list
+      Haconiwa::ProcessList.new.show
     end
 
     def self.kill(args)
