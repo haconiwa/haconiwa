@@ -60,6 +60,11 @@ module Haconiwa
       base.attach(*exe)
     end
 
+    def self.ps
+      load_global_config
+      p Haconiwa.config.etcd_available?
+    end
+
     def self.kill(args)
       opt = parse_opts(args) do |o|
         o.integer('t', 'target', 'PID', "Container's PID to kill.")
@@ -79,6 +84,14 @@ module Haconiwa
     end
 
     private
+
+    GLOBAL_CONFIG_FILE = "/etc/haconiwa.conf.rb"
+    def self.load_global_config
+      # The hook of load global config
+      if File.exist?(GLOBAL_CONFIG_FILE)
+        eval(File.read GLOBAL_CONFIG_FILE)
+      end
+    end
 
     def self.parse_opts(args, hacofile_opt='HACO_FILE', &b)
       opt = Argtable.new

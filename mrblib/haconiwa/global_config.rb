@@ -3,7 +3,12 @@ module Haconiwa
     attr_accessor :etcd_url
 
     def etcd_available?
-      # WIP
+      return false unless etcd_url
+
+      _url = etcd_url.split(':')
+      host = _url[-2].gsub("/", "")
+      port = _url[-1].to_i
+      !!(TCPSocket.open(host, port)) rescue false
     end
 
     class << self
