@@ -68,6 +68,8 @@ module Haconiwa
     end
 
     def self.kill(args)
+      load_global_config
+
       opt = parse_opts(args) do |o|
         o.integer('t', 'target', 'PID', "Container's PID to kill.")
         o.string('s', 'signal', 'SIGFOO', "Signal name. default to TERM")

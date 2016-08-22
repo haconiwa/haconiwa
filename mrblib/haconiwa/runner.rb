@@ -7,6 +7,7 @@ module Haconiwa
       @base = base
       if Haconiwa.config.etcd_available?
         @etcd = Etcd::Client.new(Haconiwa.config.etcd_url)
+        base.etcd_name = @etcd.stats["name"]
       end
     end
 
@@ -106,6 +107,9 @@ module Haconiwa
       10.times do
         sleep 0.1
         unless File.exist?(@base.container_pid_file)
+          if @etcd
+            @etcd.delete @base.etcd_key
+          end
           puts "Kill success"
           Process.exit 0
         end
@@ -132,7 +136,7 @@ module Haconiwa
         @base.pid = pid.to_i
         @base.supervisor_pid = ppid
         if @etcd
-          @etcd.put "haconinwa.mruby.org/localhost/#{@base.name}", @base.to_container_json
+          @etcd.put @base.etcd_key, @base.to_container_json
         end
 
         puts "Container successfullly up. PID={container: #{@base.pid}, supervisor: #{@base.supervisor_pid}}"
