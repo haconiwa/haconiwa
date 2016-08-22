@@ -62,9 +62,18 @@ module Haconiwa
       base.attach(*exe)
     end
 
-    def self.ps
+    def self.ps(args)
       load_global_config
-      p Haconiwa.config.etcd_available?
+      opt = Argtable.new
+      opt.literal('h', 'help', "Show help")
+      opt.parse(args)
+
+      if opt['h'].exist?
+        opt.glossary
+        exit
+      end
+
+      Haconiwa::Process.new.show_list
     end
 
     def self.kill(args)
