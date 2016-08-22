@@ -30,6 +30,8 @@ module Haconiwa
     end
 
     def self.run(args)
+      load_global_config
+
       opt = parse_opts(args, 'HACO_FILE [-- COMMAND...]') do |o|
         o.literal('D', 'daemon', "Force the container to be daemon")
       end

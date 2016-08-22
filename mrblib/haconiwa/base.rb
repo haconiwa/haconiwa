@@ -10,7 +10,8 @@ module Haconiwa
                   :attached_capabilities,
                   :signal_handler,
                   :pid,
-                  :supervisor_pid
+                  :supervisor_pid,
+                  :created_at
 
     attr_reader   :init_command,
                   :uid,

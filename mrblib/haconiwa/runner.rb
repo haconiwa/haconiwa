@@ -128,14 +128,14 @@ module Haconiwa
         w.close
         pid = r.read
 
-        base.created_at = Time.now
-        base.pid = pid
-        base.supervisor_pid = ppid
+        @base.created_at = Time.now
+        @base.pid = pid.to_i
+        @base.supervisor_pid = ppid
         if @etcd
-          @etcd.set "haconinwa.mruby.org/localhost/#{base.name}", base.to_container_json
+          @etcd.put "haconinwa.mruby.org/localhost/#{@base.name}", @base.to_container_json
         end
 
-        puts "Container successfullly up. PID={container: #{pid.chomp}, supervisor: #{ppid}}"
+        puts "Container successfullly up. PID={container: #{@base.pid}, supervisor: #{@base.supervisor_pid}}"
       else
         b.call(@base, nil)
       end
