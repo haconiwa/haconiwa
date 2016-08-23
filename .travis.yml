@@ -1,8 +1,12 @@
-sudo: false
+dist: trusty
+sudo: required
+
 language: c
 addons:
   apt:
     packages:
+      - rake
+      - psmisc
       - bison
       - git
       - gperf
@@ -26,4 +30,5 @@ cache:
 
 script:
   - rake consistent
-  - rake test
+  - rake compile
+  - sudo /usr/bin/rake test:bintest
