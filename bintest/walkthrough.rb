@@ -2,6 +2,7 @@ require 'open3'
 require 'fileutils'
 
 if `whoami` =~ /root/
+### start sudo test
 
 begin
   Haconiwa::VERSION
@@ -71,4 +72,11 @@ assert('walkthrough') do
   end
 end
 
+assert('empty ps') do
+  output, status = run_haconiwa "ps"
+  assert_true status.success?, "Process did not exit cleanly: ps"
+  assert_equal 1, output.chomp.lines.size
+end
+
+### end sudo test
 end
