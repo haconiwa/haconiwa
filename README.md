@@ -151,9 +151,9 @@ Please look into [`sample`](./sample) directory.
 
 ### Clustering
 
-#### Container control with etcd
+#### Container management with etcd
 
-If there is a `/etc/haconiwa.onf.rb` file, as a global config:
+If there is a `/etc/haconiwa.conf.rb` file like below, as a global config:
 
 ```ruby
 Haconiwa.configure do |config|
