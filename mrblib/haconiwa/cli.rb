@@ -30,6 +30,8 @@ module Haconiwa
     end
 
     def self.run(args)
+      load_global_config
+
       opt = parse_opts(args, 'HACO_FILE [-- COMMAND...]') do |o|
         o.literal('D', 'daemon', "Force the container to be daemon")
       end
@@ -60,7 +62,23 @@ module Haconiwa
       base.attach(*exe)
     end
 
+    def self.ps(args)
+      load_global_config
+      opt = Argtable.new
+      opt.literal('h', 'help', "Show help")
+      opt.parse(args)
+
+      if opt['h'].exist?
+        opt.glossary
+        exit
+      end
+
+      Haconiwa::ProcessList.new.show
+    end
+
     def self.kill(args)
+      load_global_config
+
       opt = parse_opts(args) do |o|
         o.integer('t', 'target', 'PID', "Container's PID to kill.")
         o.string('s', 'signal', 'SIGFOO', "Signal name. default to TERM")
@@ -79,6 +97,14 @@ module Haconiwa
     end
 
     private
+
+    GLOBAL_CONFIG_FILE = "/etc/haconiwa.conf.rb"
+    def self.load_global_config
+      # The hook of load global config
+      if File.exist?(GLOBAL_CONFIG_FILE)
+        eval(File.read GLOBAL_CONFIG_FILE)
+      end
+    end
 
     def self.parse_opts(args, hacofile_opt='HACO_FILE', &b)
       opt = Argtable.new

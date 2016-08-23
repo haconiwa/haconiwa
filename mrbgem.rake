@@ -23,6 +23,8 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.add_dependency 'mruby-capability', :github => 'matsumoto-r/mruby-capability'
   spec.add_dependency 'mruby-resource'  , :github => 'harasou/mruby-resource'
   spec.add_dependency 'mruby-dir'       , :github => 'iij/mruby-dir' # with Dir#chroot
+  spec.add_dependency 'mruby-socket'    , :github => 'iij/mruby-socket'
+  spec.add_dependency 'mruby-regexp-pcre', :github => 'iij/mruby-regexp-pcre'
   spec.add_dependency 'mruby-procutil'  , :github => 'haconiwa/mruby-procutil'
   spec.add_dependency 'mruby-exec'      , :github => 'haconiwa/mruby-exec'
   spec.add_dependency 'mruby-namespace' , :github => 'haconiwa/mruby-namespace'
@@ -30,6 +32,7 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.add_dependency 'mruby-process-sys' , :github => 'haconiwa/mruby-process-sys'
   spec.add_dependency 'mruby-argtable'  , :github => 'udzura/mruby-argtable', :branch => 'static-link-argtable3'
   spec.add_dependency 'mruby-signal'    , :github => 'ksss/mruby-signal'
+  spec.add_dependency 'mruby-etcd'      , :github => 'udzura/mruby-etcd'
 
   def spec.save_dependent_mgem_revisions
     file DEFS_FILE do

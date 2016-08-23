@@ -5,6 +5,10 @@ module Haconiwa
   class LinuxRunner < Runner
     def initialize(base)
       @base = base
+      if Haconiwa.config.etcd_available?
+        @etcd = Etcd::Client.new(Haconiwa.config.etcd_url)
+        base.etcd_name = @etcd.stats["name"]
+      end
     end
 
     def run(init_command)
@@ -37,6 +41,9 @@ module Haconiwa
 
         pid, status = Process.waitpid2 pid
         cleanup_cgroup(base)
+        if @etcd
+          @etcd.delete base.etcd_key
+        end
         File.unlink base.container_pid_file
         if status.success?
           puts "Container successfullly exited: #{status.inspect}"
@@ -124,7 +131,15 @@ module Haconiwa
         end
         w.close
         pid = r.read
-        puts "Container successfullly up. PID={container: #{pid.chomp}, supervisor: #{ppid}}"
+
+        @base.created_at = Time.now
+        @base.pid = pid.to_i
+        @base.supervisor_pid = ppid
+        if @etcd
+          @etcd.put @base.etcd_key, @base.to_container_json
+        end
+
+        puts "Container successfullly up. PID={container: #{@base.pid}, supervisor: #{@base.supervisor_pid}}"
       else
         b.call(@base, nil)
       end
