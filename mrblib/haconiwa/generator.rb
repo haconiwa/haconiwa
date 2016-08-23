@@ -7,8 +7,8 @@ Haconiwa.define do |config|
   config.name = !__NAME__!
   # The first process when invoking haconiwa run:
   config.init_command = "/bin/bash"
-  # If your first process is a daemon, please explicitly deamonize by:
-  # config.deamonize!
+  # If your first process is a daemon, please explicitly daemonize by:
+  # config.daemonize!
 
   # The rootfs location on your host OS
   # Pathname class is useful:
