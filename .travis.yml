@@ -3,9 +3,9 @@ sudo: required
 
 language: c
 before_install:
-  - sudo add-apt-repository ppa:cloud-green/trusty-backports -y
-  - sudo apt-get update -q
-  - sudo apt-get install etcd
+  - curl -L  https://github.com/coreos/etcd/releases/download/v2.3.7/etcd-v2.3.7-linux-amd64.tar.gz -o etcd-v2.3.7-linux-amd64.tar.gz
+  - tar xzvf etcd-v2.3.7-linux-amd64.tar.gz
+  - cd etcd-v2.3.7-linux-amd64 && sudo nohup ./etcd &
 addons:
   apt:
     packages:
