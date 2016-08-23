@@ -9,7 +9,6 @@ before_install:
 addons:
   apt:
     packages:
-      - etcd
       - rake
       - psmisc
       - bison
