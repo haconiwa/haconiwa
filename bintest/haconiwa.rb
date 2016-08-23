@@ -1,8 +1,13 @@
 require 'open3'
 
-load File.join(File.dirname(__FILE__), "../mrblib/haconiwa/version.rb")
+begin
+  Haconiwa::VERSION
+rescue NameError
+  load File.join(File.dirname(__FILE__), "../mrblib/haconiwa/version.rb")
+end
 
-BIN_PATH = File.join(File.dirname(__FILE__), "../mruby/bin/haconiwa")
+BIN_PATH = File.join(File.dirname(__FILE__), "../mruby/bin/haconiwa") unless defined?(BIN_PATH)
+
 MRUBY_REVISION = File.read(File.join(File.dirname(__FILE__), "../mruby_version.lock")).chomp
 
 assert('revision') do
