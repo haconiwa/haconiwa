@@ -1,6 +1,8 @@
 require 'open3'
 require 'fileutils'
 
+if `whoami` =~ /root/
+
 begin
   Haconiwa::VERSION
 rescue NameError
@@ -22,7 +24,7 @@ end
 
 assert('walkthrough') do
   haconame = "test-#{rand(65535)}-#{$$}.haco"
-  Dir.chdir File.dirname(HACONIWA_TMP_ROOT)do
+  Dir.chdir File.dirname(HACONIWA_TMP_ROOT) do
     output, status = run_haconiwa "new", haconame, "--root=#{HACONIWA_TMP_ROOT}"
 
     assert_true status.success?, "Process did not exit cleanly: new"
@@ -36,6 +38,8 @@ assert('walkthrough') do
     assert_true status.success?, "Process did not exit cleanly: create"
 
     assert_true File.directory? "#{HACONIWA_TMP_ROOT}/root"
-    assert_true (/^3\.\d\.\d$/).match?(File.read("#{HACONIWA_TMP_ROOT}/alpine-release"))
+    assert_true (/^3\.\d\.\d$/).match(File.read("#{HACONIWA_TMP_ROOT}/etc/alpine-release"))
   end
+end
+
 end
