@@ -5,6 +5,7 @@ language: c
 addons:
   apt:
     packages:
+      - etcd
       - rake
       - psmisc
       - bison

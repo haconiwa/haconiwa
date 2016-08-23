@@ -19,13 +19,15 @@ FileUtils.mkdir_p File.dirname(HACONIWA_TMP_ROOT)
 at_exit { FileUtils.rm_rf File.dirname(HACONIWA_TMP_ROOT) }
 
 def run_haconiwa(subcommand, *args)
+  STDERR.puts "[testcase]\thaconiwa #{[subcommand, *args].join(' ')}"
   return Open3.capture2(BIN_PATH, subcommand, *args)
 end
 
 assert('walkthrough') do
   haconame = "test-#{rand(65535)}-#{$$}.haco"
   Dir.chdir File.dirname(HACONIWA_TMP_ROOT) do
-    output, status = run_haconiwa "new", haconame, "--root=#{HACONIWA_TMP_ROOT}"
+    test_name = "haconiwa-tester-#{$$}"
+    output, status = run_haconiwa "new", haconame, "--root=#{HACONIWA_TMP_ROOT}", "--name=#{test_name}"
 
     assert_true status.success?, "Process did not exit cleanly: new"
     assert_true File.file? haconame
@@ -50,6 +52,16 @@ assert('walkthrough') do
 
     subprocess = `pstree -Al $(pgrep haconiwa) | awk -F'---' '{print $2}'`
     assert_false subprocess.empty?
+
+    FileUtils.rm_rf "/etc/haconiwa.conf.rb"
+    output, status = run_haconiwa "new", "--global"
+    assert_true status.success?, "Process did not exit cleanly: new --global"
+    assert_true File.file? "/etc/haconiwa.conf.rb"
+
+    output, status = run_haconiwa "ps"
+    assert_include output, "NAME"
+    assert_include output, test_name
+    assert_include output, HACONIWA_TMP_ROOT
 
     output, status = run_haconiwa "kill", haconame
     assert_true status.success?, "Process did not exit cleanly: kill"
