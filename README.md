@@ -149,6 +149,22 @@ e.g. just using `mount` namespace unshared, container with common filesystem, li
 
 Please look into [`sample`](./sample) directory.
 
+### Clustering
+
+#### Container control with etcd
+
+If there is a `/etc/haconiwa.onf.rb` file, as a global config:
+
+```ruby
+Haconiwa.configure do |config|
+  config.etcd_url = "http://localhost:2379/v2"
+end
+```
+
+`haconiwa` cli understands this DSL and uses [etcd](https://coreos.com/etcd/) as a container database backend, with enabled clustering. We recommend to set etcd's server name to host's primary LAN IP(such as: `ETCD_NAME="192.168.0.100"`).
+
+You can run `haconiwa ps` to check container processes (all over the hosts clustered by etcd!).
+
 ### Programming the container world by mruby
 
 e.g.:
