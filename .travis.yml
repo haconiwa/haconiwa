@@ -1,4 +1,6 @@
-sudo: false
+dist: trusty
+sudo: required
+
 language: c
 addons:
   apt:
@@ -26,4 +28,4 @@ cache:
 
 script:
   - rake consistent
-  - rake test
+  - sudo rake test:bintest
