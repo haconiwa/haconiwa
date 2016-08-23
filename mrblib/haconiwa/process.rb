@@ -22,8 +22,10 @@ module Haconiwa
         if host["dir"]
           begin
             key = host["key"].sub(/^\//, '')
-            @etcd.list(key).each do |container|
-              c << JSON.parse(container["value"])
+            if cs = @etcd.list(key)
+              cs.each do |container|
+                c << JSON.parse(container["value"])
+              end
             end
           rescue
             STDERR.puts "[Warn] Invalid key #{key}. skip"
