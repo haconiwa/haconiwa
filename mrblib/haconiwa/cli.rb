@@ -1,15 +1,20 @@
 module Haconiwa
   module Cli
     def self.init(args)
-      opt = parse_opts(args) do |o|
+      opt = parse_opts(args, 'HACO_FILE', ignore_catchall: lambda {|o| o['G'].exist? } ) do |o|
         o.string('n', 'name', 'CONTAINER_NAME', "Specify the container name if you want")
         o.string('r', 'root', 'ROOTFS_LOC', "Specify the rootfs location to generate on host")
+        o.literal('G', 'global', "Create global config /etc/haconiwa.conf.rb")
       end
 
       haconame = opt['n'].exist? ? opt['n'].value : nil
       root     = opt['r'].exist? ? opt['r'].value : nil
 
-      Haconiwa::Generator.generate_hacofile(opt.catchall.value(0), haconame, root)
+      if opt['G'].exist?
+        Haconiwa::Generator.generate_global_config
+      else
+        Haconiwa::Generator.generate_hacofile(opt.catchall.value(0), haconame, root)
+      end
     end
 
     def self.create(args)
@@ -106,7 +111,7 @@ module Haconiwa
       end
     end
 
-    def self.parse_opts(args, hacofile_opt='HACO_FILE', &b)
+    def self.parse_opts(args, hacofile_opt='HACO_FILE', options={}, &b)
       opt = Argtable.new
       b.call(opt)
 
@@ -127,7 +132,13 @@ module Haconiwa
         exit 1
       end
 
-      unless opt.catchall.exist?
+      ignore_catchall = if options[:ignore_catchall]
+                          options[:ignore_catchall][opt]
+                        else
+                          false
+                        end
+
+      if !ignore_catchall and !opt.catchall.exist?
         STDERR.puts "Please specify haco file name"
         opt.glossary
         exit 1

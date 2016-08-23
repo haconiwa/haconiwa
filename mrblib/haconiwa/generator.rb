@@ -1,6 +1,6 @@
 module Haconiwa
   module Generator
-    BASE_TEMPLATE = <<-TEMPLATE
+    BASE_TEMPLATE = <<-RUBY
 # -*- mode: ruby -*-
 Haconiwa.define do |config|
   # The container name and container's hostname:
@@ -83,7 +83,13 @@ apk add --update bash
   # https://github.com/haconiwa/haconiwa/tree/master/sample
   # Enjoy your own container!
 end
-    TEMPLATE
+    RUBY
+
+    CONFIG_TEMPLATE = <<-RUBY
+Haconiwa.configure do |config|
+  config.etcd_url = "http://localhost:2379/v2"
+end
+    RUBY
 
     def self.generate_hacofile(hacofile, haconame=nil, root=nil)
       if File.exist?(hacofile)
@@ -102,6 +108,17 @@ end
         f.puts template
       end
       puts 'create'.green + "\t#{hacofile}"
+    end
+
+    def self.generate_global_config
+      if File.exist?("/etc/haconiwa.conf.rb")
+        raise "Cannot override config file. Please run: rm -f /etc/haconiwa.conf.rb"
+      end
+
+      File.open("/etc/haconiwa.conf.rb", "w") do |f|
+        f.puts CONFIG_TEMPLATE
+      end
+      puts 'create'.green + "\t/etc/haconiwa.conf.rb"
     end
 
     def self.gen_haconame(id)
