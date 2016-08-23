@@ -1,6 +1,6 @@
 Name: haconiwa
 Epoch: 1
-Version: 0.3.0
+Version: 0.3.1
 Release: 1
 Summary: MRuby on Container
 License: GPLv3+
@@ -49,6 +49,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Tue Aug 23 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.3.1-1
+- Support haconiwa ps, cooperating with etcd
+
 * Fri Aug 19 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.3.0-1
 - Support new subcommand to generate DSL boilerplate
 - Support entering existing namespace(useful with netns)

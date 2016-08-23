@@ -1,3 +1,9 @@
+haconiwa (0.3.1-1) unstable; urgency=medium
+
+  * Support haconiwa ps, cooperating with etcd
+
+ -- Uchio Kondo <udzura@udzura.jp>  Tue, Aug 23 2016 17:03:53 +0900
+
 haconiwa (0.3.0-1) unstable; urgency=medium
 
   * Support new subcommand to generate DSL boilerplate
