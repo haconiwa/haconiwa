@@ -28,6 +28,12 @@ assert('walkthrough') do
   haconame = "test-#{rand(65535)}-#{$$}.haco"
   Dir.chdir File.dirname(HACONIWA_TMP_ROOT) do
     test_name = "haconiwa-tester-#{$$}"
+
+    FileUtils.rm_rf "/etc/haconiwa.conf.rb"
+    output, status = run_haconiwa "new", "--global"
+    assert_true status.success?, "Process did not exit cleanly: new --global"
+    assert_true File.file? "/etc/haconiwa.conf.rb"
+
     output, status = run_haconiwa "new", haconame, "--root=#{HACONIWA_TMP_ROOT}", "--name=#{test_name}"
 
     assert_true status.success?, "Process did not exit cleanly: new"
@@ -54,11 +60,6 @@ assert('walkthrough') do
     subprocess = `pstree -Al $(pgrep haconiwa) | awk -F'---' '{print $2}'`
     assert_false subprocess.empty?
 
-    FileUtils.rm_rf "/etc/haconiwa.conf.rb"
-    output, status = run_haconiwa "new", "--global"
-    assert_true status.success?, "Process did not exit cleanly: new --global"
-    assert_true File.file? "/etc/haconiwa.conf.rb"
-
     output, status = run_haconiwa "ps"
     assert_include output, "NAME"
     assert_include output, test_name
@@ -75,7 +76,7 @@ end
 assert('empty ps') do
   output, status = run_haconiwa "ps"
   assert_true status.success?, "Process did not exit cleanly: ps"
-  assert_equal 1, output.chomp.lines.size
+  assert_equal 1, output.chomp.lines.to_a.size
 end
 
 ### end sudo test
