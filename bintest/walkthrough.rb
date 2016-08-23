@@ -31,7 +31,8 @@ assert('walkthrough') do
     assert_true File.file? haconame
     check = system "ruby -c #{haconame}"
     assert_true check
-    system %Q(sed -i 's;config.init_command.*;config.init_command = ["/bin/sleep", "1d"];' #{haconame})
+    dummy_daemon = %q(["/bin/sh", "-c", "trap exit 15; while true; do : ; done"])
+    system %Q(sed -i 's!config.init_command.*!config.init_command = #{dummy_daemon}!' #{haconame})
     system %Q(sed -i 's/# config.daemonize\!/config.daemonize\!/' #{haconame})
 
     output, status = run_haconiwa "create", haconame
@@ -39,6 +40,18 @@ assert('walkthrough') do
 
     assert_true File.directory? "#{HACONIWA_TMP_ROOT}/root"
     assert_true (/^3\.\d\.\d$/).match(File.read("#{HACONIWA_TMP_ROOT}/etc/alpine-release"))
+
+    output, status = run_haconiwa "run", haconame
+    assert_true status.success?, "Process did not exit cleanly: run"
+    processes = `ps axf`
+    assert_include processes, "haconiwa run #{haconame}"
+    assert_include processes, "while true"
+
+    output, status = run_haconiwa "kill", haconame
+    assert_true status.success?, "Process did not exit cleanly: kill"
+
+    processes = `ps axf`
+    assert_not_include processes, "haconiwa run #{haconame}"
   end
 end
 
