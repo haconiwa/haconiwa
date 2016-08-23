@@ -5,6 +5,7 @@ language: c
 addons:
   apt:
     packages:
+      - rake
       - bison
       - git
       - gperf
@@ -28,4 +29,4 @@ cache:
 
 script:
   - rake consistent
-  - sudo rake test:bintest
+  - sudo /usr/bin/rake test:bintest
