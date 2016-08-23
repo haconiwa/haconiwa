@@ -8,7 +8,12 @@ module Haconiwa
       _url = etcd_url.gsub("/v2", "").split(':')
       host = _url[-2].gsub("/", "")
       port = _url[-1].to_i
-      !!(TCPSocket.open(host, port)) rescue false
+      begin
+        !!(TCPSocket.open(host, port))
+      rescue
+        STDERR.puts "[Warn] etcd_url=#{etcd_url} at /etc/haconiwa.conf.rb configured, but seems to be unavailable"
+        false
+      end
     end
 
     class << self
