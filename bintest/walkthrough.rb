@@ -34,6 +34,8 @@ assert('walkthrough') do
     dummy_daemon = %q(["/bin/sh", "-c", "trap exit 15; while true; do : ; done"])
     system %Q(sed -i 's!config.init_command.*!config.init_command = #{dummy_daemon}!' #{haconame})
     system %Q(sed -i 's/# config.daemonize\!/config.daemonize\!/' #{haconame})
+    # FIXME: /dev/shm does not exist after lxc-create'd on trusty?
+    system %Q(sed -i '/config.mount_independent "shm"/d' #{haconame})
 
     output, status = run_haconiwa "create", haconame
     assert_true status.success?, "Process did not exit cleanly: create"
