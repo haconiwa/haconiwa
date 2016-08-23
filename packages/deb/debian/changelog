@@ -1,3 +1,9 @@
+haconiwa (0.3.2-1) unstable; urgency=medium
+
+  * Fix some haconiwa ps troubles
+
+ -- Uchio Kondo <udzura@udzura.jp>  Tue, 23 Aug 2016 19:13:30 +0900
+
 haconiwa (0.3.1-1) unstable; urgency=medium
 
   * Support haconiwa ps, cooperating with etcd

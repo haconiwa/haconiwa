@@ -1,5 +1,10 @@
-latest: 0.3.1
+latest: 0.3.2
 changelog:
+  - version: 0.3.2
+    messages:
+      - Fix some haconiwa ps troubles
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Tue, 23 Aug 2016 19:13:30 +0900
   - version: 0.3.1
     messages:
       - Support haconiwa ps, cooperating with etcd
