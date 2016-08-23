@@ -2,13 +2,11 @@ haconiwa (0.3.1-1) unstable; urgency=medium
 
   * Support haconiwa ps, cooperating with etcd
 
- -- Uchio Kondo <udzura@udzura.jp>  Tue, Aug 23 2016 17:03:53 +0900
+ -- Uchio Kondo <udzura@udzura.jp>  Tue, 23 Aug 2016 17:03:53 +0900
 
 haconiwa (0.3.0-1) unstable; urgency=medium
 
-  * Support new subcommand to generate DSL boilerplate
-  * Support entering existing namespace(useful with netns)
-  * Add mount_independent, deprecate mount_independent_procfs
+  * Support new subcommand to generate DSL boilerplate, Support entering existing namespace(useful with netns), Add mount_independent, deprecate mount_independent_procfs
 
  -- Uchio Kondo <udzura@udzura.jp>  Fri, 19 Aug 2016 19:03:53 +0900
 

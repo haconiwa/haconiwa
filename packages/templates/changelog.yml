@@ -4,7 +4,7 @@ changelog:
     messages:
       - Support haconiwa ps, cooperating with etcd
     author: Uchio Kondo <udzura@udzura.jp>
-    date: Tue, Aug 23 2016 17:03:53 +0900
+    date: Tue, 23 Aug 2016 17:03:53 +0900
   - version: 0.3.0
     messages:
       - Support new subcommand to generate DSL boilerplate

@@ -1,7 +1,7 @@
 <% @changelog.each do |change| %>haconiwa (<%= change["version"] %>-1) unstable; urgency=medium
 
-<% change["messages"].each do |msg| %>  * <%= msg %>
-<% end %>
+  * <%= change["messages"].join(", ") %>
+
  -- <%= change["author"] %>  <%= change["date"] %>
 
 <% end %>

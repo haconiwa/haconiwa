@@ -160,10 +160,10 @@ task :package_regen do
     @changelog = data["changelog"]
 
     deb = ERB.new(File.read("packages/templates/deb-changelog.erb")).result(binding).strip
-    File.write("packages/deb/debian/changelog", deb)
+    File.write("packages/deb/debian/changelog", deb + "\n")
 
     rpm = ERB.new(File.read("packages/templates/rpm-spec.erb")).result(binding).strip
-    File.write("packages/rpm/haconiwa.spec", rpm)
+    File.write("packages/rpm/haconiwa.spec", rpm + "\n")
 
     docker_deb = ERB.new(File.read("packages/templates/Dockerfile.debian.erb")).result(binding)
     File.write("packages/dockerfiles/Dockerfile.debian", docker_deb)
