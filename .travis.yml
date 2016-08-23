@@ -6,6 +6,7 @@ addons:
   apt:
     packages:
       - rake
+      - psmisc
       - bison
       - git
       - gperf
@@ -29,4 +30,5 @@ cache:
 
 script:
   - rake consistent
+  - rake compile
   - sudo /usr/bin/rake test:bintest

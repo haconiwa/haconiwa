@@ -45,7 +45,9 @@ assert('walkthrough') do
     assert_true status.success?, "Process did not exit cleanly: run"
     processes = `ps axf`
     assert_include processes, "haconiwa run #{haconame}"
-    assert_include processes, "while true"
+
+    subprocess = `pstree -Al $(pgrep haconiwa) | awk -F'---' '{print $2}'`
+    assert_false subprocess.empty?
 
     output, status = run_haconiwa "kill", haconame
     assert_true status.success?, "Process did not exit cleanly: kill"
