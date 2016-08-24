@@ -1,6 +1,8 @@
 module Haconiwa
   class ProcessList
-    def initialize
+    def initialize(options={})
+      @hide_header = options[:hide_header]
+
       if Haconiwa.config.etcd_available?
         @etcd = Etcd::Client.new(Haconiwa.config.etcd_url)
       else
@@ -22,7 +24,10 @@ module Haconiwa
     def show
       rows = containers.map{|c| to_array(c) }
       fmt = make_format(rows)
-      puts sprintf(fmt, *(%w(NAME HOST ROOTFS COMMAND CREATED_AT STATUS PID SPID)))
+
+      unless @hide_header
+        puts sprintf(fmt, *(%w(NAME HOST ROOTFS COMMAND CREATED_AT STATUS PID SPID)))
+      end
       unless rows.empty?
         puts rows.map{|r| sprintf(fmt, *r) }.join("\n")
       end
