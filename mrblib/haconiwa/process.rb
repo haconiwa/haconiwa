@@ -1,6 +1,8 @@
 module Haconiwa
   class ProcessList
-    def initialize
+    def initialize(options={})
+      @hide_header = options[:hide_header]
+
       if Haconiwa.config.etcd_available?
         @etcd = Etcd::Client.new(Haconiwa.config.etcd_url)
       else
@@ -8,11 +10,27 @@ module Haconiwa
       end
     end
 
-    LIST_FORMAT = "%-16s\t%-16s\t%-16s\t%-16s\t%-30s\t%-8s\t%-5s\t%-5s"
+    LIST_FORMAT = {
+      "name" => 16,
+      "etcd_name" => 16,
+      "root" => 16,
+      "command" => 16,
+      "created_at" => 30,
+      "status" => 8,
+      "pid" => 5,
+      "supervisor_pid" => 5,
+    }
 
     def show
-      puts sprintf(LIST_FORMAT, *(%w(NAME HOST ROOTFS COMMAND CREATED_AT STATUS PID SPID)))
-      puts containers.map{|c| sprintf(LIST_FORMAT, *to_array(c)) }.join("\n")
+      rows = containers.map{|c| to_array(c) }
+      fmt = make_format(rows)
+
+      unless @hide_header
+        puts sprintf(fmt, *(%w(NAME HOST ROOTFS COMMAND CREATED_AT STATUS PID SPID)))
+      end
+      unless rows.empty?
+        puts rows.map{|r| sprintf(fmt, *r) }.join("\n")
+      end
     end
 
     def containers
@@ -33,6 +51,16 @@ module Haconiwa
         end
       end
       c
+    end
+
+    def make_format(rows)
+      lengths = []
+      idx = 0
+      LIST_FORMAT.each do |key, default_max|
+        lengths << [default_max, *rows.map{|r| r[idx].to_s.length }].max
+        idx += 1
+      end
+      sprintf "%%-%ds\t%%-%ds\t%%-%ds\t%%-%ds\t%%-%ds\t%%-%ds\t%%-%ds\t%%-%ds", *lengths
     end
 
     def to_array(json)

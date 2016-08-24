@@ -70,6 +70,7 @@ module Haconiwa
     def self.ps(args)
       load_global_config
       opt = Argtable.new
+      opt.literal('N', 'no-header', "Do not show header line")
       opt.literal('h', 'help', "Show help")
       opt.parse(args)
 
@@ -78,7 +79,7 @@ module Haconiwa
         exit
       end
 
-      Haconiwa::ProcessList.new.show
+      Haconiwa::ProcessList.new(hide_header: opt['N'].exist?).show
     end
 
     def self.kill(args)
