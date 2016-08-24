@@ -1,6 +1,11 @@
-latest: 0.3.2
+latest: 0.3.3
 changelog:
-  - version: 0.3.2
+  - version: 0.3.3
+    messages:
+      - Enhance ps subcommand with one more fix
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Wed, 24 Aug 2016 14:48:00 +0900
+  - version: 0.3.3
     messages:
       - Fix some haconiwa ps troubles
     author: Uchio Kondo <udzura@udzura.jp>

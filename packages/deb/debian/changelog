@@ -1,4 +1,10 @@
-haconiwa (0.3.2-1) unstable; urgency=medium
+haconiwa (0.3.3-1) unstable; urgency=medium
+
+  * Enhance ps subcommand with one more fix
+
+ -- Uchio Kondo <udzura@udzura.jp>  Wed, 24 Aug 2016 14:48:00 +0900
+
+haconiwa (0.3.3-1) unstable; urgency=medium
 
   * Fix some haconiwa ps troubles
 
