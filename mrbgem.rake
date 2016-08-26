@@ -9,6 +9,10 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
 
   spec.add_dependency 'mruby-process'   , :mgem => 'mruby-process'
   spec.add_dependency 'mruby-io'        , :mgem => 'mruby-io'
+  spec.add_dependency 'mruby-dir'       , :mgem => 'mruby-dir' # with Dir#chroot
+  spec.add_dependency 'mruby-socket'    , :mgem => 'mruby-socket'
+  spec.add_dependency 'mruby-regexp-pcre', :mgem => 'mruby-regexp-pcre'
+  spec.add_dependency 'mruby-env'       , :mgem => 'mruby-env'
   spec.add_dependency 'mruby-eval'      , :core => 'mruby-eval'
   #spec.add_dependency 'mruby-bin-mirb'  , :core => 'mruby-bin-mirb'
   spec.add_dependency 'mruby-bin-mruby' , :core => 'mruby-bin-mruby'
@@ -22,9 +26,6 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.add_dependency 'mruby-cgroup'    , :github => 'matsumoto-r/mruby-cgroup'
   spec.add_dependency 'mruby-capability', :github => 'matsumoto-r/mruby-capability'
   spec.add_dependency 'mruby-resource'  , :github => 'harasou/mruby-resource'
-  spec.add_dependency 'mruby-dir'       , :github => 'iij/mruby-dir' # with Dir#chroot
-  spec.add_dependency 'mruby-socket'    , :github => 'iij/mruby-socket'
-  spec.add_dependency 'mruby-regexp-pcre', :github => 'iij/mruby-regexp-pcre'
   spec.add_dependency 'mruby-procutil'  , :github => 'haconiwa/mruby-procutil'
   spec.add_dependency 'mruby-exec'      , :github => 'haconiwa/mruby-exec'
   spec.add_dependency 'mruby-namespace' , :github => 'haconiwa/mruby-namespace'
