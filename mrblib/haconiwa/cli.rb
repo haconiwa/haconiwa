@@ -39,10 +39,12 @@ module Haconiwa
 
       opt = parse_opts(args, 'HACO_FILE [-- COMMAND...]') do |o|
         o.literal('D', 'daemon', "Force the container to be daemon")
+        o.literal('T', 'no-daemon', "Force the container not to be daemon, stuck in tty")
       end
 
       base, init = get_script_and_eval(opt.catchall.values)
       base.daemonize! if opt['D'].exist?
+      base.cancel_daemonize! if opt['T'].exist?
       base.run(*init)
     end
 

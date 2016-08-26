@@ -160,6 +160,10 @@ module Haconiwa
       @daemon = true
     end
 
+    def cancel_daemonize!
+      @daemon = false
+    end
+
     def daemon?
       !! @daemon
     end
