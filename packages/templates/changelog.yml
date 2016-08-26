@@ -1,5 +1,10 @@
-latest: 0.3.3
+latest: 0.3.4
 changelog:
+  - version: 0.3.4
+    messages:
+      - Support ENV in DSL, fix some bug on run
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Fri, 26 Aug 2016 16:19:38 +0900
   - version: 0.3.3
     messages:
       - Enhance ps subcommand with one more fix

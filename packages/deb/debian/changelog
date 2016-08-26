@@ -1,3 +1,9 @@
+haconiwa (0.3.4-1) unstable; urgency=medium
+
+  * Support ENV in DSL, fix some bug on run
+
+ -- Uchio Kondo <udzura@udzura.jp>  Fri, 26 Aug 2016 16:19:38 +0900
+
 haconiwa (0.3.3-1) unstable; urgency=medium
 
   * Enhance ps subcommand with one more fix
