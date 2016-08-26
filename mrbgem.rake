@@ -12,6 +12,7 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.add_dependency 'mruby-dir'       , :mgem => 'mruby-dir' # with Dir#chroot
   spec.add_dependency 'mruby-socket'    , :mgem => 'mruby-socket'
   spec.add_dependency 'mruby-regexp-pcre', :mgem => 'mruby-regexp-pcre'
+  spec.add_dependency 'mruby-env'       , :mgem => 'mruby-env'
   spec.add_dependency 'mruby-eval'      , :core => 'mruby-eval'
   #spec.add_dependency 'mruby-bin-mirb'  , :core => 'mruby-bin-mirb'
   spec.add_dependency 'mruby-bin-mruby' , :core => 'mruby-bin-mruby'
