@@ -15,6 +15,9 @@ module Haconiwa
       if File.exist? @base.container_pid_file
         raise "PID file #{@base.container_pid_file} exists. You may be creating the container with existing name #{@base.name}!"
       end
+      unless init_command.empty?
+        @base.init_command = init_command
+      end
 
       wrap_daemonize do |base, notifier|
         jail_pid(base)
