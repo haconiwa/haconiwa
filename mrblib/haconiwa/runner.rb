@@ -46,7 +46,7 @@ module Haconiwa
         end
         File.unlink base.container_pid_file
         if status.success?
-          puts "Container successfullly exited: #{status.inspect}"
+          puts "Container successfully exited: #{status.inspect}"
         else
           puts "Container failed: #{status.inspect}"
         end
@@ -81,7 +81,7 @@ module Haconiwa
 
       pid, status = Process.waitpid2 pid
       if status.success?
-        puts "Process successfullly exited: #{status.inspect}"
+        puts "Process successfully exited: #{status.inspect}"
       else
         puts "Process failed: #{status.inspect}"
       end
@@ -139,7 +139,7 @@ module Haconiwa
           @etcd.put @base.etcd_key, @base.to_container_json
         end
 
-        puts "Container successfullly up. PID={container: #{@base.pid}, supervisor: #{@base.supervisor_pid}}"
+        puts "Container successfully up. PID={container: #{@base.pid}, supervisor: #{@base.supervisor_pid}}"
       else
         b.call(@base, nil)
       end
