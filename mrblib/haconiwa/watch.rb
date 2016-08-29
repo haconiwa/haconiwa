@@ -8,7 +8,7 @@ module Haconiwa
     end
 
     class Cluster
-      def self.instance
+      def self.cluster
         @@__instance__ ||= new
       end
 
@@ -53,8 +53,7 @@ module Haconiwa
     class Response
       def initialize(resp, cluster)
         @raw_resp = resp
-        @cluster  = Cluster.cluster
-        @cluster.apply(resp)
+        @cluster  = cluster
       end
       attr_reader :raw_resp, :cluster
 
@@ -93,58 +92,54 @@ module Haconiwa
       end
       p = UV::Prepare.new()
 
-      asyncs = []
-      watch.events.each do |name, event|
-        a = UV::Async.new {|_|
-          etcd = Etcd::Client.new(Haconiwa.config.etcd_url)
-          cluster = nil
-          if event.type == :cluster
-            cluster = Cluster.cluster
-            hosts = etcd.list("haconiwa.mruby.org")
-            hosts.each do |host|
-              if host["dir"]
-                begin
-                  key = host["key"].sub(/^\//, '')
-                  if info = etcd.list(key)
-                    cluster.register(info)
-                  end
-                rescue
-                  STDERR.puts "[Warn] Invalid key #{key}. skip"
-                end
+      event = watch.events["cluster"]
+      raise("No event registered") unless event
+
+      etcd = Etcd::Client.new(Haconiwa.config.etcd_url)
+      if event.type == :cluster
+        cluster = Cluster.cluster
+        hosts = etcd.list("haconiwa.mruby.org")
+        hosts.each do |host|
+          if host["dir"]
+            begin
+              key = host["key"].sub(/^\//, '')
+              if info = etcd.list(key)
+                cluster.register(info)
               end
+            rescue
+              STDERR.puts "[Warn] Invalid key #{key}. skip"
             end
           end
-
-          wi = nil
-          wi_param = {}
-          loop do
-            ret = etcd.wait(event.watch_key, true, wi_param)
-            puts "Received: #{ret.inspect}"
-            wi = ret["node"]["modifiedIndex"] rescue 0
-            hook = UV::Async.new {|_|
-              # TODO: race condition
-              if event.hook
-                Cluster.mutex.try_lock_loop do
-                  self.lock
-                end
-                event.hook.call(Response.new(ret))
-                Cluster.mutex.unlock
-              end
-            }
-            hook.send
-            wi_param = {wait_index: (wi + 1)}
-          end
-        }
-        puts "Registered: #{event.name}"
-        asyncs << a
+        end
       end
 
-      p.start {|x|
-        asyncs.each do |a|
-          a.send
-        end
+      wi = nil
+      wi_param = {}
+      p.start { |x|
+        ret = etcd.wait(event.watch_key, true, wi_param)
+        puts "Received: #{ret.inspect}"
+        wi = ret["node"]["modifiedIndex"] rescue 0
+
+        hook = UV::Async.new {|_|
+          # race condition is resolved by UV::Async
+          puts "Hello async !! for #{wi}"
+          cluster = Cluster.cluster
+          cluster.apply(ret)
+
+          if event.hook
+            # Cluster.mutex.try_lock_loop do
+            #   self.lock
+            # end
+            event.hook.call(Response.new(ret, cluster))
+            # Cluster.mutex.unlock
+          end
+        }
+        hook.send
+        puts "waitIndex is: #{wi}"
+        wi_param = {wait_index: (wi + 1)}
       }
 
+      puts "Registered: #{event.name}"
       UV::run()
     end
 
