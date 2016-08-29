@@ -103,6 +103,7 @@ module Haconiwa
       opt = parse_opts(args, 'WATCH_FILE') do |o|
       end
 
+      watch = Haconiwa::Watch.from_file(opt.catchall.value(0))
       Haconiwa::Watch.run
     end
 
