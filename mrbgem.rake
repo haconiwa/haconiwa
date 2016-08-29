@@ -36,7 +36,7 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.add_dependency 'mruby-etcd'      , :github => 'udzura/mruby-etcd'
 
   spec.add_dependency 'mruby-uv'        , :github => 'mattn/mruby-uv'
-  spec.add_dependency 'mruby-mutex'     , :github => 'matsumoto-r/mruby-mutex'
+  #spec.add_dependency 'mruby-mutex'     , :github => 'matsumoto-r/mruby-mutex'
 
   def spec.save_dependent_mgem_revisions
     file DEFS_FILE do
