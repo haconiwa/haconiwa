@@ -1,24 +1,159 @@
 module Haconiwa
   class Watch
-    def self.run
+    class Event
+      def initilize(name, type, watch_key, hook)
+        @name, @type, @watch_key, @hook = name, type, watch_key, hook
+      end
+      attr_reader :name, :type, :watch_key, :hook
+    end
+
+    class Cluster
+      def initilize
+        @nodes = {}
+      end
+      attr_reader :nodes
+
+      def register(nodes_from_etcd)
+        nodes_from_etcd.each do |node_info|
+          if node_info["key"] and v = (JSON.parse(node_info["value"]) rescue nil)
+            @nodes[node_info["key"]] = v
+          end
+        end
+      end
+
+      def apply(event)
+        node_info = event["node"]
+        case event["action"]
+        when "create"
+          puts "Accept create ivent: #{event.inspect}"
+          if v = (JSON.parse(node_info["value"]) rescue nil)
+            @nodes[node_info["key"]] = v
+          end
+        when "delete"
+          puts "Accept delete ivent: #{event.inspect}"
+          @nodes.delete(node_info["key"])
+        else
+          puts "[Warn] Unknown event: #{event.inspect}"
+        end
+      end
+
+      def count
+        @nodes.count
+      end
+    end
+
+    class Response
+      def initialize(resp, cluster)
+        @raw_resp = resp
+        @cluster  = cluster
+        @cluster.apply(resp)
+      end
+      attr_reader :raw_resp, :cluster
+
+      def created?
+        @raw_resp["action"] == "create"
+      end
+
+      def deleted?
+        @raw_resp["action"] == "delete"
+      end
+
+      def action
+        @raw_resp["action"]
+      end
+
+      def changed_node
+        @raw_resp["node"]
+      end
+
+      def prev_node
+        @raw_resp["prevNode"]
+      end
+    end
+
+    def self.from_file(path)
+      eval(File.read(path))
+    end
+
+    def self.run(watch)
       unless Haconiwa.config.etcd_available?
         raise "`haconiwa watch' requires etcd available"
       end
       p = UV::Prepare.new()
 
-      a = UV::Async.new {|_|
-        etcd = Etcd::Client.new(Haconiwa.config.etcd_url)
-        loop do
-          ret = etcd.wait("haconiwa.mruby.org", true)
-          puts "Changed: #{ret.inspect}"
+      asyncs = []
+      watch.events.each do |name, event|
+        a = UV::Async.new {|_|
+          etcd = Etcd::Client.new(Haconiwa.config.etcd_url)
+          cluster = nil
+          if event.event_type == :cluster
+            cluster = Cluster.new
+            hosts = etcd.list("haconiwa.mruby.org")
+            hosts.each do |host|
+              if host["dir"]
+                begin
+                  key = host["key"].sub(/^\//, '')
+                  if info = etcd.list(key)
+                    cluster.register(info)
+                  end
+                rescue
+                  STDERR.puts "[Warn] Invalid key #{key}. skip"
+                end
+              end
+            end
+          end
+
+          loop do
+            ret = etcd.wait(event.wait_key, true)
+            puts "Received: #{ret.inspect}"
+
+            if event.hook
+              event.hook(Response.new(ret, cluster))
+            end
+          end
+        }
+        asyncs << a
+      end
+
+      p.start {|x|
+        asyncs.each do |a|
+          a.send
         end
       }
 
-      p.start {|x|
-        a.send
-      }
-
       UV::run()
+    end
+
+    def initialize(&b)
+      @events = {}
+      b.call(self) if block_given?
+    end
+    attr_accessor :events
+
+    WATCH_KEYS = {
+      :cluster => "haconiwa.mruby.org", # global event
+    }
+
+    def watch(event_type, &hook)
+      watch_key = WATCH_KEYS[event_type]
+      # TODO: another event types
+      self.events["cluster"] = Event.new("cluster", event_type, watch_key, hook)
+    end
+  end
+
+  def self.watch(&b)
+    Watch.new &b
+  end
+
+  def self.spawn(hacofile)
+    cmd = RunCmd.new("haconiwa.core.watch")
+    cmdline = "haconiwa run #{hacofile}"
+    p, status = cmd.run(cmdline)
+    if status.success?
+      puts "Spawn success".cyan + " #{cmdline}"
+    else
+      puts "[!]Spawn failed".red + " #{cmdline}"
+      puts "[!]status code: #{status.inspect}"
     end
   end
 end
