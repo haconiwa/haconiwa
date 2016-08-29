@@ -107,9 +107,12 @@ module Haconiwa
             end
           end
 
+          wi = nil
+          wi_param = {}
           loop do
-            ret = etcd.wait(event.watch_key, true)
+            ret = etcd.wait(event.watch_key, true, wi_param)
             puts "Received: #{ret.inspect}"
+            wi = ret["node"]["modifiedIndex"] rescue 0
             hook = UV::Async.new {|_|
               # TODO: race condition
               if event.hook
@@ -117,6 +120,7 @@ module Haconiwa
               end
             }
             hook.send
+            wi_param = {wait_index: (wi + 1)}
           end
         }
         puts "Registered: #{event.name}"
