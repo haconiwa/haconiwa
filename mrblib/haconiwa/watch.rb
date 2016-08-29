@@ -8,6 +8,14 @@ module Haconiwa
     end
 
     class Cluster
+      def self.instance
+        @@__instance__ ||= new
+      end
+
+      def self.mutex
+        @@__mutex__ ||= ::Mutex.new(global: true)
+      end
+
       def initialize
         @nodes = {}
       end
@@ -45,7 +53,7 @@ module Haconiwa
     class Response
       def initialize(resp, cluster)
         @raw_resp = resp
-        @cluster  = cluster
+        @cluster  = Cluster.cluster
         @cluster.apply(resp)
       end
       attr_reader :raw_resp, :cluster
@@ -91,7 +99,7 @@ module Haconiwa
           etcd = Etcd::Client.new(Haconiwa.config.etcd_url)
           cluster = nil
           if event.type == :cluster
-            cluster = Cluster.new
+            cluster = Cluster.cluster
             hosts = etcd.list("haconiwa.mruby.org")
             hosts.each do |host|
               if host["dir"]
@@ -116,7 +124,11 @@ module Haconiwa
             hook = UV::Async.new {|_|
               # TODO: race condition
               if event.hook
-                event.hook.call(Response.new(ret, cluster))
+                Cluster.mutex.try_lock_loop do
+                  self.lock
+                end
+                event.hook.call(Response.new(ret))
+                Cluster.mutex.unlock
               end
             }
             hook.send
