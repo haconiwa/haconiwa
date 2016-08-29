@@ -12,7 +12,8 @@ module Haconiwa
                   :pid,
                   :supervisor_pid,
                   :created_at,
-                  :etcd_name
+                  :etcd_name,
+                  :network_mountpoint
 
     attr_reader   :init_command,
                   :uid,
@@ -40,6 +41,7 @@ module Haconiwa
       @daemon = false
       @uid = @gid = nil
       @groups = []
+      @network_mountpoint = []
     end
 
     def init_command=(cmd)
@@ -72,6 +74,12 @@ module Haconiwa
     def mount_independent(fs)
       self.namespace.unshare "mount"
       self.filesystem.mount_independent(fs)
+    end
+
+    def mount_network_etc(root, options={})
+      from = options[:host_root] || '/etc'
+      self.network_mountpoint << MountPoint.new("#{from}/resolv.conf", to: "#{root}/etc/resolv.conf")
+      self.network_mountpoint << MountPoint.new("#{from}/hosts",       to: "#{root}/etc/hosts")
     end
 
     def uid=(newid)

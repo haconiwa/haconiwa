@@ -69,6 +69,13 @@ module Haconiwa
       ::Namespace.unshare ::Namespace::CLONE_NEWNS
 
       m.make_private "/"
+
+      # network etc files should be shared
+      ["/etc/hosts", "/etc/resolv.conf"].each do |etc|
+        File.open("#{root}#{etc}", "a+") {|f| f.print "" }
+        m.bind_mount etc, "#{root}#{etc}", readonly: true
+      end
+
       Dir.chdir root
       Dir.chroot root
       m.mount "proc",     "/proc", type: "proc"
