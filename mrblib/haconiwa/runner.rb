@@ -177,6 +177,9 @@ module Haconiwa
           m.bind_mount mp.src, mp.dest, mp.options
         end
       end
+      base.network_mountpoint.each do |mp|
+        m.bind_mount mp.src, mp.dest, readonly: true
+      end
     end
 
     CG_MAPPING = {
