@@ -24,7 +24,7 @@ module Haconiwa
       def apply(event)
         node_info = event["node"]
         case event["action"]
-        when "create"
+        when "create", "set"
           puts "Accept create event: #{event.inspect}"
           if v = (JSON.parse(node_info["value"]) rescue nil)
             @nodes[node_info["key"]] = v
@@ -38,7 +38,7 @@ module Haconiwa
       end
 
       def count
-        @nodes.count
+        @nodes.keys.size
       end
     end
 
@@ -52,6 +52,10 @@ module Haconiwa
 
       def created?
         @raw_resp["action"] == "create"
+      end
+
+      def set?
+        @raw_resp["action"] == "set"
       end
 
       def deleted?
@@ -106,11 +110,13 @@ module Haconiwa
           loop do
             ret = etcd.wait(event.watch_key, true)
             puts "Received: #{ret.inspect}"
-
-            if event.hook
-              p event.hook
-              event.hook.call(Response.new(ret, cluster))
-            end
+            hook = UV::Async.new {|_|
+              # TODO: race condition
+              if event.hook
+                event.hook.call(Response.new(ret, cluster))
+              end
+            }
+            hook.send
           end
         }
         puts "Registered: #{event.name}"
