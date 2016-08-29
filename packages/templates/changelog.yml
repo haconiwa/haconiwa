@@ -1,5 +1,10 @@
-latest: 0.3.4
+latest: 0.3.5
 changelog:
+  - version: 0.3.5
+    messages:
+      - Add network etc sharing options
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Mon, 29 Aug 2016 12:34:00 +0900
   - version: 0.3.4
     messages:
       - Support ENV in DSL, fix some bug on run

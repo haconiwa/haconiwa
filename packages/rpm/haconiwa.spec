@@ -1,6 +1,6 @@
 Name: haconiwa
 Epoch: 1
-Version: 0.3.4
+Version: 0.3.5
 Release: 1
 Summary: MRuby on Container
 License: GPLv3+
@@ -49,6 +49,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Mon Aug 29 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.3.5-1
+- Add network etc sharing options
+
 * Fri Aug 26 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.3.4-1
 - Support ENV in DSL, fix some bug on run
 
