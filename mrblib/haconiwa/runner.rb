@@ -178,6 +178,7 @@ module Haconiwa
         end
       end
       base.network_mountpoint.each do |mp|
+        File.open(mp.dest, "a+") {|f| f.print "" }
         m.bind_mount mp.src, mp.dest, readonly: true
       end
     end

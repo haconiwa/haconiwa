@@ -77,9 +77,9 @@ module Haconiwa
     end
 
     def mount_network_etc(root, options={})
-      from = options(:host_root) || '/etc'
-      self.network_mountpoint << MountPoint.new("#{from}/resolv.conf", to: "#{root}/resolv.conf")
-      self.network_mountpoint << MountPoint.new("#{from}/hosts",       to: "#{root}/hosts")
+      from = options[:host_roo] || '/etc'
+      self.network_mountpoint << MountPoint.new("#{from}/resolv.conf", to: "#{root}/etc/resolv.conf")
+      self.network_mountpoint << MountPoint.new("#{from}/hosts",       to: "#{root}/etc/hosts")
     end
 
     def uid=(newid)
