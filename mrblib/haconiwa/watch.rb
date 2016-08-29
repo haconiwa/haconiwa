@@ -1,14 +1,14 @@
 module Haconiwa
   class Watch
     class Event
-      def initilize(name, type, watch_key, hook)
+      def initialize(name, type, watch_key, hook)
         @name, @type, @watch_key, @hook = name, type, watch_key, hook
       end
       attr_reader :name, :type, :watch_key, :hook
     end
 
     class Cluster
-      def initilize
+      def initialize
         @nodes = {}
       end
       attr_reader :nodes
@@ -25,12 +25,12 @@ module Haconiwa
         node_info = event["node"]
         case event["action"]
         when "create"
-          puts "Accept create ivent: #{event.inspect}"
+          puts "Accept create event: #{event.inspect}"
           if v = (JSON.parse(node_info["value"]) rescue nil)
             @nodes[node_info["key"]] = v
           end
         when "delete"
-          puts "Accept delete ivent: #{event.inspect}"
+          puts "Accept delete event: #{event.inspect}"
           @nodes.delete(node_info["key"])
         else
           puts "[Warn] Unknown event: #{event.inspect}"
@@ -86,7 +86,7 @@ module Haconiwa
         a = UV::Async.new {|_|
           etcd = Etcd::Client.new(Haconiwa.config.etcd_url)
           cluster = nil
-          if event.event_type == :cluster
+          if event.type == :cluster
             cluster = Cluster.new
             hosts = etcd.list("haconiwa.mruby.org")
             hosts.each do |host|
@@ -104,14 +104,16 @@ module Haconiwa
           end
 
           loop do
-            ret = etcd.wait(event.wait_key, true)
+            ret = etcd.wait(event.watch_key, true)
             puts "Received: #{ret.inspect}"
 
             if event.hook
-              event.hook(Response.new(ret, cluster))
+              p event.hook
+              event.hook.call(Response.new(ret, cluster))
             end
           end
         }
+        puts "Registered: #{event.name}"
         asyncs << a
       end
 
@@ -142,7 +144,7 @@ module Haconiwa
   end
 
   def self.watch(&b)
-    Watch.new &b
+    Watch.new(&b)
   end
 
   def self.spawn(hacofile)

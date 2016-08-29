@@ -104,7 +104,7 @@ module Haconiwa
       end
 
       watch = Haconiwa::Watch.from_file(opt.catchall.value(0))
-      Haconiwa::Watch.run
+      Haconiwa::Watch.run(watch)
     end
 
     def self.revisions
