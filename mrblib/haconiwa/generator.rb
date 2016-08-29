@@ -38,6 +38,10 @@ apk add --update bash
   # mount point configuration:
   config.add_mount_point "tmpfs", to: root.join("tmp"), fs: "tmpfs"
 
+  # Share network etc files from host to contianer
+  # You can reuse /etc/netns/${netnsname}/* files:
+  config.mount_network_etc(root, host_root: "/etc")
+
   # more mount point configuration example:
   # config.add_mount_point root, to: root, readonly: true
   # config.add_mount_point "/lib64", to: root.join("lib64"), readonly: true
