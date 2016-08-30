@@ -12,10 +12,6 @@ module Haconiwa
         @@__instance__ ||= new
       end
 
-      def self.mutex
-        @@__mutex__ ||= ::Mutex.new(global: true)
-      end
-
       def initialize
         @nodes = {}
       end
@@ -31,15 +27,16 @@ module Haconiwa
 
       def apply(event)
         node_info = event["node"]
-        case event["action"]
+        key = node_info["key"]
+        case action = event["action"]
         when "create", "set"
-          puts "Accept create event: #{event.inspect}"
           if v = (JSON.parse(node_info["value"]) rescue nil)
-            @nodes[node_info["key"]] = v
+            @nodes[key] = v
+            puts "[Debug] Apply #{action} event for #{key}"
           end
         when "delete"
-          puts "Accept delete event: #{event.inspect}"
-          @nodes.delete(node_info["key"])
+          @nodes.delete(key)
+          puts "[Debug] Apply #{action} event for #{key}"
         else
           puts "[Warn] Unknown event: #{event.inspect}"
         end
@@ -48,6 +45,8 @@ module Haconiwa
       def count
         @nodes.keys.size
       end
+      alias size count
+      alias length count
     end
 
     class Response
@@ -80,10 +79,16 @@ module Haconiwa
       def prev_node
         @raw_resp["prevNode"]
       end
+
+      def etcd_index
+        @raw_resp["node"]["modifiedIndex"]
+      end
     end
 
     def self.from_file(path)
-      eval(File.read(path))
+      obj = eval(File.read(path))
+      raise("Not a Watch DSL in file: #{path}") unless obj.is_a?(Watch)
+      obj
     end
 
     def self.run(watch)
@@ -117,12 +122,16 @@ module Haconiwa
       wi_param = {}
       p.start { |x|
         ret = etcd.wait(event.watch_key, true, wi_param)
-        puts "Received: #{ret.inspect}"
         wi = ret["node"]["modifiedIndex"] rescue 0
+        begin
+          puts sprintf("Received: action=%s, node_key=%s, index=%d", ret["action"], ret["node"]["key"], wi)
+        rescue
+          puts "[Warn] Invalid response format: #{ret.inspect}".red
+          retry
+        end
 
         hook = UV::Async.new {|_|
           # race condition is resolved by UV::Async
-          puts "Hello async !! for #{wi}"
           cluster = Cluster.cluster
           cluster.apply(ret)
 
@@ -135,7 +144,6 @@ module Haconiwa
           end
         }
         hook.send
-        puts "waitIndex is: #{wi}"
         wi_param = {wait_index: (wi + 1)}
       }
 
@@ -169,9 +177,9 @@ module Haconiwa
     cmdline = "haconiwa run #{hacofile}"
     p, status = cmd.run(cmdline)
     if status.success?
-      puts "Spawn success".cyan + " #{cmdline}"
+      puts "Spawn success:".green + " #{cmdline}"
     else
-      puts "[!]Spawn failed".red + " #{cmdline}"
+      puts "[!]Spawn failed:".red + " #{cmdline}"
       puts "[!]status code: #{status.inspect}"
     end
   end
