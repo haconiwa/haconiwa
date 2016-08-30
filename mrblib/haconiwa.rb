@@ -19,6 +19,8 @@ def __main__(argv)
     Haconiwa::Cli.kill(argv)
   when "ps", "list"
     Haconiwa::Cli.ps(argv)
+  when "watch"
+    Haconiwa::Cli.watch(argv)
   else
     puts <<-USAGE
 haconiwa - The MRuby on Container
@@ -30,6 +32,7 @@ commands:
     attach    - attach to existing container
     kill      - kill the running container
     ps        - list running containers (across the clusterd hosts, etcd needed)
+    watch     - (experimental) watch the cluster status and set hooks via mruby file
     version   - show version
     revisions - show mgem/mruby revisions which haconiwa bin uses
 
