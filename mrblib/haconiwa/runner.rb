@@ -54,7 +54,7 @@ module Haconiwa
         end
 
         pid, status = Process.waitpid2 pid
-        cleanup_supervisor(base)
+        cleanup_supervisor(base, @etcd)
         if status.success?
           puts "Container successfully exited: #{status.inspect}"
         else
