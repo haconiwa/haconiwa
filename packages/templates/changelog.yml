@@ -1,5 +1,10 @@
-latest: 0.3.5
+latest: 0.4.0
 changelog:
+  - version: 0.4.0
+    messages:
+      - Experimental support haconiwa watch, bump mruby, fix some bugs
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Tue, 30 Aug 2016 15:44:41 +0900
   - version: 0.3.5
     messages:
       - Add network etc sharing options

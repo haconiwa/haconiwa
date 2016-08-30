@@ -1,6 +1,6 @@
 Name: haconiwa
 Epoch: 1
-Version: 0.3.5
+Version: 0.4.0
 Release: 1
 Summary: MRuby on Container
 License: GPLv3+
@@ -49,6 +49,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Tue Aug 30 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.4.0-1
+- Experimental support haconiwa watch, bump mruby, fix some bugs
+
 * Mon Aug 29 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.3.5-1
 - Add network etc sharing options
 
