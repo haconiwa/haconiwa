@@ -42,12 +42,19 @@ module Haconiwa
           notifier.close # notify container is up
         end
 
-        pid, status = Process.waitpid2 pid
-        cleanup_cgroup(base)
-        if @etcd
-          @etcd.delete base.etcd_key
+        r, etcd = self, @etcd
+        [:SIGTERM, :SIGINT, :SIGHUP, :SIGPIPE].each do |sig|
+          Signal.trap(sig) do |signo|
+            unless base.cleaned
+              puts "Supervisor received unintended kill. Cleanup..."
+              r.cleanup_supervisor(base, etcd)
+            end
+            exit 127
+          end
         end
-        File.unlink base.container_pid_file
+
+        pid, status = Process.waitpid2 pid
+        cleanup_supervisor(base)
         if status.success?
           puts "Container successfully exited: #{status.inspect}"
         else
@@ -120,6 +127,15 @@ module Haconiwa
 
       puts "Killing seemd to be failed in 1 second"
       Process.exit 1
+    end
+
+    def cleanup_supervisor(base, etcd=nil)
+      cleanup_cgroup(base)
+      if etcd
+        etcd.delete base.etcd_key
+      end
+      File.unlink base.container_pid_file
+      base.cleaned = true
     end
 
     private
