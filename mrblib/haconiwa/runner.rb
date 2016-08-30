@@ -129,11 +129,13 @@ module Haconiwa
         r, w = IO.pipe
         ppid = Process.fork do
           # TODO: logging
+          r.close
           Procutil.daemon_fd_reopen
           b.call(@base, w)
         end
         w.close
         pid = r.read
+        r.close
 
         @base.created_at = Time.now
         @base.pid = pid.to_i
