@@ -98,6 +98,15 @@ module Haconiwa
       base.kill(signame)
     end
 
+    def self.watch(args)
+      load_global_config
+      opt = parse_opts(args, 'WATCH_FILE') do |o|
+      end
+
+      watch = Haconiwa::Watch.from_file(opt.catchall.value(0))
+      Haconiwa::Watch.run(watch)
+    end
+
     def self.revisions
       puts "mgem and mruby revisions:"
       puts "--------"
