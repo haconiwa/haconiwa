@@ -13,7 +13,8 @@ module Haconiwa
                   :supervisor_pid,
                   :created_at,
                   :etcd_name,
-                  :network_mountpoint
+                  :network_mountpoint,
+                  :cleaned
 
     attr_reader   :init_command,
                   :uid,
@@ -42,6 +43,7 @@ module Haconiwa
       @uid = @gid = nil
       @groups = []
       @network_mountpoint = []
+      @cleaned = false
     end
 
     def init_command=(cmd)
