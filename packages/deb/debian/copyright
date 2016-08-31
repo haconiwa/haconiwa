@@ -30,4 +30,5 @@ License: GPL-3+
  * libcgroup: LGPL-2.1
  * libargtable: MITL
  * mruby: MITL
+ * libuv: Node's license
  About others, please see https://github.com/haconiwa/haconiwa/blob/master/README.md#license
