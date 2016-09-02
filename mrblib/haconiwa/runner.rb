@@ -200,12 +200,16 @@ module Haconiwa
     end
 
     def apply_namespace(namespace)
-      ::Namespace.unshare(namespace.to_flag_for_unshare)
+      if ::Namespace.unshare(namespace.to_flag_for_unshare) < 0
+        raise "Some namespace is unsupported by this kernel. Please check"
+      end
 
       if namespace.setns_on_run?
         namespace.ns_to_path.each do |ns, path|
           f = File.open(path)
-          ::Namespace.setns(ns, fd: f.fileno)
+          if ::Namespace.setns(ns, fd: f.fileno) < 0
+            raise "Some namespace is unsupported by this kernel. Please check"
+          end
           f.close
         end
       end
