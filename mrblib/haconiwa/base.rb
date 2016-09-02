@@ -284,6 +284,8 @@ module Haconiwa
     def initialize
       @use_ns = []
       @ns_to_path = {}
+      @uid_mapping = nil
+      @gid_mapping = nil
     end
 
     def unshare(ns)
@@ -306,7 +308,24 @@ module Haconiwa
       unshare(flag)
       @ns_to_path[flag] = path
     end
-    attr_reader :use_pid_ns, :ns_to_path
+
+    def set_uid_mapping(options)
+      unshare "user"
+      if (options.keys & [:min, :max, :options]).size != 3
+        raise("Invalid mapping option: #{options.inspect}")
+      end
+      @uid_mapping = options
+    end
+
+    def set_gid_mapping(options)
+      unshare "user"
+      if (options.keys & [:min, :max, :options]).size != 3
+        raise("Invalid mapping option: #{options.inspect}")
+      end
+      @gid_mapping = options
+    end
+
+    attr_reader :use_pid_ns, :ns_to_path, :uid_mapping, :gid_mapping
 
     def use_netns(name)
       enter("net", "/var/run/netns/#{name}")
