@@ -31,22 +31,22 @@ module Haconiwa
           p r, w, r2, w2
           [r, w2].each {|io| io.close if io }
           apply_namespace(base.namespace)
-          if w
+
+          if base.namespace.use_guid_mapping?
+            # ping and pong between parent
             w.puts "unshared"
             w.close
-          end
 
+            r2.read
+            r2.close
+            switch_current_namespace_root
+          end
           apply_filesystem(base)
           apply_rlimit(base.resource)
           apply_cgroup(base)
           apply_capability(base.capabilities)
           do_chroot(base)
           ::Procutil.sethostname(base.name)
-
-          if base.namespace.use_guid_mapping?
-            r2.read
-            r2.close
-          end
 
           switch_guid(base)
           Exec.exec(*base.init_command)
@@ -310,6 +310,11 @@ module Haconiwa
           m.mount mp.src, mp.dest, type: mp.fs
         end
       end
+    end
+
+    def switch_current_namespace_root
+      ::Process::Sys.setuid(0)
+      ::Process::Sys.setgid(0)
     end
 
     def switch_guid(base)
