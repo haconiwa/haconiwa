@@ -355,15 +355,15 @@ module Haconiwa
     end
 
     def to_flag_for_unshare
-      f = to_flag_without_pid
+      f = to_flag_without_pid_and_user
       @ns_to_path.keys.each do |mask|
         f &= (~mask)
       end
       f
     end
 
-    def to_flag_without_pid
-      to_flag & (~(::Namespace::CLONE_NEWPID))
+    def to_flag_without_pid_and_user
+      to_flag & (~(::Namespace::CLONE_NEWPID | ::Namespace::CLONE_NEWUSER))
     end
   end
 
