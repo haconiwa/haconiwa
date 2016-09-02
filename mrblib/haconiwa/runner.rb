@@ -21,8 +21,21 @@ module Haconiwa
 
       wrap_daemonize do |base, notifier|
         jail_pid(base)
+        # The pipe to set guid maps
+        if base.namespace.use_guid_mapping?
+          r,  w  = IO.pipe
+          r2, w2 = IO.pipe
+        end
+
         pid = Process.fork do
+          p r, w, r2, w2
+          [r, w2].each {|io| io.close if io }
           apply_namespace(base.namespace)
+          if w
+            w.puts "unshared"
+            w.close
+          end
+
           apply_filesystem(base)
           apply_rlimit(base.resource)
           apply_cgroup(base)
@@ -30,10 +43,24 @@ module Haconiwa
           do_chroot(base)
           ::Procutil.sethostname(base.name)
 
+          if base.namespace.use_guid_mapping?
+            r2.read
+            r2.close
+          end
+
           switch_guid(base)
           Exec.exec(*base.init_command)
         end
+
         File.open(base.container_pid_file, 'w') {|f| f.write pid }
+        if base.namespace.use_guid_mapping?
+          [w, r2].each {|io| io.close }
+          r.read
+          r.close
+          set_guid_mapping(base.namespace, pid)
+          w2.puts "mapped"
+          w2.close
+        end
 
         base.signal_handler.register_handlers!
 
@@ -42,12 +69,12 @@ module Haconiwa
           notifier.close # notify container is up
         end
 
-        r, etcd = self, @etcd
+        runner, etcd = self, @etcd
         [:SIGTERM, :SIGINT, :SIGHUP, :SIGPIPE].each do |sig|
           Signal.trap(sig) do |signo|
             unless base.cleaned
               puts "Supervisor received unintended kill. Cleanup..."
-              r.cleanup_supervisor(base, etcd)
+              runner.cleanup_supervisor(base, etcd)
             end
             exit 127
           end
@@ -182,8 +209,9 @@ module Haconiwa
           f.close
         end
       end
+    end
 
-      pid = Process.pid
+    def set_guid_mapping(namespace, pid)
       if m = namespace.uid_mapping
         File.open("/proc/#{pid}/uid_map", "w") do |map|
           map.write "#{m[:min].to_i} #{m[:offset].to_i} #{m[:max].to_i}"
@@ -209,7 +237,9 @@ module Haconiwa
         end
       end
       base.network_mountpoint.each do |mp|
-        File.open(mp.dest, "a+") {|f| f.print "" }
+        unless File.exist? mp.dest
+          File.open(mp.dest, "w+") {|f| f.print "" }
+        end
         m.bind_mount mp.src, mp.dest, readonly: true
       end
     end

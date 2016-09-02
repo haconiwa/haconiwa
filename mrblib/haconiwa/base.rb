@@ -325,6 +325,10 @@ module Haconiwa
       @gid_mapping = options
     end
 
+    def use_guid_mapping?
+      !!@uid_mapping or !!@gid_mapping
+    end
+
     attr_reader :use_pid_ns, :ns_to_path, :uid_mapping, :gid_mapping
 
     def use_netns(name)
