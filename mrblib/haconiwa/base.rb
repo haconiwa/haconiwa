@@ -311,7 +311,7 @@ module Haconiwa
 
     def set_uid_mapping(options)
       unshare "user"
-      if (options.keys & [:min, :max, :options]).size != 3
+      if (options.keys & [:min, :max, :offset]).size != 3
         raise("Invalid mapping option: #{options.inspect}")
       end
       @uid_mapping = options
@@ -319,7 +319,7 @@ module Haconiwa
 
     def set_gid_mapping(options)
       unshare "user"
-      if (options.keys & [:min, :max, :options]).size != 3
+      if (options.keys & [:min, :max, :offset]).size != 3
         raise("Invalid mapping option: #{options.inspect}")
       end
       @gid_mapping = options
