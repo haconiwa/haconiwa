@@ -182,6 +182,19 @@ module Haconiwa
           f.close
         end
       end
+
+      pid = Process.pid
+      if m = namespace.uid_mapping
+        File.open("/proc/#{pid}/uid_map", "w") do |map|
+          map.write "#{m[:min].to_i} #{m[:offset].to_i} #{m[:max].to_i}"
+        end
+      end
+
+      if m = namespace.gid_mapping
+        File.open("/proc/#{pid}/gid_map", "w") do |map|
+          map.write "#{m[:min].to_i} #{m[:offset].to_i} #{m[:max].to_i}"
+        end
+      end
     end
 
     def apply_filesystem(base)
