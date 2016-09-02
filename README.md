@@ -203,12 +203,9 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/haconi
 
 ## TODOs
 
-* [ ] Support setguid
-* [ ] Support rlimits
 * [ ] Haconiwa DSL compiler
-* [ ] netns attachment
-* [ ] More utilities such as `ps`
-* [ ] Better daemon handling
+* [ ] Networking helpers
+* [ ] P2P containers
 
 ## License
 
