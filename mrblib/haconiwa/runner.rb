@@ -28,10 +28,16 @@ module Haconiwa
         end
 
         pid = Process.fork do
-          p r, w, r2, w2
           [r, w2].each {|io| io.close if io }
           apply_namespace(base.namespace)
+          apply_filesystem(base)
+          apply_rlimit(base.resource)
+          apply_cgroup(base)
+          apply_capability(base.capabilities)
+          apply_remount(base)
+          ::Procutil.sethostname(base.name)
 
+          apply_user_namespace(base.namespace)
           if base.namespace.use_guid_mapping?
             # ping and pong between parent
             w.puts "unshared"
@@ -41,13 +47,8 @@ module Haconiwa
             r2.close
             switch_current_namespace_root
           end
-          apply_filesystem(base)
-          apply_rlimit(base.resource)
-          apply_cgroup(base)
-          apply_capability(base.capabilities)
-          do_chroot(base)
-          ::Procutil.sethostname(base.name)
 
+          do_chroot(base)
           switch_guid(base)
           Exec.exec(*base.init_command)
         end
@@ -112,7 +113,7 @@ module Haconiwa
 
         apply_cgroup(base)
         apply_capability(base.attached_capabilities)
-        do_chroot(base, false)
+        do_chroot(base)
         Exec.exec(*exe)
       end
 
@@ -206,12 +207,28 @@ module Haconiwa
 
       if namespace.setns_on_run?
         namespace.ns_to_path.each do |ns, path|
+          next if ns == ::Namespace::CLONE_NEWUSER
           f = File.open(path)
           if ::Namespace.setns(ns, fd: f.fileno) < 0
             raise "Some namespace is unsupported by this kernel. Please check"
           end
           f.close
         end
+      end
+    end
+
+    def apply_user_namespace(namespace)
+      flg = namespace.to_flag & ::Namespace::CLONE_NEWUSER
+      if flg != 0 and ::Namespace.unshare(flg) < 0
+        raise "User namespace is unsupported by this kernel. Please check"
+      end
+
+      if path = namespace.ns_to_path[::Namespace::CLONE_NEWUSER]
+        f = File.open(path)
+        if ::Namespace.setns(::Namespace::CLONE_NEWUSER, fd: f.fileno) < 0
+          raise "User namespace is unsupported by this kernel. Please check"
+        end
+        f.close
       end
     end
 
@@ -305,20 +322,21 @@ module Haconiwa
       end
     end
 
-    def do_chroot(base, init_mount=true)
-      Dir.chroot base.filesystem.chroot
-      Dir.chdir "/"
-      if init_mount
-        m = Mount.new
-        base.filesystem.independent_mount_points.each do |mp|
-          m.mount mp.src, mp.dest, type: mp.fs
-        end
+    def apply_remount(base)
+      m = Mount.new
+      base.filesystem.independent_mount_points.each do |mp|
+        m.mount mp.src, "#{base.filesystem.chroot}#{mp.dest}", type: mp.fs
       end
     end
 
+    def do_chroot(base)
+      Dir.chroot base.filesystem.chroot
+      Dir.chdir "/"
+    end
+
     def switch_current_namespace_root
-      ::Process::Sys.setuid(0)
       ::Process::Sys.setgid(0)
+      ::Process::Sys.setuid(0)
     end
 
     def switch_guid(base)
