@@ -1,5 +1,10 @@
-latest: 0.4.0
+latest: 0.4.1
 changelog:
+  - version: 0.4.1
+    messages:
+      - Experimental support for uid/gid mapping, note that some feature might be broken
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Mon,  5 Sep 2016 17:19:01 +0900
   - version: 0.4.0
     messages:
       - Experimental support haconiwa watch, bump mruby, fix some bugs
