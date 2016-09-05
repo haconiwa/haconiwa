@@ -1,10 +1,16 @@
 # -*- mode: ruby -*-
+# Pass environment variable OFFSET=1000/2000/3000/...
+# Then assigned user id range will be changed
+
 Haconiwa.define do |config|
-  config.name = "uid-mapping001"
+  offset = ENV['OFFSET'] || 1000
+
+  config.name = "uid-mapping-#{offset}"
   config.init_command = "/bin/bash"
 
-  root = Pathname.new("/var/lib/haconiwa/uid-mapping001")
+  root = Pathname.new("/var/lib/haconiwa/uid-mapping-#{offset}")
   config.chroot_to root
+  config.rootfs_owner uid: offset, gid: offset
   config.bootstrap do |b|
     b.strategy = "lxc"
     b.os_type  = "debian"
@@ -22,6 +28,6 @@ Haconiwa.define do |config|
   config.namespace.unshare "uts"
   config.namespace.unshare "pid"
 
-  config.namespace.set_uid_mapping min: 0, max: 10_000, offset: 100_000
-  config.namespace.set_gid_mapping min: 0, max: 10_000, offset: 100_000
+  config.namespace.set_uid_mapping min: 0, max: 999, offset: offset
+  config.namespace.set_gid_mapping min: 0, max: 999, offset: offset
 end
