@@ -382,6 +382,14 @@ module Haconiwa
 
     def to_s;   self.root; end
     def to_str; self.root; end
+
+    def to_owner_options
+      opts = []
+      opts << "uid=#{@owner_uid}" if @owner_uid != 0
+      opts << "gid=#{@owner_gid}" if @owner_gid != 0
+
+      opts.empty? ? {} : {options: opts.join(",")}
+    end
   end
 
   class Filesystem
