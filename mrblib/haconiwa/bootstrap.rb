@@ -23,10 +23,7 @@ module Haconiwa
         raise "Unsupported: #{strategy}"
       end
 
-      if r.owner_uid != 0 or r.owner_gid != 0
-        cmd = RunCmd.new("bootstrap.teardown")
-        cmd.run "chown -R #{r.owner_uid}:#{r.owner_gid} #{r.root.to_s}"
-      end
+      teardown
     end
 
     def bootstrap_with_lxc_template
@@ -63,6 +60,13 @@ module Haconiwa
     end
 
     private
+    def teardown
+      if root.owner_uid != 0 or root.owner_gid != 0
+        cmd = RunCmd.new("bootstrap.teardown")
+        cmd.run "chown -R #{root.owner_uid}:#{root.owner_gid} #{root.root.to_s}"
+      end
+    end
+
     def log(msg)
       $stderr.puts msg.green
     end
