@@ -1,0 +1,27 @@
+# -*- mode: ruby -*-
+Haconiwa.define do |config|
+  config.name = "uid-mapping001"
+  config.init_command = "/bin/bash"
+
+  root = Pathname.new("/var/lib/haconiwa/uid-mapping001")
+  config.chroot_to root
+  config.bootstrap do |b|
+    b.strategy = "lxc"
+    b.os_type  = "debian"
+  end
+
+  config.mount_network_etc(root, host_root: "/etc")
+  config.mount_independent "procfs"
+  config.mount_independent "sysfs"
+  config.mount_independent "devtmpfs"
+  config.mount_independent "devpts"
+  config.mount_independent "shm"
+
+  config.namespace.unshare "mount"
+  config.namespace.unshare "ipc"
+  config.namespace.unshare "uts"
+  config.namespace.unshare "pid"
+
+  config.namespace.set_uid_mapping min: 0, max: 10_000, offset: 100_000
+  config.namespace.set_gid_mapping min: 0, max: 10_000, offset: 100_000
+end
