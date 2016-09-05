@@ -56,11 +56,16 @@ module Haconiwa
 
     # aliases
     def chroot_to(dest)
-      self.filesystem.chroot = dest
+      self.filesystem.rootfs = Rootfs.new(dest)
     end
 
-    def root
-      filesystem.chroot
+    def rootfs_owner(options)
+      rootfs.owner_uid = options[:uid]
+      rootfs.owner_gid = options[:gid]
+    end
+
+    def rootfs
+      filesystem.rootfs
     end
 
     def add_mount_point(point, options)
@@ -130,20 +135,20 @@ module Haconiwa
 
     def create(no_provision)
       validate_non_nil(@bootstrap, "`config.bootstrap' block must be defined to create rootfs")
-      @bootstrap.boot!(self.root)
+      @bootstrap.boot!(self.rootfs)
       if @provision and !no_provision
-        @provision.provision!(self.root)
+        @provision.provision!(self.rootfs)
       end
     end
 
     def do_provision(ops)
-      unless ::File.directory?(self.root.to_s)
-        raise "Rootfs #{root} not yet bootstrapped. Run `haconiwa create' before provision."
+      unless ::File.directory?(self.rootfs.root)
+        raise "Rootfs #{rootfs.root} not yet bootstrapped. Run `haconiwa create' before provision."
       end
 
       validate_non_nil(@provision, "`config.provision' block must be defined to run provisioning")
       @provision.select_ops(ops) unless ops.empty?
-      @provision.provision!(self.root)
+      @provision.provision!(self.rootfs)
     end
 
     def start(*init_command)
@@ -367,13 +372,34 @@ module Haconiwa
     end
   end
 
+  class Rootfs
+    def initialize(rootpath, options={})
+      @root = rootpath.to_str
+      @owner_uid = options[:owner_uid] || 0
+      @owner_gid = options[:owner_gid] || 0
+    end
+    attr_accessor :root, :owner_uid, :owner_gid
+
+    def to_s;   self.root; end
+    def to_str; self.root; end
+
+    def to_owner_options
+      opts = []
+      opts << "uid=#{@owner_uid}" if @owner_uid != 0
+      opts << "gid=#{@owner_gid}" if @owner_gid != 0
+
+      opts.empty? ? {} : {options: opts.join(",")}
+    end
+  end
+
   class Filesystem
     def initialize
       @mount_points = []
       @independent_mount_points = []
     end
-    attr_accessor :chroot, :mount_points,
-                  :independent_mount_points
+    attr_accessor :mount_points,
+                  :independent_mount_points,
+                  :rootfs
 
     FS_TO_MOUNT = {
       "procfs" => ["proc", "proc", "/proc"],
@@ -382,6 +408,10 @@ module Haconiwa
       "devpts" => ["devpts", "devpts", "/dev/pts"],
       "shm"    => ["tmpfs", "tmpfs", "/dev/shm"],
     }
+
+    def chroot
+      self.rootfs.root
+    end
 
     def mount_independent(fs)
       params = FS_TO_MOUNT[fs]
