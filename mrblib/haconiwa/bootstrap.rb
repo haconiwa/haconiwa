@@ -7,7 +7,7 @@ module Haconiwa
                   :arch, :variant, :components, :debian_release, :mirror_url
 
     def boot!(r)
-      self.root = Pathname.new(r.to_s)
+      self.root = r
       self.project_name ||= File.basename(root.to_str)
       if File.directory?(root.to_str)
         log("Directory #{root.to_str} already bootstrapped. Skip.")
@@ -21,6 +21,11 @@ module Haconiwa
         bootstrap_with_debootstrap
       else
         raise "Unsupported: #{strategy}"
+      end
+
+      if r.owner_uid != 0 or r.owner_gid != 0
+        cmd = RunCmd.new("bootstrap.teardown")
+        cmd.run "chown -R #{r.owner_uid}:#{r.owner_gid} #{r.root.to_s}"
       end
     end
 
