@@ -30,12 +30,12 @@ module Haconiwa
     end
 
     def provision!(r)
-      self.root = Pathname.new(r.to_s)
+      self.root = r
 
       p = self
       log "Start provisioning..."
       pid = Process.fork do
-        p.chroot_into(p.root)
+        p.chroot_into(p.root.root)
 
         p.ops.each do |op|
           case strategy = op.strategy
@@ -48,6 +48,7 @@ module Haconiwa
       end
       pid, s = *Process.waitpid2(pid)
 
+      teardown
       if s.success?
         log "Success!"
         return true
@@ -85,6 +86,13 @@ module Haconiwa
     end
 
     private
+    def teardown
+      if root.owner_uid != 0 or root.owner_gid != 0
+        cmd = RunCmd.new("provision.teardown")
+        cmd.run "chown -R #{root.owner_uid}:#{root.owner_gid} #{root.root.to_s}"
+      end
+    end
+
     def log(msg)
       $stderr.puts msg.green
     end

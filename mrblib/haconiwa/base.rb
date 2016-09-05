@@ -142,13 +142,13 @@ module Haconiwa
     end
 
     def do_provision(ops)
-      unless ::File.directory?(self.root.to_s)
-        raise "Rootfs #{root} not yet bootstrapped. Run `haconiwa create' before provision."
+      unless ::File.directory?(self.rootfs.root)
+        raise "Rootfs #{rootfs.root} not yet bootstrapped. Run `haconiwa create' before provision."
       end
 
       validate_non_nil(@provision, "`config.provision' block must be defined to run provisioning")
       @provision.select_ops(ops) unless ops.empty?
-      @provision.provision!(self.root)
+      @provision.provision!(self.rootfs)
     end
 
     def start(*init_command)
@@ -374,7 +374,7 @@ module Haconiwa
 
   class Rootfs
     def initialize(rootpath, options={})
-      @root = rootpath
+      @root = rootpath.to_str
       @owner_uid = options[:owner_uid] || 0
       @owner_gid = options[:owner_gid] || 0
     end
