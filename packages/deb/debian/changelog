@@ -1,3 +1,9 @@
+haconiwa (0.4.1-1) unstable; urgency=medium
+
+  * Experimental support for uid/gid mapping, note that some feature might be broken
+
+ -- Uchio Kondo <udzura@udzura.jp>  Mon,  5 Sep 2016 17:19:01 +0900
+
 haconiwa (0.4.0-1) unstable; urgency=medium
 
   * Experimental support haconiwa watch, bump mruby, fix some bugs

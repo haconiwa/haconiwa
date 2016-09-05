@@ -1,6 +1,6 @@
 Name: haconiwa
 Epoch: 1
-Version: 0.4.0
+Version: 0.4.1
 Release: 1
 Summary: MRuby on Container
 License: GPLv3+
@@ -45,10 +45,13 @@ fi
 %postun
 
 %files
-%doc LICENSE LICENSE_argtable3 LICENSE_libcap LICENSE_libcgroup LICENSE_mruby README.md
+%doc LICENSE LICENSE_argtable3 LICENSE_libcap LICENSE_libcgroup LICENSE_mruby LICENSE_libuv README.md
 %{_bindir}/*
 
 %changelog
+* Mon Sep  5 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.4.1-1
+- Experimental support for uid/gid mapping, note that some feature might be broken
+
 * Tue Aug 30 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.4.0-1
 - Experimental support haconiwa watch, bump mruby, fix some bugs
 
