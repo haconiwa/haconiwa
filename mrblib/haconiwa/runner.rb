@@ -21,19 +21,47 @@ module Haconiwa
 
       wrap_daemonize do |base, notifier|
         jail_pid(base)
+        # The pipe to set guid maps
+        if base.namespace.use_guid_mapping?
+          r,  w  = IO.pipe
+          r2, w2 = IO.pipe
+        end
+
         pid = Process.fork do
+          [r, w2].each {|io| io.close if io }
           apply_namespace(base.namespace)
           apply_filesystem(base)
           apply_rlimit(base.resource)
           apply_cgroup(base)
           apply_capability(base.capabilities)
-          do_chroot(base)
+          apply_remount(base)
           ::Procutil.sethostname(base.name)
 
+          apply_user_namespace(base.namespace)
+          if base.namespace.use_guid_mapping?
+            # ping and pong between parent
+            w.puts "unshared"
+            w.close
+
+            r2.read
+            r2.close
+            switch_current_namespace_root
+          end
+
+          do_chroot(base)
           switch_guid(base)
           Exec.exec(*base.init_command)
         end
+
         File.open(base.container_pid_file, 'w') {|f| f.write pid }
+        if base.namespace.use_guid_mapping?
+          [w, r2].each {|io| io.close }
+          r.read
+          r.close
+          set_guid_mapping(base.namespace, pid)
+          w2.puts "mapped"
+          w2.close
+        end
 
         base.signal_handler.register_handlers!
 
@@ -42,12 +70,12 @@ module Haconiwa
           notifier.close # notify container is up
         end
 
-        r, etcd = self, @etcd
+        runner, etcd = self, @etcd
         [:SIGTERM, :SIGINT, :SIGHUP, :SIGPIPE].each do |sig|
           Signal.trap(sig) do |signo|
             unless base.cleaned
               puts "Supervisor received unintended kill. Cleanup..."
-              r.cleanup_supervisor(base, etcd)
+              runner.cleanup_supervisor(base, etcd)
             end
             exit 127
           end
@@ -85,7 +113,7 @@ module Haconiwa
 
         apply_cgroup(base)
         apply_capability(base.attached_capabilities)
-        do_chroot(base, false)
+        do_chroot(base)
         Exec.exec(*exe)
       end
 
@@ -173,13 +201,47 @@ module Haconiwa
     end
 
     def apply_namespace(namespace)
-      ::Namespace.unshare(namespace.to_flag_for_unshare)
+      if ::Namespace.unshare(namespace.to_flag_for_unshare) < 0
+        raise "Some namespace is unsupported by this kernel. Please check"
+      end
 
       if namespace.setns_on_run?
         namespace.ns_to_path.each do |ns, path|
+          next if ns == ::Namespace::CLONE_NEWUSER
           f = File.open(path)
-          ::Namespace.setns(ns, fd: f.fileno)
+          if ::Namespace.setns(ns, fd: f.fileno) < 0
+            raise "Some namespace is unsupported by this kernel. Please check"
+          end
           f.close
+        end
+      end
+    end
+
+    def apply_user_namespace(namespace)
+      flg = namespace.to_flag & ::Namespace::CLONE_NEWUSER
+      if flg != 0 and ::Namespace.unshare(flg) < 0
+        raise "User namespace is unsupported by this kernel. Please check"
+      end
+
+      if path = namespace.ns_to_path[::Namespace::CLONE_NEWUSER]
+        f = File.open(path)
+        if ::Namespace.setns(::Namespace::CLONE_NEWUSER, fd: f.fileno) < 0
+          raise "User namespace is unsupported by this kernel. Please check"
+        end
+        f.close
+      end
+    end
+
+    def set_guid_mapping(namespace, pid)
+      if m = namespace.uid_mapping
+        File.open("/proc/#{pid}/uid_map", "w") do |map|
+          map.write "#{m[:min].to_i} #{m[:offset].to_i} #{m[:max].to_i}"
+        end
+      end
+
+      if m = namespace.gid_mapping
+        File.open("/proc/#{pid}/gid_map", "w") do |map|
+          map.write "#{m[:min].to_i} #{m[:offset].to_i} #{m[:max].to_i}"
         end
       end
     end
@@ -196,7 +258,9 @@ module Haconiwa
         end
       end
       base.network_mountpoint.each do |mp|
-        File.open(mp.dest, "a+") {|f| f.print "" }
+        unless File.exist? mp.dest
+          File.open(mp.dest, "w+") {|f| f.print "" }
+        end
         m.bind_mount mp.src, mp.dest, readonly: true
       end
     end
@@ -258,15 +322,21 @@ module Haconiwa
       end
     end
 
-    def do_chroot(base, init_mount=true)
+    def apply_remount(base)
+      m = Mount.new
+      base.filesystem.independent_mount_points.each do |mp|
+        m.mount mp.src, "#{base.filesystem.chroot}#{mp.dest}", type: mp.fs
+      end
+    end
+
+    def do_chroot(base)
       Dir.chroot base.filesystem.chroot
       Dir.chdir "/"
-      if init_mount
-        m = Mount.new
-        base.filesystem.independent_mount_points.each do |mp|
-          m.mount mp.src, mp.dest, type: mp.fs
-        end
-      end
+    end
+
+    def switch_current_namespace_root
+      ::Process::Sys.setgid(0)
+      ::Process::Sys.setuid(0)
     end
 
     def switch_guid(base)
