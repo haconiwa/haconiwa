@@ -20,7 +20,9 @@ Haconiwa is written in [mruby](https://mruby.org/), so you can utilize Ruby DSL 
 
 `haconiwa` packages are provided via [packagecloud](https://packagecloud.io/udzura/haconiwa).
 
-Available for: `CentOS >= 7 / Ubuntu Trusty / Ubuntu Xenial / Debian jessie` (which are supported by best effort...)
+Available for: `CentOS >= 7 / Fedora >= 23 / Ubuntu Trusty / Ubuntu Xenial / Debian jessie` (which are supported by best effort...)
+
+(PR: We are welcoming package maintainers for other distro!!!)
 
 Other linuxes users can just download binaries from [latest](https://github.com/haconiwa/haconiwa/releases):
 
