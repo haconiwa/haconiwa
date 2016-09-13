@@ -29,6 +29,8 @@ module Haconiwa
 
         pid = Process.fork do
           [r, w2].each {|io| io.close if io }
+          ::Procutil.setsid
+
           apply_namespace(base.namespace)
           apply_filesystem(base)
           apply_rlimit(base.resource)
