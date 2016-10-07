@@ -1,6 +1,7 @@
 module Haconiwa
-  class Base
+  class DSLObject
     attr_accessor :name,
+                  :init_command,
                   :container_pid_file,
                   :filesystem,
                   :resource,
@@ -16,35 +17,9 @@ module Haconiwa
                   :network_mountpoint,
                   :cleaned
 
-    attr_reader   :init_command,
-                  :uid,
+    attr_reader   :uid,
                   :gid,
                   :groups
-
-    def self.define(&b)
-      base = new
-      b.call(base)
-      base
-    end
-
-    def initialize
-      @filesystem = Filesystem.new
-      @resource = Resource.new
-      @cgroup = CGroup.new
-      @namespace = Namespace.new
-      @capabilities = Capabilities.new
-      @signal_handler = SignalHandler.new(self)
-      @attached_capabilities = nil
-      @name = "haconiwa-#{Time.now.to_i}"
-      @init_command = ["/bin/bash"] # FIXME: maybe /sbin/init is better
-      @container_pid_file = nil
-      @pid = nil
-      @daemon = false
-      @uid = @gid = nil
-      @groups = []
-      @network_mountpoint = []
-      @cleaned = false
-    end
 
     def init_command=(cmd)
       if cmd.is_a?(Array)
@@ -117,10 +92,6 @@ module Haconiwa
       @groups
     end
 
-    def add_handler(sig, &b)
-      @signal_handler.add_handler(sig, &b)
-    end
-
     def bootstrap
       @bootstrap ||= Bootstrap.new
       yield(@bootstrap) if block_given?
@@ -131,6 +102,63 @@ module Haconiwa
       @provision ||= Provision.new
       yield(@provision) if block_given?
       @provision
+    end
+  end
+
+  class Barn < DSLObject
+    attr_accessor :bases
+
+    def self.define(&b)
+      barn = new
+      b.call(barn)
+      barn
+    end
+
+    def initialize
+      @filesystem = Filesystem.new
+      @resource = Resource.new
+      @cgroup = CGroup.new
+      @namespace = Namespace.new
+      @capabilities = Capabilities.new
+      @signal_handler = SignalHandler.new(self)
+      @attached_capabilities = nil
+      @name = "haconiwa-#{Time.now.to_i}"
+      @init_command = ["/bin/bash"] # FIXME: maybe /sbin/init is better
+      @container_pid_file = nil
+      @pid = nil
+      @daemon = false
+      @uid = @gid = nil
+      @groups = []
+      @network_mountpoint = []
+      @cleaned = false
+    end
+
+    def add_handler(sig, &b)
+      @signal_handler.add_handler(sig, &b)
+    end
+  end
+
+  class Base < DSLObject
+    def self.define(&b)
+      base = new
+      b.call(base)
+      base
+    end
+
+    def initialize(barn)
+      # copy parent parameters to each child
+      [:init_command,
+       :filesystem,
+       :resource,
+       :cgroup,
+       :namespace,
+       :capabilities,
+       :network_mountpoint,
+       :uid,
+       :gid,
+       :groups].each do |attr|
+        self.send("#{attr}=", barn.send(attr))
+      end
     end
 
     def create(no_provision)
