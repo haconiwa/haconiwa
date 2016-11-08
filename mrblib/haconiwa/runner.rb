@@ -50,15 +50,20 @@ module Haconiwa
 
           do_chroot(base)
           switch_guid(base)
+
+          Logger.info "Container is going to exec: #{base.init_command.inspect}"
           Exec.exec(*base.init_command)
         end
 
         File.open(base.container_pid_file, 'w') {|f| f.write pid }
         if base.namespace.use_guid_mapping?
+          Logger.info "Using gid/uid mapping in this container..."
           [w, r2].each {|io| io.close }
           r.read
           r.close
           set_guid_mapping(base.namespace, pid)
+          Logger.info "Mapping setup is OK"
+
           w2.puts "mapped"
           w2.close
         end
@@ -81,6 +86,7 @@ module Haconiwa
           end
         end
 
+        Logger.puts "Container fork success and going to wait: pid=#{pid}"
         pid, status = Process.waitpid2 pid
         cleanup_supervisor(base, @etcd)
         if status.success?
@@ -114,10 +120,11 @@ module Haconiwa
         apply_cgroup(base)
         apply_capability(base.attached_capabilities)
         do_chroot(base)
+        Logger.info "Attach process is going to exec: #{base.init_command.inspect}"
         Exec.exec(*exe)
       end
+      Logger.info "Attach process fork success: pid=#{pid}"
 
-      Logger.info "waitpid2 started: target pid=#{pid}"
       pid, status = Process.waitpid2 pid
       if status.success?
         Logger.puts "Process successfully exited: #{status.inspect}"
