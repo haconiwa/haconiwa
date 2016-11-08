@@ -36,6 +36,7 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.add_dependency 'mruby-procutil'  , :github => 'haconiwa/mruby-procutil'
   spec.add_dependency 'mruby-resource'  , :github => 'harasou/mruby-resource'
 
+  spec.add_dependency 'mruby-syslog'    , :github => 'iij/mruby-syslog'
   spec.add_dependency 'mruby-uv'        , :github => 'mattn/mruby-uv'
   #spec.add_dependency 'mruby-mutex'     , :github => 'matsumoto-r/mruby-mutex'
 
