@@ -8,12 +8,16 @@ module Haconiwa
       Syslog.open("haconiwa.#{base.name}")
     end
 
+    # Calling this will stop haconiwa process
     def err(*args)
       Syslog.err(*args)
+      raise *args
     end
 
+    # Warning is forced to be teed to stderr
     def warning(*args)
       Syslog.warning(*args)
+      STDERR.puts *args
     end
 
     def notice(*args)
@@ -22,6 +26,12 @@ module Haconiwa
 
     def info(*args)
       Syslog.info(*args)
+    end
+
+    # Teeing log to stdout
+    def puts(*args)
+      Syslog.info(*args)
+      Kernel.puts *args
     end
 
     def debug(*args)
