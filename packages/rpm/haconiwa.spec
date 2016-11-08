@@ -35,8 +35,8 @@ fi
 if ! %{_bindir}/getent passwd haconiwa >/dev/null; then
     %{_sbindir}/useradd --system --gid haconiwa --home-dir "/var/lib/haconiwa" haconiwa
 fi
-%{_bindir}/mkdir -p /var/lib/haconiwa
-%{_bindir}/chown haconiwa: /var/lib/haconiwa
+/bin/mkdir -p /var/lib/haconiwa
+/bin/chown haconiwa: /var/lib/haconiwa
 
 %post
 
