@@ -13,7 +13,7 @@ module Haconiwa
 
     def run(init_command)
       if File.exist? @base.container_pid_file
-        raise "PID file #{@base.container_pid_file} exists. You may be creating the container with existing name #{@base.name}!"
+        Logger.err "PID file #{@base.container_pid_file} exists. You may be creating the container with existing name #{@base.name}!"
       end
       unless init_command.empty?
         @base.init_command = init_command
@@ -74,7 +74,7 @@ module Haconiwa
         [:SIGTERM, :SIGINT, :SIGHUP, :SIGPIPE].each do |sig|
           Signal.trap(sig) do |signo|
             unless base.cleaned
-              puts "Supervisor received unintended kill. Cleanup..."
+              Logger.warning "Supervisor received unintended kill. Cleanup..."
               runner.cleanup_supervisor(base, etcd)
             end
             exit 127
@@ -84,9 +84,9 @@ module Haconiwa
         pid, status = Process.waitpid2 pid
         cleanup_supervisor(base, @etcd)
         if status.success?
-          puts "Container successfully exited: #{status.inspect}"
+          Logger.puts "Container successfully exited: #{status.inspect}"
         else
-          puts "Container failed: #{status.inspect}"
+          Logger.warning "Container failed: #{status.inspect}"
         end
       end
     end
@@ -97,7 +97,7 @@ module Haconiwa
         if File.exist? base.container_pid_file
           base.pid = File.read(base.container_pid_file).to_i
         else
-          raise "PID file #{base.container_pid_file} doesn't exist. You may be specifying container PID by -t option"
+          Logger.err "PID file #{base.container_pid_file} doesn't exist. You may be specifying container PID by -t option"
         end
       end
 
@@ -117,11 +117,12 @@ module Haconiwa
         Exec.exec(*exe)
       end
 
+      Logger.info "waitpid2 started: target pid=#{pid}"
       pid, status = Process.waitpid2 pid
       if status.success?
-        puts "Process successfully exited: #{status.inspect}"
+        Logger.puts "Process successfully exited: #{status.inspect}"
       else
-        puts "Process failed: #{status.inspect}"
+        Logger.warning "Process failed: #{status.inspect}"
       end
     end
 
@@ -148,12 +149,12 @@ module Haconiwa
       10.times do
         sleep 0.1
         unless File.exist?(@base.container_pid_file)
-          puts "Kill success"
+          Logger.puts "Kill success"
           Process.exit 0
         end
       end
 
-      puts "Killing seemd to be failed in 1 second"
+      Logger.warning "Killing seemd to be failed in 1 second"
       Process.exit 1
     end
 
@@ -170,6 +171,7 @@ module Haconiwa
 
     def wrap_daemonize(&b)
       if @base.daemon?
+        Logger.info "Container is running in daemon mode"
         r, w = IO.pipe
         ppid = Process.fork do
           # TODO: logging
@@ -188,7 +190,7 @@ module Haconiwa
           @etcd.put @base.etcd_key, @base.to_container_json
         end
 
-        puts "Container successfully up. PID={container: #{@base.pid}, supervisor: #{@base.supervisor_pid}}"
+        Logger.puts "Container successfully up. PID={container: #{@base.pid}, supervisor: #{@base.supervisor_pid}}"
       else
         b.call(@base, nil)
       end
@@ -202,7 +204,7 @@ module Haconiwa
 
     def apply_namespace(namespace)
       if ::Namespace.unshare(namespace.to_flag_for_unshare) < 0
-        raise "Some namespace is unsupported by this kernel. Please check"
+        Logger.err "Some namespace is unsupported by this kernel. Please check"
       end
 
       if namespace.setns_on_run?
@@ -210,7 +212,7 @@ module Haconiwa
           next if ns == ::Namespace::CLONE_NEWUSER
           f = File.open(path)
           if ::Namespace.setns(ns, fd: f.fileno) < 0
-            raise "Some namespace is unsupported by this kernel. Please check"
+            Logger.err "Some namespace is unsupported by this kernel. Please check"
           end
           f.close
         end
@@ -276,7 +278,7 @@ module Haconiwa
     }
     def apply_cgroup(base)
       base.cgroup.controllers.each do |controller|
-        raise("Invalid or unsupported controller name: #{controller}") unless CG_MAPPING.has_key?(controller)
+        Logger.err("Invalid or unsupported controller name: #{controller}") unless CG_MAPPING.has_key?(controller)
 
         c = CG_MAPPING[controller].new(base.name)
         base.cgroup.groups_by_controller[controller].each do |pair|
@@ -291,7 +293,7 @@ module Haconiwa
 
     def cleanup_cgroup(base)
       base.cgroup.controllers.each do |controller|
-        raise("Invalid or unsupported controller name: #{controller}") unless CG_MAPPING.has_key?(controller)
+        Logger.err("Invalid or unsupported controller name: #{controller}") unless CG_MAPPING.has_key?(controller)
 
         c = CG_MAPPING[controller].new(base.name)
         c.delete
