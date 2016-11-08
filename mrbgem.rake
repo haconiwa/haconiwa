@@ -17,7 +17,7 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.add_dependency 'mruby-string-ext', :core => 'mruby-string-ext'
   spec.add_dependency 'mruby-time'      , :core => 'mruby-time'
 
-  spec.add_dependency 'mruby-capability', :github => 'udzura/mruby-capability'
+  spec.add_dependency 'mruby-capability', :mgem => 'mruby-capability'
   spec.add_dependency 'mruby-cgroup'    , :mgem => 'mruby-cgroup'
   spec.add_dependency 'mruby-dir'       , :mgem => 'mruby-dir' # with Dir#chroot
   spec.add_dependency 'mruby-env'       , :mgem => 'mruby-env'
