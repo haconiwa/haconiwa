@@ -12,20 +12,21 @@ RUN yum -q -y install \
 
 RUN yum -y install epel-release
 RUN yum -y install centos-release-SCL
-RUN yum -y install ruby193
+RUN yum -y install ruby200 ruby200-rubygem-rake
 
 RUN mkdir -p /root/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 
 ENV VERSION 0.4.1
 ENV USER root
 ENV HOME /root
-ENV COMMIT_HASH ab39aa607ef8d29ae90b77f3a790ecd9c8159224
+ENV COMMIT_HASH 6e4729935cba38da44fe07b848e748ebbeef7704
 VOLUME /out
 
 RUN mkdir -p /libexec
 RUN echo '#!/bin/bash'                                        >  /libexec/buildrpm.sh
 RUN echo 'set -xe'                                            >> /libexec/buildrpm.sh
-RUN echo 'export PATH=$PATH:/opt/rh/ruby193/root/usr/bin'     >> /libexec/buildrpm.sh
+RUN echo 'export PATH=$PATH:/opt/rh/ruby200/root/usr/bin'     >> /libexec/buildrpm.sh
+RUN echo 'export LD_LIBRARY_PATH=/opt/rh/ruby200/root/usr/lib64' >> /libexec/buildrpm.sh
 RUN echo 'git clone https://github.com/haconiwa/haconiwa.git /root/haconiwa-$VERSION' >> /libexec/buildrpm.sh
 RUN echo 'cd /root'                                           >> /libexec/buildrpm.sh
 RUN echo '( cd haconiwa-$VERSION; git checkout $COMMIT_HASH )' >> /libexec/buildrpm.sh
