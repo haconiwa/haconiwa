@@ -24,6 +24,8 @@ module Haconiwa
     def self.define(&b)
       base = new
       b.call(base)
+      Logger.setup(base)
+      Logger.info("Base setting DSL is evaluated")
       base
     end
 
