@@ -6,7 +6,7 @@ RUN yum -q -y update
 RUN yum -q -y groupinstall "Development Tools"
 RUN yum -q -y install \
     gcc gcc-c++ git openssl-devel zlib-devel \
-    pam-devel readline-devel rake make \
+    pam-devel readline-devel rubygem-rake make \
     automake autoconf libtool rpm-build \
     glibc-headers glibc-static
 
