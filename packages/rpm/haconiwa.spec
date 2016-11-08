@@ -7,7 +7,7 @@ License: GPLv3+
 URL: https://github.com/haconiwa/haconiwa
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-%(%{__id_u} -n)
-BuildRequires: gcc gcc-c++ git openssl-devel zlib-devel pam-devel readline-devel ruby193 make automake autoconf libtool
+BuildRequires: gcc gcc-c++ git openssl-devel zlib-devel pam-devel readline-devel ruby200 ruby200-rubygem-rake make automake autoconf libtool
 Requires: glibc
 Requires(pre): shadow-utils
 
