@@ -1,6 +1,7 @@
 module Haconiwa
   module Logger
-    def self.setup(base)
+    extend self
+    def setup(base)
       if Syslog.opened?
         Syslog.close
       end
