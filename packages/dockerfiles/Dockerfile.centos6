@@ -8,7 +8,7 @@ RUN yum -q -y install \
     gcc gcc-c++ git openssl-devel zlib-devel \
     pam-devel readline-devel make \
     automake autoconf libtool rpm-build \
-    glibc-headers glibc-static
+    glibc-headers glibc-static kernel-headers
 
 RUN yum -y install epel-release
 RUN yum -y install centos-release-SCL
