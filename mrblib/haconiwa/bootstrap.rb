@@ -1,10 +1,24 @@
 module Haconiwa
   class Bootstrap
-    def initialize
+    attr_reader :strategy
+    attr_accessor :root,
+                  :project_name, :os_type, # for LXC
+                  :arch, :variant, :components, :debian_release, :mirror_url # for Deb
+
+    def strategy=(name_or_instance)
+      @strategy = if name_or_instance.is_a?(String) || name_or_instance.is_a?(Symbol)
+                    case name_or_instance.to_s
+                    when "lxc", "lxc-create"
+                      BootWithLXCTemplate.new
+                    when "debootstrap"
+                      BootWithDebootstrap.new
+                    else
+                      raise "Unsupported bootstrap strategy: #{name_or_instance}"
+                    end
+                  else
+                    name_or_instance
+                  end
     end
-    attr_accessor :strategy, :root,
-                  :project_name, :os_type,
-                  :arch, :variant, :components, :debian_release, :mirror_url
 
     def boot!(r)
       self.root = r
@@ -14,49 +28,51 @@ module Haconiwa
         return true
       end
 
-      case strategy
-      when "lxc", "lxc-create"
-        bootstrap_with_lxc_template
-      when "debootstrap"
-        bootstrap_with_debootstrap
-      else
-        raise "Unsupported: #{strategy}"
-      end
+      # Requires duck typing bootstrap class
+      self.strategy.bootstrap(self)
 
       teardown
     end
 
-    def bootstrap_with_lxc_template
-      cmd = RunCmd.new("bootstrap.lxc")
-      log("Start bootstrapping rootfs with lxc-create...")
+    class BootWithLXCTemplate
+      def bootstrap(boot)
+        cmd = RunCmd.new("bootstrap.lxc")
+        boot.log("Start bootstrapping rootfs with lxc-create...")
 
-      unless system "which lxc-create >/dev/null"
-        raise "lxc-create command may not be installed yet. Please install via your package manager."
+        unless system "which lxc-create >/dev/null"
+          raise "lxc-create command may not be installed yet. Please install via your package manager."
+        end
+
+        cmd.run(sprintf("lxc-create -n %s -t %s --dir %s", boot.project_name, boot.os_type, boot.root.to_str))
+        boot.log("Success!")
+        return true
       end
-
-      cmd.run(sprintf("lxc-create -n %s -t %s --dir %s", project_name, os_type, root.to_str))
-      log("Success!")
-      return true
     end
 
-    def bootstrap_with_debootstrap
-      cmd = RunCmd.new("bootstrap.debootstrap")
-      log("Start bootstrapping rootfs with debootstrap...")
+    class BootWithDebootstrap
+      def bootstrap(boot)
+        cmd = RunCmd.new("bootstrap.debootstrap")
+        boot.log("Start bootstrapping rootfs with debootstrap...")
 
-      unless system "which debootstrap >/dev/null"
-        raise "debootstrap command may not be installed yet. Please install via your package manager."
+        unless system "which debootstrap >/dev/null"
+          raise "debootstrap command may not be installed yet. Please install via your package manager."
+        end
+
+        self.arch ||= "amd64" # TODO: detection
+        self.components ||= "main"
+        self.mirror_url ||= "http://ftp.us.debian.org/debian/"
+
+        cmd.run(sprintf(
+                  "debootstrap --arch=%s --variant=%s --components=%s %s %s %s",
+                  boot.arch, boot.variant, boot.components, boot.debian_release, boot.root.to_str, boot.mirror_url
+                ))
+        boot.log("Success!")
+        return true
       end
+    end
 
-      self.arch ||= "amd64" # TODO: detection
-      self.components ||= "main"
-      self.mirror_url ||= "http://ftp.us.debian.org/debian/"
-
-      cmd.run(sprintf(
-                "debootstrap --arch=%s --variant=%s --components=%s %s %s %s",
-                arch, variant, components, debian_release, root.to_str, mirror_url
-              ))
-      log("Success!")
-      return true
+    def log(msg)
+      $stderr.puts msg.green
     end
 
     private
@@ -65,10 +81,6 @@ module Haconiwa
         cmd = RunCmd.new("bootstrap.teardown")
         cmd.run "chown -R #{root.owner_uid}:#{root.owner_gid} #{root.root.to_s}"
       end
-    end
-
-    def log(msg)
-      $stderr.puts msg.green
     end
   end
 end
