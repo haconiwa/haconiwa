@@ -193,6 +193,9 @@ task :package_regen do
     docker_rpm = ERB.new(File.read("packages/templates/Dockerfile.centos.erb")).result(binding)
     File.write("packages/dockerfiles/Dockerfile.centos", docker_rpm)
 
+    docker_rpm = ERB.new(File.read("packages/templates/Dockerfile.centos6.erb")).result(binding)
+    File.write("packages/dockerfiles/Dockerfile.centos6", docker_rpm)
+
     version = ERB.new(File.read("packages/templates/version.rb.erb")).result(binding)
     File.write("mrblib/haconiwa/version.rb", version)
 

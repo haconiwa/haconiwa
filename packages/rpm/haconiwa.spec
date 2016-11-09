@@ -7,7 +7,7 @@ License: GPLv3+
 URL: https://github.com/haconiwa/haconiwa
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-%(%{__id_u} -n)
-BuildRequires: gcc gcc-c++ git openssl-devel zlib-devel pam-devel readline-devel ruby200 ruby200-rubygem-rake make automake autoconf libtool
+BuildRequires: gcc gcc-c++ git openssl-devel zlib-devel pam-devel readline-devel make automake autoconf libtool
 Requires: glibc
 Requires(pre): shadow-utils
 
@@ -35,8 +35,8 @@ fi
 if ! %{_bindir}/getent passwd haconiwa >/dev/null; then
     %{_sbindir}/useradd --system --gid haconiwa --home-dir "/var/lib/haconiwa" haconiwa
 fi
-/bin/mkdir -p /var/lib/haconiwa
-/bin/chown haconiwa: /var/lib/haconiwa
+%{__mkdir_p} /var/lib/haconiwa
+%{__chown} haconiwa: /var/lib/haconiwa
 
 %post
 
