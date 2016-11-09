@@ -16,12 +16,31 @@ module Haconiwa
                       BootWithDebootstrap.new
                     when "git_clone"
                       BootWithDebootstrap.new
+                    when "tarball", "unarchive"
+                      BootWithUnarchive.new
+                    when "shell"
+                      BootWithShell.new
+                    when "mruby"
+                      BootWithMruby.new
                     else
                       raise "Unsupported bootstrap strategy: #{name_or_instance}"
                     end
                   else
                     name_or_instance
                   end
+    end
+
+    # This is forboth shell and mruby
+    def code(&b)
+      if block_given?
+        @code = b
+      else
+        @code
+      end
+    end
+
+    def code=(the_code)
+      @code = the_code
     end
 
     def boot!(r)
@@ -107,7 +126,7 @@ module Haconiwa
         boot.tar_options << boot.root.to_str
 
         cmd.run(sprintf("mkdir -p %s", boot.root.to_str))
-        cmd.run(sprintf("tar %s", boot.tar_options.join(' '))
+        cmd.run(sprintf("tar %s", boot.tar_options.join(' ')))
         boot.log("Success!")
         return true
       end
@@ -125,6 +144,35 @@ module Haconiwa
           log "[Warning] Archive type detection failed: #{path}. Skip"
           nil
         end
+      end
+    end
+
+    class BootWithShell
+      def bootstrap(boot)
+        cmd = RunCmd.new("bootstrap.shell")
+        boot.log("Start bootstrapping with shell script...")
+
+        boot.code.to_s.lines.each do |line|
+          cmd.run(line.chomp)
+        end
+        boot.log("Success!")
+        return true
+      end
+    end
+
+    class BootWithMruby
+      def bootstrap(boot)
+        cmd = RunCmd.new("bootstrap.mruby")
+        boot.log("Start bootstrapping with mruby code...")
+
+        case code = boot.code
+        when String
+          eval(code)
+        when Proc
+          code.call
+        end
+        boot.log("Success!")
+        return true
       end
     end
 
