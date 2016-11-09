@@ -3,7 +3,8 @@ module Haconiwa
     attr_reader :strategy
     attr_accessor :root,
                   :project_name, :os_type, # for LXC
-                  :arch, :variant, :components, :debian_release, :mirror_url # for Deb
+                  :arch, :variant, :components, :debian_release, :mirror_url, # for Deb
+                  :git_url, :git_options # for git clone
 
     def strategy=(name_or_instance)
       @strategy = if name_or_instance.is_a?(String) || name_or_instance.is_a?(Symbol)
@@ -11,6 +12,8 @@ module Haconiwa
                     when "lxc", "lxc-create"
                       BootWithLXCTemplate.new
                     when "debootstrap"
+                      BootWithDebootstrap.new
+                    when "git_clone"
                       BootWithDebootstrap.new
                     else
                       raise "Unsupported bootstrap strategy: #{name_or_instance}"
@@ -58,14 +61,31 @@ module Haconiwa
           raise "debootstrap command may not be installed yet. Please install via your package manager."
         end
 
-        self.arch ||= "amd64" # TODO: detection
-        self.components ||= "main"
-        self.mirror_url ||= "http://ftp.us.debian.org/debian/"
+        boot.arch ||= "amd64" # TODO: detection
+        boot.components ||= "main"
+        boot.mirror_url ||= "http://ftp.us.debian.org/debian/"
 
         cmd.run(sprintf(
                   "debootstrap --arch=%s --variant=%s --components=%s %s %s %s",
                   boot.arch, boot.variant, boot.components, boot.debian_release, boot.root.to_str, boot.mirror_url
                 ))
+        boot.log("Success!")
+        return true
+      end
+    end
+
+    class BootWithGitClone
+      def bootstrap(boot)
+        cmd = RunCmd.new("bootstrap.git_clone")
+        boot.log("Cloning rootfs from #{boot.git_url}...")
+
+        unless system "which git >/dev/null"
+          raise "mmm... you seem not to have git."
+        end
+
+        boot.git_options ||= []
+
+        cmd.run(sprintf("git clone %s %s %s", boot.git_options.join(' '), boot.git_url, boot.root.to_str))
         boot.log("Success!")
         return true
       end
