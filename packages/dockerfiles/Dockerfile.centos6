@@ -15,11 +15,11 @@ RUN yum -y install centos-release-SCL
 RUN yum -y install ruby200 ruby200-rubygem-rake
 
 RUN mkdir -p /root/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+RUN sed -i "s;%_build_name_fmt.*;%_build_name_fmt\t%%{ARCH}/%%{NAME}-%%{VERSION}-%%{RELEASE}%{dist}.%%{ARCH}.rpm;" /usr/lib/rpm/macros
 
 ENV VERSION 0.4.1
 ENV USER root
 ENV HOME /root
-ENV COMMIT_HASH 6e4729935cba38da44fe07b848e748ebbeef7704
 VOLUME /out
 
 RUN mkdir -p /libexec
