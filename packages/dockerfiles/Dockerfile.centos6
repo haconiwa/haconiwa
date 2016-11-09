@@ -15,7 +15,7 @@ RUN yum -y install centos-release-SCL
 RUN yum -y install ruby200 ruby200-rubygem-rake
 
 RUN mkdir -p /root/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
-RUN sed -i "s;%_build_name_fmt.*;%_build_name_fmt\t%%{ARCH}/%%{NAME}-%%{VERSION}-%%{RELEASE}%{dist}.%%{ARCH}.rpm;" /usr/lib/rpm/macros
+RUN sed -i "s;%_build_name_fmt.*;%_build_name_fmt\t%%{ARCH}/%%{NAME}-%%{VERSION}-%%{RELEASE}.el7.%%{ARCH}.rpm;" /usr/lib/rpm/macros
 
 ENV VERSION 0.4.1
 ENV USER root
@@ -27,9 +27,9 @@ RUN echo '#!/bin/bash'                                        >  /libexec/buildr
 RUN echo 'set -xe'                                            >> /libexec/buildrpm.sh
 RUN echo 'export PATH=$PATH:/opt/rh/ruby200/root/usr/bin'     >> /libexec/buildrpm.sh
 RUN echo 'export LD_LIBRARY_PATH=/opt/rh/ruby200/root/usr/lib64' >> /libexec/buildrpm.sh
-RUN echo 'git clone https://github.com/haconiwa/haconiwa.git /root/haconiwa-$VERSION' >> /libexec/buildrpm.sh
+RUN echo 'git clone --depth=50 https://github.com/haconiwa/haconiwa.git /root/haconiwa-$VERSION' >> /libexec/buildrpm.sh
 RUN echo 'cd /root'                                           >> /libexec/buildrpm.sh
-RUN echo '( cd haconiwa-$VERSION; git checkout $COMMIT_HASH )' >> /libexec/buildrpm.sh
+RUN echo '( cd haconiwa-$VERSION; git checkout $(git rev-parse v$VERSION) )' >> /libexec/buildrpm.sh
 RUN echo 'tar czf haconiwa-$VERSION.tar.gz haconiwa-$VERSION' >> /libexec/buildrpm.sh
 RUN echo 'mv /root/haconiwa-$VERSION.tar.gz /root/rpmbuild/SOURCES'  >> /libexec/buildrpm.sh
 RUN echo 'rpmbuild -bb haconiwa-$VERSION/packages/rpm/haconiwa.spec' >> /libexec/buildrpm.sh
