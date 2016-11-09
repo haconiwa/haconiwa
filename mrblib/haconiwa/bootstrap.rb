@@ -4,7 +4,8 @@ module Haconiwa
     attr_accessor :root,
                   :project_name, :os_type, # for LXC
                   :arch, :variant, :components, :debian_release, :mirror_url, # for Deb
-                  :git_url, :git_options # for git clone
+                  :git_url, :git_options, # for git clone
+                  :archive_path, :tar_options # for unarchive
 
     def strategy=(name_or_instance)
       @strategy = if name_or_instance.is_a?(String) || name_or_instance.is_a?(Symbol)
@@ -88,6 +89,42 @@ module Haconiwa
         cmd.run(sprintf("git clone %s %s %s", boot.git_options.join(' '), boot.git_url, boot.root.to_str))
         boot.log("Success!")
         return true
+      end
+    end
+
+    class BootWithUnarchive
+      def bootstrap(boot)
+        cmd = RunCmd.new("bootstrap.unarchive")
+        boot.log("Extracting rootfs...")
+
+        boot.tar_options ||= []
+        boot.tar_options << "-x"
+        boot.tar_options << detect_zip_type(boot.archive_path)
+        boot.tar_options = boot.tar_options.compact.uniq
+        boot.tar_options << "-f"
+        boot.tar_options << boot.archive_path
+        boot.tar_options << "-C"
+        boot.tar_options << boot.root.to_str
+
+        cmd.run(sprintf("mkdir -p %s", boot.root.to_str))
+        cmd.run(sprintf("tar %s", boot.tar_options.join(' '))
+        boot.log("Success!")
+        return true
+      end
+
+      private
+      def detect_zip_type(path)
+        case ::File.extname(path)
+        when ".gz", ".tgz"
+          "-z"
+        when ".bz2"
+          "-j"
+        when ".xz"
+          "-J"
+        else
+          log "[Warning] Archive type detection failed: #{path}. Skip"
+          nil
+        end
       end
     end
 
