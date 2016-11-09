@@ -1,6 +1,6 @@
 Name: haconiwa
 Epoch: 1
-Version: 0.4.1
+Version: 0.4.2
 Release: 1
 Summary: MRuby on Container
 License: GPLv3+
@@ -49,6 +49,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Wed Nov  9 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.4.2-1
+- Logs are now put to syslog, and added CentOS 6 experimental support
+
 * Mon Sep  5 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.4.1-1
 - Experimental support for uid/gid mapping, note that some feature might be broken
 
