@@ -30,7 +30,7 @@ mruby_root=File.expand_path(ENV["MRUBY_ROOT"] || "#{APP_ROOT}/mruby")
 mruby_config=File.expand_path(ENV["MRUBY_CONFIG"] || "build_config.rb")
 ENV['MRUBY_ROOT'] = mruby_root
 ENV['MRUBY_CONFIG'] = mruby_config
-if !Dir.exist?(mruby_root) or !File.exist?("#{mruby_root}/Rakefile")
+if !File.exist?(mruby_root) or !File.exist?("#{mruby_root}/Rakefile")
   FileUtils.rm_rf mruby_root
   Rake::Task[:mruby].invoke
 end
@@ -192,6 +192,9 @@ task :package_regen do
 
     docker_rpm = ERB.new(File.read("packages/templates/Dockerfile.centos.erb")).result(binding)
     File.write("packages/dockerfiles/Dockerfile.centos", docker_rpm)
+
+    docker_rpm = ERB.new(File.read("packages/templates/Dockerfile.centos6.erb")).result(binding)
+    File.write("packages/dockerfiles/Dockerfile.centos6", docker_rpm)
 
     version = ERB.new(File.read("packages/templates/version.rb.erb")).result(binding)
     File.write("mrblib/haconiwa/version.rb", version)
