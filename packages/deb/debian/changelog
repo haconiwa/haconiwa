@@ -1,3 +1,9 @@
+haconiwa (0.4.2-1) unstable; urgency=medium
+
+  * Logs are now put to syslog, and added CentOS 6 experimental support
+
+ -- Uchio Kondo <udzura@udzura.jp>  Wed,  9 Nov 2016 16:15:45 +0900
+
 haconiwa (0.4.1-1) unstable; urgency=medium
 
   * Experimental support for uid/gid mapping, note that some feature might be broken
