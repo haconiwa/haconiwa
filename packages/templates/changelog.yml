@@ -1,5 +1,10 @@
-latest: 0.4.1
+latest: 0.4.2
 changelog:
+  - version: 0.4.2
+    messages:
+      - Logs are now put to syslog, and added CentOS 6 experimental support
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Wed,  9 Nov 2016 16:15:45 +0900
   - version: 0.4.1
     messages:
       - Experimental support for uid/gid mapping, note that some feature might be broken
