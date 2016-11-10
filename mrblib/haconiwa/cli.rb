@@ -40,12 +40,19 @@ module Haconiwa
       opt = parse_opts(args, 'HACO_FILE [-- COMMAND...]') do |o|
         o.literal('D', 'daemon', "Force the container to be daemon")
         o.literal('T', 'no-daemon', "Force the container not to be daemon, stuck in tty")
+        o.literal('b', 'bootstrap', "Kick the bootstrap process on run")
+        o.literal('N', 'no-provision', "Skip provisioning, when you intend to kick bootstrap")
       end
+      cli_options = {}
 
       base, init = get_script_and_eval(opt.catchall.values)
       base.daemonize! if opt['D'].exist?
       base.cancel_daemonize! if opt['T'].exist?
-      base.run(*init)
+
+      cli_options[:booting] = opt['b'].exist?
+      cli_options[:no_provision] = opt['N'].exist?
+
+      base.run(cli_options, *init)
     end
 
     def self.attach(args)
