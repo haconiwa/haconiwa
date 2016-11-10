@@ -16,7 +16,7 @@ Haconiwa.define do |config|
   config.chroot_to root
 
   # The bootstrap process...
-  # Choose lxc or debootstrap:
+  # Choose lxc, debootstrap, git-clone, shell or mruby:
   config.bootstrap do |b|
     b.strategy = "lxc"
     b.os_type  = "alpine"
