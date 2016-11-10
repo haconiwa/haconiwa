@@ -153,7 +153,11 @@ module Haconiwa
       @provision.provision!(self.rootfs)
     end
 
-    def start(*init_command)
+    def start(options, *init_command)
+      if options[:booting]
+        Logger.puts "Bootstrapping rootfs on run..."
+        create(options[:no_provision])
+      end
       self.container_pid_file ||= default_container_pid_file
       LinuxRunner.new(self).run(init_command)
     end
