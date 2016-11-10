@@ -14,8 +14,8 @@ module Haconiwa
                       BootWithLXCTemplate.new
                     when "debootstrap"
                       BootWithDebootstrap.new
-                    when "git_clone"
-                      BootWithDebootstrap.new
+                    when "git", "git-clone"
+                      BootWithGitClone.new
                     when "tarball", "unarchive"
                       BootWithUnarchive.new
                     when "shell"
@@ -96,7 +96,7 @@ module Haconiwa
 
     class BootWithGitClone
       def bootstrap(boot)
-        cmd = RunCmd.new("bootstrap.git_clone")
+        cmd = RunCmd.new("bootstrap.git-clone")
         boot.log("Cloning rootfs from #{boot.git_url}...")
 
         unless system "which git >/dev/null"
