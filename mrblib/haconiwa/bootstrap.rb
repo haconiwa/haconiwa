@@ -75,7 +75,9 @@ module Haconiwa
       self.strategy.bootstrap(self)
 
       if @postprocess
+        log("Start postprocess...")
         @postprocess.call(self)
+        log("Success!")
       end
 
       teardown
