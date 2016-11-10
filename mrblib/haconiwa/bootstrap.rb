@@ -7,6 +7,10 @@ module Haconiwa
                   :git_url, :git_options, # for git clone
                   :archive_path, :tar_options # for unarchive
 
+    def initialize
+      @postprocess = nil
+    end
+
     def strategy=(name_or_instance)
       @strategy = if name_or_instance.is_a?(String) || name_or_instance.is_a?(Symbol)
                     case name_or_instance.to_s
@@ -43,6 +47,22 @@ module Haconiwa
       @code = the_code
     end
 
+    def postprocess(type, code=nil, &b)
+      case type.to_s
+      when "shell"
+        @postprocess = lambda { |_|
+          cmd = RunCmd.new("bootstrap.postprocess")
+          code.lines.each do |l|
+            cmd.run l.chomp
+          end
+        }
+      when "mruby"
+        @postprocess = b.nil? ?
+                         lambda { |boot| eval(code) } :
+                         b
+      end
+    end
+
     def boot!(r)
       self.root = r
       self.project_name ||= File.basename(root.to_str)
@@ -53,6 +73,12 @@ module Haconiwa
 
       # Requires duck typing bootstrap class
       self.strategy.bootstrap(self)
+
+      if @postprocess
+        log("Start postprocess...")
+        @postprocess.call(self)
+        log("Success!")
+      end
 
       teardown
     end
