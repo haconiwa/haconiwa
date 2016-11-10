@@ -33,7 +33,6 @@ module Haconiwa
           apply_filesystem(base)
           apply_rlimit(base.resource)
           apply_cgroup(base)
-          apply_capability(base.capabilities)
           apply_remount(base)
           ::Procutil.sethostname(base.name)
 
@@ -51,6 +50,7 @@ module Haconiwa
           do_chroot(base)
           switch_guid(base)
 
+          apply_capability(base.capabilities)
           Logger.info "Container is going to exec: #{base.init_command.inspect}"
           Exec.exec(*base.init_command)
         end
@@ -118,8 +118,8 @@ module Haconiwa
         ::Namespace.setns(base.namespace.to_flag_without_pid, pid: base.pid)
 
         apply_cgroup(base)
-        apply_capability(base.attached_capabilities)
         do_chroot(base)
+        apply_capability(base.attached_capabilities)
         Logger.info "Attach process is going to exec: #{base.init_command.inspect}"
         Exec.exec(*exe)
       end
