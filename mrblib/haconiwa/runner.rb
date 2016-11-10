@@ -285,6 +285,7 @@ module Haconiwa
     }
     def apply_cgroup(base)
       base.cgroup.controllers.each do |controller|
+        Logger.debug "Creating cgroup controller #{controller}"
         Logger.err("Invalid or unsupported controller name: #{controller}") unless CG_MAPPING.has_key?(controller)
 
         c = CG_MAPPING[controller].new(base.name)
@@ -315,10 +316,12 @@ module Haconiwa
         (0..38).each do |cap|
           break unless ::Capability.supported? cap
           next if ids.include?(cap)
+          Logger.debug "Dropping cap of #{cap}"
           ::Capability.drop_bound cap
         end
       else
         capabilities.blacklist_ids.each do |cap|
+          Logger.debug "Dropping cap of #{cap}"
           ::Capability.drop_bound cap
         end
       end
