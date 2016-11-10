@@ -1,5 +1,10 @@
-latest: 0.4.2
+latest: 0.4.3
 changelog:
+  - version: 0.4.3
+    messages:
+      - Support postprocess hooks for bootstrap, add run -b option
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Thu, 10 Nov 2016 15:23:17 +0900
   - version: 0.4.2
     messages:
       - Logs are now put to syslog, and added CentOS 6 experimental support

@@ -1,3 +1,9 @@
+haconiwa (0.4.3-1) unstable; urgency=medium
+
+  * Support postprocess hooks for bootstrap, add run -b option
+
+ -- Uchio Kondo <udzura@udzura.jp>  Thu, 10 Nov 2016 15:23:17 +0900
+
 haconiwa (0.4.2-1) unstable; urgency=medium
 
   * Logs are now put to syslog, and added CentOS 6 experimental support
