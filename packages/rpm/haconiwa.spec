@@ -1,6 +1,6 @@
 Name: haconiwa
 Epoch: 1
-Version: 0.4.2
+Version: 0.4.3
 Release: 1
 Summary: MRuby on Container
 License: GPLv3+
@@ -49,6 +49,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Thu Nov 10 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.4.3-1
+- Support postprocess hooks for bootstrap, add run -b option
+
 * Wed Nov  9 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.4.2-1
 - Logs are now put to syslog, and added CentOS 6 experimental support
 
