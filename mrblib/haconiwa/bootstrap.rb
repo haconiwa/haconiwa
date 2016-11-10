@@ -1,10 +1,47 @@
 module Haconiwa
   class Bootstrap
-    def initialize
+    attr_reader :strategy
+    attr_accessor :root,
+                  :project_name, :os_type, # for LXC
+                  :arch, :variant, :components, :debian_release, :mirror_url, # for Deb
+                  :git_url, :git_options, # for git clone
+                  :archive_path, :tar_options # for unarchive
+
+    def strategy=(name_or_instance)
+      @strategy = if name_or_instance.is_a?(String) || name_or_instance.is_a?(Symbol)
+                    case name_or_instance.to_s
+                    when "lxc", "lxc-create"
+                      BootWithLXCTemplate.new
+                    when "debootstrap"
+                      BootWithDebootstrap.new
+                    when "git", "git-clone"
+                      BootWithGitClone.new
+                    when "tarball", "unarchive"
+                      BootWithUnarchive.new
+                    when "shell"
+                      BootWithShell.new
+                    when "mruby"
+                      BootWithMruby.new
+                    else
+                      raise "Unsupported bootstrap strategy: #{name_or_instance}"
+                    end
+                  else
+                    name_or_instance
+                  end
     end
-    attr_accessor :strategy, :root,
-                  :project_name, :os_type,
-                  :arch, :variant, :components, :debian_release, :mirror_url
+
+    # This is forboth shell and mruby
+    def code(&b)
+      if block_given?
+        @code = b
+      else
+        @code
+      end
+    end
+
+    def code=(the_code)
+      @code = the_code
+    end
 
     def boot!(r)
       self.root = r
@@ -14,49 +51,133 @@ module Haconiwa
         return true
       end
 
-      case strategy
-      when "lxc", "lxc-create"
-        bootstrap_with_lxc_template
-      when "debootstrap"
-        bootstrap_with_debootstrap
-      else
-        raise "Unsupported: #{strategy}"
-      end
+      # Requires duck typing bootstrap class
+      self.strategy.bootstrap(self)
 
       teardown
     end
 
-    def bootstrap_with_lxc_template
-      cmd = RunCmd.new("bootstrap.lxc")
-      log("Start bootstrapping rootfs with lxc-create...")
+    class BootWithLXCTemplate
+      def bootstrap(boot)
+        cmd = RunCmd.new("bootstrap.lxc")
+        boot.log("Start bootstrapping rootfs with lxc-create...")
 
-      unless system "which lxc-create >/dev/null"
-        raise "lxc-create command may not be installed yet. Please install via your package manager."
+        unless system "which lxc-create >/dev/null"
+          raise "lxc-create command may not be installed yet. Please install via your package manager."
+        end
+
+        cmd.run(sprintf("lxc-create -n %s -t %s --dir %s", boot.project_name, boot.os_type, boot.root.to_str))
+        boot.log("Success!")
+        return true
       end
-
-      cmd.run(sprintf("lxc-create -n %s -t %s --dir %s", project_name, os_type, root.to_str))
-      log("Success!")
-      return true
     end
 
-    def bootstrap_with_debootstrap
-      cmd = RunCmd.new("bootstrap.debootstrap")
-      log("Start bootstrapping rootfs with debootstrap...")
+    class BootWithDebootstrap
+      def bootstrap(boot)
+        cmd = RunCmd.new("bootstrap.debootstrap")
+        boot.log("Start bootstrapping rootfs with debootstrap...")
 
-      unless system "which debootstrap >/dev/null"
-        raise "debootstrap command may not be installed yet. Please install via your package manager."
+        unless system "which debootstrap >/dev/null"
+          raise "debootstrap command may not be installed yet. Please install via your package manager."
+        end
+
+        boot.arch ||= "amd64" # TODO: detection
+        boot.components ||= "main"
+        boot.mirror_url ||= "http://ftp.us.debian.org/debian/"
+
+        cmd.run(sprintf(
+                  "debootstrap --arch=%s --variant=%s --components=%s %s %s %s",
+                  boot.arch, boot.variant, boot.components, boot.debian_release, boot.root.to_str, boot.mirror_url
+                ))
+        boot.log("Success!")
+        return true
+      end
+    end
+
+    class BootWithGitClone
+      def bootstrap(boot)
+        cmd = RunCmd.new("bootstrap.git-clone")
+        boot.log("Cloning rootfs from #{boot.git_url}...")
+
+        unless system "which git >/dev/null"
+          raise "mmm... you seem not to have git."
+        end
+
+        boot.git_options ||= []
+
+        cmd.run(sprintf("git clone %s %s %s", boot.git_options.join(' '), boot.git_url, boot.root.to_str))
+        boot.log("Success!")
+        return true
+      end
+    end
+
+    class BootWithUnarchive
+      def bootstrap(boot)
+        cmd = RunCmd.new("bootstrap.unarchive")
+        boot.log("Extracting rootfs...")
+
+        boot.tar_options ||= []
+        boot.tar_options << "-x"
+        boot.tar_options << detect_zip_type(boot.archive_path)
+        boot.tar_options = boot.tar_options.compact.uniq
+        boot.tar_options << "-f"
+        boot.tar_options << boot.archive_path
+        boot.tar_options << "-C"
+        boot.tar_options << boot.root.to_str
+
+        cmd.run(sprintf("mkdir -p %s", boot.root.to_str))
+        cmd.run(sprintf("tar %s", boot.tar_options.join(' ')))
+        boot.log("Success!")
+        return true
       end
 
-      self.arch ||= "amd64" # TODO: detection
-      self.components ||= "main"
-      self.mirror_url ||= "http://ftp.us.debian.org/debian/"
+      private
+      def detect_zip_type(path)
+        case ::File.extname(path)
+        when ".gz", ".tgz"
+          "-z"
+        when ".bz2"
+          "-j"
+        when ".xz"
+          "-J"
+        else
+          log "[Warning] Archive type detection failed: #{path}. Skip"
+          nil
+        end
+      end
+    end
 
-      cmd.run(sprintf(
-                "debootstrap --arch=%s --variant=%s --components=%s %s %s %s",
-                arch, variant, components, debian_release, root.to_str, mirror_url
-              ))
-      log("Success!")
-      return true
+    class BootWithShell
+      def bootstrap(boot)
+        cmd = RunCmd.new("bootstrap.shell")
+        boot.log("Start bootstrapping with shell script...")
+
+        boot.code.to_s.lines.each do |line|
+          cmd.run(line.chomp)
+        end
+        boot.log("Success!")
+        return true
+      end
+    end
+
+    class BootWithMruby
+      def bootstrap(boot)
+        cmd = RunCmd.new("bootstrap.mruby")
+        boot.log("Start bootstrapping with mruby code...")
+
+        case code = boot.code
+        when String
+          eval(code)
+        when Proc
+          code.call
+        end
+        boot.log("Success!")
+        return true
+      end
+    end
+
+    def log(msg)
+      $stderr.puts msg.green
     end
 
     private
@@ -65,10 +186,6 @@ module Haconiwa
         cmd = RunCmd.new("bootstrap.teardown")
         cmd.run "chown -R #{root.owner_uid}:#{root.owner_gid} #{root.root.to_s}"
       end
-    end
-
-    def log(msg)
-      $stderr.puts msg.green
     end
   end
 end
