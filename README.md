@@ -20,7 +20,7 @@ Haconiwa is written in [mruby](https://mruby.org/), so you can utilize Ruby DSL 
 
 `haconiwa` packages are provided via [packagecloud](https://packagecloud.io/udzura/haconiwa).
 
-Available for: `CentOS >= 7 / Fedora >= 23 / Ubuntu Trusty / Ubuntu Xenial / Debian jessie` (which are supported by best effort...)
+Available for: `CentOS >= 7 / CentOS ~> 6(Experimental, maybe kernel update required) / Fedora >= 23 / Ubuntu Trusty / Ubuntu Xenial / Debian jessie` (which are supported by best effort...)
 
 (PR: We are welcoming package maintainers for other distro!!!)
 
@@ -112,7 +112,7 @@ And `attach` is not concerned with capabilities which is granted to container. S
 
 #### Bootstrap
 
-`config.bootstrap` block support 2 strategy.
+`config.bootstrap` block support 6 strategies now.
 
 * `strategy = "lxc"`
   * needs `lxc-create` command
@@ -124,6 +124,16 @@ And `attach` is not concerned with capabilities which is granted to container. S
   * `deb.debian_release` to set Debian's release name squeeze/jessie/sid and so on...
   * `deb.mirror_url` to set mirror URL debootstrap uses
   * `deb.components` to set components installed. eg, `'base'`
+* `strategy = "git"`
+  * needs `git` command :)
+  * `git.git_url` to set the repository URL for clone
+  * `git.git_options` to set extra `git` options by Array, if necessary
+* `strategy = "tarball"`
+  * needs `tar` command ;)
+  * `tb.archive_path` to set the source archive path on your host machine
+  * `tb.tar_options` to set extra `tar` options by Array, if necessary
+* `strategy = "shell" / "mruby"`
+  * `shell.code` to set a shell or mruby code by string(heredoc is OK). You can pass the mruby code block for `"mruby"`
 
 #### Provision
 
