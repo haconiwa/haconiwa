@@ -17,8 +17,8 @@ Haconiwa.define do |config|
   # The bootstrap process...
   # Choose lxc or debootstrap:
   config.bootstrap do |b|
-    b.strategy = "lxc"
-    b.os_type  = "alpine"
+    b.strategy = "git"
+    b.git_url = "https://github.com/haconiwa/haconiwa-image-php-tester"
 
     # b.strategy = "debootstrap"
     # b.variant = "minbase"
