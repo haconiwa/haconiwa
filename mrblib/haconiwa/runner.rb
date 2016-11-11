@@ -325,6 +325,9 @@ module Haconiwa
           ::Capability.drop_bound cap
         end
       end
+    rescue => e
+      showid = capabilities.acts_as_whitelist? ? capabilities.whitelist_ids : capabilities.blacklist_ids
+      Logger.err "Maybe there are unsupported caps in #{showid.inspect}: #{e.class} - #{e.message}"
     end
 
     def apply_rlimit(rlimit)
