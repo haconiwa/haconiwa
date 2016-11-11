@@ -266,11 +266,11 @@ module Haconiwa
     end
 
     def whitelist_ids
-      @whitelist.map{|n| ::Capability.from_name(n) }
+      @whitelist.map{|n| get_cap_name(n) }
     end
 
     def blacklist_ids
-      @blacklist.map{|n| ::Capability.from_name(n) }
+      @blacklist.map{|n| get_cap_name(n) }
     end
 
     def drop(*keys)
@@ -279,6 +279,14 @@ module Haconiwa
 
     def acts_as_whitelist?
       ! @whitelist.empty?
+    end
+
+    private
+    def get_cap_name(n)
+      ::Capability.from_name(n)
+    rescue => e
+      STDERR.puts "Capability name looks invalid: #{n}"
+      raise e
     end
   end
 

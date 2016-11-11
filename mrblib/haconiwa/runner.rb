@@ -33,7 +33,6 @@ module Haconiwa
           apply_filesystem(base)
           apply_rlimit(base.resource)
           apply_cgroup(base)
-          apply_capability(base.capabilities)
           apply_remount(base)
           ::Procutil.sethostname(base.name)
 
@@ -51,6 +50,7 @@ module Haconiwa
           do_chroot(base)
           switch_guid(base)
 
+          apply_capability(base.capabilities)
           Logger.info "Container is going to exec: #{base.init_command.inspect}"
           Exec.exec(*base.init_command)
         end
@@ -118,8 +118,8 @@ module Haconiwa
         ::Namespace.setns(base.namespace.to_flag_without_pid, pid: base.pid)
 
         apply_cgroup(base)
-        apply_capability(base.attached_capabilities)
         do_chroot(base)
+        apply_capability(base.attached_capabilities)
         Logger.info "Attach process is going to exec: #{base.init_command.inspect}"
         Exec.exec(*exe)
       end
@@ -285,6 +285,7 @@ module Haconiwa
     }
     def apply_cgroup(base)
       base.cgroup.controllers.each do |controller|
+        Logger.debug "Creating cgroup controller #{controller}"
         Logger.err("Invalid or unsupported controller name: #{controller}") unless CG_MAPPING.has_key?(controller)
 
         c = CG_MAPPING[controller].new(base.name)
@@ -315,13 +316,18 @@ module Haconiwa
         (0..38).each do |cap|
           break unless ::Capability.supported? cap
           next if ids.include?(cap)
+          Logger.debug "Dropping cap of #{cap}"
           ::Capability.drop_bound cap
         end
       else
         capabilities.blacklist_ids.each do |cap|
+          Logger.debug "Dropping cap of #{cap}"
           ::Capability.drop_bound cap
         end
       end
+    rescue => e
+      showid = capabilities.acts_as_whitelist? ? capabilities.whitelist_ids : capabilities.blacklist_ids
+      Logger.err "Maybe there are unsupported caps in #{showid.inspect}: #{e.class} - #{e.message}"
     end
 
     def apply_rlimit(rlimit)
