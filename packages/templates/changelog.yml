@@ -1,5 +1,10 @@
-latest: 0.4.3
+latest: 0.4.4
 changelog:
+  - version: 0.4.4
+    messages:
+      - Fix failing to drop caps when g/uid mappping is active
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Fri, 11 Nov 2016 15:28:45 +0900
   - version: 0.4.3
     messages:
       - Support postprocess hooks for bootstrap, add run -b option
