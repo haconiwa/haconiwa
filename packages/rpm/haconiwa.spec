@@ -1,6 +1,6 @@
 Name: haconiwa
 Epoch: 1
-Version: 0.4.3
+Version: 0.4.4
 Release: 1
 Summary: MRuby on Container
 License: GPLv3+
@@ -49,6 +49,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Fri Nov 11 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.4.4-1
+- Fix failing to drop caps when g/uid mappping is active
+
 * Thu Nov 10 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.4.3-1
 - Support postprocess hooks for bootstrap, add run -b option
 
