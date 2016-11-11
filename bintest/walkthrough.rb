@@ -46,6 +46,10 @@ assert('walkthrough') do
     # FIXME: /dev/shm does not exist after lxc-create'd on trusty?
     system %Q(sed -i '/config.mount_independent "shm"/d' #{haconame})
 
+    # change to git strategy
+    system %Q(sed -i 's!b.strategy.*!b.strategy = "git"!' #{haconame})
+    system %Q(sed -i 's!b.os_type.*!b.git_url = "https://github.com/haconiwa/haconiwa-image-alpine"!' #{haconame})
+
     output, status = run_haconiwa "create", haconame
     assert_true status.success?, "Process did not exit cleanly: create"
 
