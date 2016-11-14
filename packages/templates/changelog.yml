@@ -1,5 +1,10 @@
-latest: 0.4.4
+latest: 0.4.5
 changelog:
+  - version: 0.4.5
+    messages:
+      - Fix brken option haconiwa attach -t, support centos 6 attach
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Mon, 14 Nov 2016 15:44:08 +0900
   - version: 0.4.4
     messages:
       - Fix failing to drop caps when g/uid mappping is active
