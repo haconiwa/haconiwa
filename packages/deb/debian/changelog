@@ -1,3 +1,9 @@
+haconiwa (0.4.5-1) unstable; urgency=medium
+
+  * Fix brken option haconiwa attach -t, support centos 6 attach
+
+ -- Uchio Kondo <udzura@udzura.jp>  Mon, 14 Nov 2016 15:44:08 +0900
+
 haconiwa (0.4.4-1) unstable; urgency=medium
 
   * Fix failing to drop caps when g/uid mappping is active

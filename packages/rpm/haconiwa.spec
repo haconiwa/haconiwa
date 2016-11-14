@@ -1,6 +1,6 @@
 Name: haconiwa
 Epoch: 1
-Version: 0.4.4
+Version: 0.4.5
 Release: 1
 Summary: MRuby on Container
 License: GPLv3+
@@ -49,6 +49,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Mon Nov 14 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.4.5-1
+- Fix brken option haconiwa attach -t, support centos 6 attach
+
 * Fri Nov 11 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.4.4-1
 - Fix failing to drop caps when g/uid mappping is active
 
