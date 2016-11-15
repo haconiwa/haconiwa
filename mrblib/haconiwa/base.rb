@@ -131,6 +131,11 @@ module Haconiwa
       @provision.provision!(self.rootfs)
     end
 
+    def archive(options)
+      create(options[:no_provision])
+      Archive.new(self, options).do_archive
+    end
+
     def start(options, *init_command)
       if options[:booting]
         Logger.puts "Bootstrapping rootfs on run..."
