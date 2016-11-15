@@ -40,6 +40,7 @@ module Haconiwa
         o.string('d', 'dest', 'PATH.EXT', "Location where to create archive. Type will be detected by extname")
         o.string('t', 'type', 'TYPE', "Archive type to be created [gzip|bzip2|xz]")
         o.literal('v', 'verbose', "Verbose mode. Passes `-v' to tar command")
+        o.literal('n', 'dry-run', "Dry-run mode. Makes dry just on archive phase")
         o.string('O', 'tar-options', 'OPTIONS,OPTIONS...', "Extra option to pass to tar command")
       end
 
@@ -48,6 +49,7 @@ module Haconiwa
         dest: opt['d'].value,
         type: (opt['t'].exist? ? opt['t'].value : nil),
         verbose: opt['v'].exist?,
+        dry_run: opt['n'].exist?,
         tar_options: (opt['O'].exist? ? opt['O'].value.split(',') : nil)
       }
 
