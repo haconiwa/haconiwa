@@ -1,5 +1,7 @@
 module Haconiwa
   class Base
+    extend ::Forwardable
+
     attr_accessor :name,
                   :container_pid_file,
                   :filesystem,
@@ -7,6 +9,7 @@ module Haconiwa
                   :cgroup,
                   :namespace,
                   :capabilities,
+                  :guid,
                   :attached_capabilities,
                   :signal_handler,
                   :pid,
@@ -16,10 +19,14 @@ module Haconiwa
                   :network_mountpoint,
                   :cleaned
 
-    attr_reader   :init_command,
-                  :uid,
+    attr_reader   :init_command
+
+    delegate     [:uid,
+                  :uid=,
                   :gid,
-                  :groups
+                  :gid=,
+                  :groups,
+                  :groups=] => :@guid
 
     def self.define(&b)
       base = new
@@ -35,6 +42,7 @@ module Haconiwa
       @cgroup = CGroup.new
       @namespace = Namespace.new
       @capabilities = Capabilities.new
+      @guid = Guid.new
       @signal_handler = SignalHandler.new(self)
       @attached_capabilities = nil
       @name = "haconiwa-#{Time.now.to_i}"
@@ -42,8 +50,6 @@ module Haconiwa
       @container_pid_file = nil
       @pid = nil
       @daemon = false
-      @uid = @gid = nil
-      @groups = []
       @network_mountpoint = []
       @cleaned = false
     end
@@ -89,34 +95,6 @@ module Haconiwa
       from = options[:host_root] || '/etc'
       self.network_mountpoint << MountPoint.new("#{from}/resolv.conf", to: "#{root}/etc/resolv.conf")
       self.network_mountpoint << MountPoint.new("#{from}/hosts",       to: "#{root}/etc/hosts")
-    end
-
-    def uid=(newid)
-      if newid.is_a?(String)
-        @uid = ::Process::UID.from_name newid
-      else
-        @uid = newid
-      end
-    end
-
-    def gid=(newid)
-      if newid.is_a?(String)
-        @gid = ::Process::GID.from_name newid
-      else
-        @gid = newid
-      end
-    end
-
-    def groups=(newgroups)
-      @groups.clear
-      newgroups.each do |newid|
-        if newid.is_a?(String)
-          @groups << ::Process::GID.from_name(newid)
-        else
-          @groups << newid
-        end
-      end
-      @groups
     end
 
     def add_handler(sig, &b)
@@ -383,6 +361,45 @@ module Haconiwa
 
     def to_flag_without_pid_and_user
       to_flag & (~(::Namespace::CLONE_NEWPID | ::Namespace::CLONE_NEWUSER))
+    end
+  end
+
+  class Guid
+    attr_reader :uid,
+                :gid,
+                :groups
+
+    def initialize
+      @uid = @gid = nil
+      @groups = []
+    end
+
+    def uid=(newid)
+      if newid.is_a?(String) and newid !~ /^\d+$/
+        @uid = ::Process::UID.from_name newid
+      else
+        @uid = newid.to_i
+      end
+    end
+
+    def gid=(newid)
+      if newid.is_a?(String) and newid !~ /^\d+$/
+        @gid = ::Process::GID.from_name newid
+      else
+        @gid = newid.to_i
+      end
+    end
+
+    def groups=(newgroups)
+      @groups.clear
+      newgroups.each do |newid|
+        if newid.is_a?(String)
+          @groups << ::Process::GID.from_name(newid)
+        else
+          @groups << newid
+        end
+      end
+      @groups
     end
   end
 

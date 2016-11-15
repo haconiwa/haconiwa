@@ -17,6 +17,7 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.add_dependency 'mruby-string-ext', :core => 'mruby-string-ext'
   spec.add_dependency 'mruby-time'      , :core => 'mruby-time'
 
+  spec.add_dependency 'mruby-forwardable', :mgem => 'mruby-forwardable'
   spec.add_dependency 'mruby-capability', :mgem => 'mruby-capability'
   spec.add_dependency 'mruby-cgroup'    , :mgem => 'mruby-cgroup'
   spec.add_dependency 'mruby-dir'       , :mgem => 'mruby-dir' # with Dir#chroot
@@ -25,7 +26,7 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.add_dependency 'mruby-io'        , :mgem => 'mruby-io'
   spec.add_dependency 'mruby-linux-namespace', :mgem => 'mruby-linux-namespace'
   spec.add_dependency 'mruby-process'   , :mgem => 'mruby-process'
-  spec.add_dependency 'mruby-regexp-pcre', :mgem => 'mruby-regexp-pcre'
+  #spec.add_dependency 'mruby-regexp-pcre', :mgem => 'mruby-regexp-pcre'
   spec.add_dependency 'mruby-signal'    , :mgem => 'mruby-signal'
   spec.add_dependency 'mruby-socket'    , :mgem => 'mruby-socket'
 

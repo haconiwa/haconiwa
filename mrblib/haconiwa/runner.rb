@@ -48,9 +48,9 @@ module Haconiwa
           end
 
           do_chroot(base)
-          switch_guid(base)
-
           apply_capability(base.capabilities)
+          switch_guid(base.guid)
+
           Logger.info "Container is going to exec: #{base.init_command.inspect}"
           Exec.exec(*base.init_command)
         end
@@ -120,7 +120,10 @@ module Haconiwa
 
         apply_cgroup(base)
         do_chroot(base)
+        switch_current_namespace_root if base.namespace.use_guid_mapping?
         apply_capability(base.attached_capabilities)
+        switch_guid(base.guid)
+
         Logger.info "Attach process is going to exec: #{base.init_command.inspect}"
         Exec.exec(*exe)
       end
@@ -358,12 +361,15 @@ module Haconiwa
       ::Process::Sys.setuid(0)
     end
 
-    def switch_guid(base)
-      if base.gid
-        ::Process::Sys.setgid(base.gid)
-        ::Process::Sys.__setgroups(base.groups + [base.gid])
+    def switch_guid(guid)
+      if guid.gid
+        ::Process::Sys.setgid(guid.gid)
+        ::Process::Sys.__setgroups(guid.groups + [guid.gid])
+      else
+        # Assume gid is same as uid
+        ::Process::Sys.setgid(guid.uid) if guid.uid
       end
-      ::Process::Sys.setuid(base.uid) if base.uid
+      ::Process::Sys.setuid(guid.uid) if guid.uid
     end
   end
 end
