@@ -42,6 +42,7 @@ module Haconiwa
       tar_options << @dest
       tar_options << "-C"
       tar_options << @root.to_str
+      Util.to_safe_shellargs(tar_options)
     end
 
     def detect_zip_type(path)
