@@ -61,6 +61,8 @@ module Haconiwa
         o.string('n', 'name', 'CONTAINER_NAME', "Container's name. Set if the name is dynamically defined")
         o.string('A', 'allow', 'CAPS[,CAPS...]', "Capabilities to allow attached process. Independent container's own caps")
         o.string('D', 'drop', 'CAPS[,CAPS...]', "Capabilities to drop from attached process. Independent container's own caps")
+        o.string('u', 'uid', 'UID_OR_NAME', "The UID to be set to attaching process")
+        o.string('g', 'gid', 'GID_OR_NAME', "The GID to be set to attaching process")
       end
 
       base, exe = get_script_and_eval(opt.catchall.values)
@@ -71,6 +73,13 @@ module Haconiwa
       if opt['A'].exist? or opt['D'].exist?
         base.attached_capabilities.allow(*opt['A'].value.split(',')) if opt['A'].exist?
         base.attached_capabilities.drop(*opt['D'].value.split(','))  if opt['D'].exist?
+      end
+
+      if opt['u'].exist?
+        base.uid = opt['u'].value
+      end
+      if opt['g'].exist?
+        base.gid = opt['g'].value
       end
 
       base.attach(*exe)

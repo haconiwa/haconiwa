@@ -375,18 +375,18 @@ module Haconiwa
     end
 
     def uid=(newid)
-      if newid.is_a?(String)
+      if newid.is_a?(String) and newid !~ /^\d+$/
         @uid = ::Process::UID.from_name newid
       else
-        @uid = newid
+        @uid = newid.to_i
       end
     end
 
     def gid=(newid)
-      if newid.is_a?(String)
+      if newid.is_a?(String) and newid !~ /^\d+$/
         @gid = ::Process::GID.from_name newid
       else
-        @gid = newid
+        @gid = newid.to_i
       end
     end
 
