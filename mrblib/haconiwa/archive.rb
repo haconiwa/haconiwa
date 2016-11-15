@@ -3,7 +3,7 @@ module Haconiwa
     def initialize(base, options)
       @root = base.rootfs
       @dest = options[:dest]
-      @type = detect_zip_type(options[:type].to_s || @dest)
+      @type = detect_zip_type((options[:type] || @dest).to_s)
       @tar_options = options[:tar_options] || []
       @verbose = options[:verbose]
       @cmd = RunCmd.new("archive.run")
@@ -24,7 +24,7 @@ module Haconiwa
       tar_options << "-c"
       tar_options << @type
       tar_options << "-v" if @verbose
-      tar_options = boot.tar_options.compact.uniq
+      tar_options = tar_options.compact.uniq
       tar_options << "-f"
       tar_options << @dest
       tar_options << "-C"
@@ -37,7 +37,7 @@ module Haconiwa
       case extname
       when "gzip", "gz", ".gz", ".tgz"
         "-z"
-      when "bzip2", "bz2". ".bz2"
+      when "bzip2", "bz2", ".bz2"
         "-j"
       when "lzma2", "xz", ".xz"
         "-J"
