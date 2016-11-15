@@ -25,6 +25,7 @@ module Haconiwa
       tar_options << @type
       tar_options << "-v" if @verbose
       tar_options = tar_options.compact.uniq
+      tar_options << "--exclude=.git"
       tar_options << "-f"
       tar_options << @dest
       tar_options << "-C"
