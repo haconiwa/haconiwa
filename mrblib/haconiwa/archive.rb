@@ -6,17 +6,29 @@ module Haconiwa
       @type = detect_zip_type((options[:type] || @dest).to_s)
       @tar_options = options[:tar_options] || []
       @verbose = options[:verbose]
-      @cmd = RunCmd.new("archive.run")
+      if @dry_run = options[:dry_run]
+        @dest = '-'
+      end
+      @cmd = RunCmd.new("archive.#{@dry_run ? 'dry-run' : 'run'}")
     end
 
     def do_archive
       @cmd.run(to_tar_command)
-      Logger.puts "Created: #{@dest}"
+      if @dry_run
+        Logger.puts "Dry-run OK"
+      else
+        Logger.puts "Created: #{@dest}"
+      end
     end
 
     private
     def to_tar_command
-      "tar #{gen_tar_options.join(' ')} ./"
+      pre = post = ""
+      if @dry_run
+        pre = "size=`"
+        post = " | wc -c` && echo 'Assumed archive size(bytes): '$size"
+      end
+      "#{pre}tar #{gen_tar_options.join(' ')} ./#{post}"
     end
 
     def gen_tar_options
