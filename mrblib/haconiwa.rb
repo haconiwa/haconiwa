@@ -11,6 +11,8 @@ def __main__(argv)
     Haconiwa::Cli.create(argv)
   when "provision"
     Haconiwa::Cli.provision(argv)
+  when "archive"
+    Haconiwa::Cli.archive(argv)
   when "start", "run"
     Haconiwa::Cli.run(argv)
   when "attach"
@@ -28,6 +30,7 @@ commands:
     new       - generate haconiwa's config DSL file template
     create    - create the container rootfs
     provision - provision already booted container rootfs
+    archive   - create, provision, then archive rootfs to image
     start     - run the container
     attach    - attach to existing container
     kill      - kill the running container

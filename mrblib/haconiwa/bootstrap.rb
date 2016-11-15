@@ -92,7 +92,7 @@ module Haconiwa
           raise "lxc-create command may not be installed yet. Please install via your package manager."
         end
 
-        cmd.run(sprintf("lxc-create -n %s -t %s --dir %s", boot.project_name, boot.os_type, boot.root.to_str))
+        cmd.run(Util.safe_shell_fmt("lxc-create -n %s -t %s --dir %s", boot.project_name, boot.os_type, boot.root.to_str))
         boot.log("Success!")
         return true
       end
@@ -111,7 +111,7 @@ module Haconiwa
         boot.components ||= "main"
         boot.mirror_url ||= "http://ftp.us.debian.org/debian/"
 
-        cmd.run(sprintf(
+        cmd.run(Util.safe_shell_fmt(
                   "debootstrap --arch=%s --variant=%s --components=%s %s %s %s",
                   boot.arch, boot.variant, boot.components, boot.debian_release, boot.root.to_str, boot.mirror_url
                 ))
@@ -131,7 +131,7 @@ module Haconiwa
 
         boot.git_options ||= []
 
-        cmd.run(sprintf("git clone %s %s %s", boot.git_options.join(' '), boot.git_url, boot.root.to_str))
+        cmd.run(Util.safe_shell_fmt("git clone %s %s %s", boot.git_options.join(' '), boot.git_url, boot.root.to_str))
         boot.log("Success!")
         return true
       end
@@ -151,8 +151,10 @@ module Haconiwa
         boot.tar_options << "-C"
         boot.tar_options << boot.root.to_str
 
-        cmd.run(sprintf("mkdir -p %s", boot.root.to_str))
-        cmd.run(sprintf("tar %s", boot.tar_options.join(' ')))
+        boot.tar_options = Util.to_safe_shellargs(boot.tar_options)
+
+        cmd.run(Util.safe_shell_fmt("mkdir -p %s", boot.root.to_str))
+        cmd.run(Util.safe_shell_fmt("tar %s", boot.tar_options.join(' ')))
         boot.log("Success!")
         return true
       end

@@ -18,6 +18,7 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.add_dependency 'mruby-time'      , :core => 'mruby-time'
 
   spec.add_dependency 'mruby-forwardable', :mgem => 'mruby-forwardable'
+  spec.add_dependency 'mruby-shellwords', :mgem => 'mruby-shellwords'
   spec.add_dependency 'mruby-capability', :mgem => 'mruby-capability'
   spec.add_dependency 'mruby-cgroup'    , :mgem => 'mruby-cgroup'
   spec.add_dependency 'mruby-dir'       , :mgem => 'mruby-dir' # with Dir#chroot
