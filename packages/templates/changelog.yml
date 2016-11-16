@@ -1,5 +1,10 @@
-latest: 0.4.5
+latest: 0.4.6
 changelog:
+  - version: 0.4.6
+    messages:
+      - Small fixes in uid mapped attach, support archive subcommand
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Wed, 16 Nov 2016 16:29:46 +0900
   - version: 0.4.5
     messages:
       - Fix brken option haconiwa attach -t, support centos 6 attach
