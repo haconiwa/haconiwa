@@ -1,6 +1,6 @@
 Name: haconiwa
 Epoch: 1
-Version: 0.4.5
+Version: 0.4.6
 Release: 1
 Summary: MRuby on Container
 License: GPLv3+
@@ -49,6 +49,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Wed Nov 16 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.4.6-1
+- Small fixes in uid mapped attach, support archive subcommand
+
 * Mon Nov 14 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.4.5-1
 - Fix brken option haconiwa attach -t, support centos 6 attach
 
