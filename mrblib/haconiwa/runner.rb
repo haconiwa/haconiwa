@@ -193,6 +193,7 @@ module Haconiwa
         ppid = Process.fork do
           # TODO: logging
           r.close
+          ::Procutil.daemon_fd_reopen
           b.call(@base, w)
         end
         w.close
