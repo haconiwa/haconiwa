@@ -50,10 +50,13 @@ module Haconiwa
           end
 
           do_chroot(base)
+          ::Procutil.daemon_fd_reopen if base.daemon?
+
           apply_capability(base.capabilities)
           switch_guid(base.guid)
 
           Logger.info "Container is going to exec: #{base.init_command.inspect}"
+          ::Procutil.mark_cloexec
           Exec.exec(*base.init_command)
         end
 
@@ -122,6 +125,7 @@ module Haconiwa
 
         apply_cgroup(base)
         do_chroot(base)
+
         switch_current_namespace_root if base.namespace.use_guid_mapping?
         apply_capability(base.attached_capabilities)
         switch_guid(base.guid)
@@ -189,7 +193,6 @@ module Haconiwa
         ppid = Process.fork do
           # TODO: logging
           r.close
-          Procutil.daemon_fd_reopen
           b.call(@base, w)
         end
         w.close
