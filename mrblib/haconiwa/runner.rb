@@ -20,25 +20,26 @@ module Haconiwa
       end
 
       wrap_daemonize do |base, notifier|
-        jail_pid(base)
         # The pipe to set guid maps
         if base.namespace.use_guid_mapping?
           r,  w  = IO.pipe
           r2, w2 = IO.pipe
         end
 
-        pid = Process.fork do
+        runner = self
+        pid = ::Namespace.clone(base.namespace.to_flag_for_clone) do
           [r, w2].each {|io| io.close if io }
           ::Procutil.setsid
 
-          apply_namespace(base.namespace)
-          apply_filesystem(base)
-          apply_rlimit(base.resource)
-          apply_cgroup(base)
-          apply_remount(base)
+          # doing some setns(2)
+          runner.apply_namespace(base.namespace)
+          runner.apply_filesystem(base)
+          runner.apply_rlimit(base.resource)
+          runner.apply_cgroup(base)
+          runner.apply_remount(base)
           ::Procutil.sethostname(base.name)
 
-          apply_user_namespace(base.namespace)
+          runner.apply_user_namespace(base.namespace)
           if base.namespace.use_guid_mapping?
             # ping and pong between parent
             w.puts "unshared"
@@ -46,14 +47,14 @@ module Haconiwa
 
             r2.read
             r2.close
-            switch_current_namespace_root
+            runner.switch_current_namespace_root
           end
 
-          do_chroot(base)
+          runner.do_chroot(base)
           ::Procutil.daemon_fd_reopen if base.daemon?
 
-          apply_capability(base.capabilities)
-          switch_guid(base.guid)
+          runner.apply_capability(base.capabilities)
+          runner.switch_guid(base.guid)
 
           Logger.info "Container is going to exec: #{base.init_command.inspect}"
           ::Procutil.mark_cloexec
@@ -184,8 +185,6 @@ module Haconiwa
       base.cleaned = true
     end
 
-    private
-
     def wrap_daemonize(&b)
       if @base.daemon?
         Logger.info "Container is running in daemon mode"
@@ -213,17 +212,7 @@ module Haconiwa
       end
     end
 
-    def jail_pid(base)
-      if base.namespace.use_pid_ns
-        ::Namespace.unshare(::Namespace::CLONE_NEWPID)
-      end
-    end
-
     def apply_namespace(namespace)
-      if ::Namespace.unshare(namespace.to_flag_for_unshare) < 0
-        Logger.err "Some namespace is unsupported by this kernel. Please check"
-      end
-
       if namespace.setns_on_run?
         namespace.ns_to_path.each do |ns, path|
           next if ns == ::Namespace::CLONE_NEWUSER
