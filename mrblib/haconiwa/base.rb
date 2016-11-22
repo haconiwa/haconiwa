@@ -341,6 +341,10 @@ module Haconiwa
       !@ns_to_path.empty?
     end
 
+    # def enter_existing_pid?
+    #   !! @ns_to_path["pid"]
+    # end
+
     def to_bit(ns)
       case ns
       when String, Symbol
@@ -358,6 +362,14 @@ module Haconiwa
 
     def to_flag_for_unshare
       f = to_flag_without_pid_and_user
+      @ns_to_path.keys.each do |mask|
+        f &= (~mask)
+      end
+      f
+    end
+
+    def to_flag_for_clone
+      f = to_flag & (~::Namespace::CLONE_NEWUSER)
       @ns_to_path.keys.each do |mask|
         f &= (~mask)
       end

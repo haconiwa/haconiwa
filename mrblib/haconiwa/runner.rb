@@ -20,17 +20,17 @@ module Haconiwa
       end
 
       wrap_daemonize do |base, notifier|
-        jail_pid(base)
         # The pipe to set guid maps
         if base.namespace.use_guid_mapping?
           r,  w  = IO.pipe
           r2, w2 = IO.pipe
         end
 
-        pid = Process.fork do
+        pid = ::Namespace.clone(base.namespace.to_flag_for_clone) do
           [r, w2].each {|io| io.close if io }
           ::Procutil.setsid
 
+          # doing some setns(2)
           apply_namespace(base.namespace)
           apply_filesystem(base)
           apply_rlimit(base.resource)
@@ -213,17 +213,7 @@ module Haconiwa
       end
     end
 
-    def jail_pid(base)
-      if base.namespace.use_pid_ns
-        ::Namespace.unshare(::Namespace::CLONE_NEWPID)
-      end
-    end
-
     def apply_namespace(namespace)
-      if ::Namespace.unshare(namespace.to_flag_for_unshare) < 0
-        Logger.err "Some namespace is unsupported by this kernel. Please check"
-      end
-
       if namespace.setns_on_run?
         namespace.ns_to_path.each do |ns, path|
           next if ns == ::Namespace::CLONE_NEWUSER
