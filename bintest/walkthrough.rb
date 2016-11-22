@@ -21,7 +21,11 @@ at_exit { FileUtils.rm_rf File.dirname(HACONIWA_TMP_ROOT) }
 
 def run_haconiwa(subcommand, *args)
   STDERR.puts "[testcase]\thaconiwa #{[subcommand, *args].join(' ')}"
-  return Open3.capture2(BIN_PATH, subcommand, *args)
+  o, s = Open3.capture2(BIN_PATH, subcommand, *args)
+  if s.coredump?
+    raise "[BUG] haconiwa got SEGV. Abort testing"
+  end
+  return [o, s]
 end
 
 assert('walkthrough') do
