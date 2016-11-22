@@ -26,20 +26,20 @@ module Haconiwa
           r2, w2 = IO.pipe
         end
 
-        r = self
+        runner = self
         pid = ::Namespace.clone(base.namespace.to_flag_for_clone) do
           [r, w2].each {|io| io.close if io }
           ::Procutil.setsid
 
           # doing some setns(2)
-          r.apply_namespace(base.namespace)
-          r.apply_filesystem(base)
-          r.apply_rlimit(base.resource)
-          r.apply_cgroup(base)
-          r.apply_remount(base)
+          runner.apply_namespace(base.namespace)
+          runner.apply_filesystem(base)
+          runner.apply_rlimit(base.resource)
+          runner.apply_cgroup(base)
+          runner.apply_remount(base)
           ::Procutil.sethostname(base.name)
 
-          r.apply_user_namespace(base.namespace)
+          runner.apply_user_namespace(base.namespace)
           if base.namespace.use_guid_mapping?
             # ping and pong between parent
             w.puts "unshared"
@@ -47,14 +47,14 @@ module Haconiwa
 
             r2.read
             r2.close
-            switch_current_namespace_root
+            runner.switch_current_namespace_root
           end
 
-          r.do_chroot(base)
+          runner.do_chroot(base)
           ::Procutil.daemon_fd_reopen if base.daemon?
 
-          r.apply_capability(base.capabilities)
-          r.switch_guid(base.guid)
+          runner.apply_capability(base.capabilities)
+          runner.switch_guid(base.guid)
 
           Logger.info "Container is going to exec: #{base.init_command.inspect}"
           ::Procutil.mark_cloexec
