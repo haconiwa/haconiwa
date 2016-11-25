@@ -336,6 +336,10 @@ module Haconiwa
       !!@uid_mapping or !!@gid_mapping
     end
 
+    def enter_existing_pidns?
+      @ns_to_path.has_key? ::Namespace::CLONE_NEWPID
+    end
+
     attr_reader :use_pid_ns, :ns_to_path, :uid_mapping, :gid_mapping
 
     def use_netns(name)
