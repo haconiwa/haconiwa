@@ -19,7 +19,8 @@ module Haconiwa
                   :network_mountpoint,
                   :cleaned
 
-    attr_reader   :init_command
+    attr_reader   :init_command,
+                  :waitloop
 
     delegate     [:uid,
                   :uid=,
@@ -52,6 +53,8 @@ module Haconiwa
       @daemon = false
       @network_mountpoint = []
       @cleaned = false
+
+      @waitloop = WaitLoop.new
     end
 
     def init_command=(cmd)
@@ -99,6 +102,10 @@ module Haconiwa
 
     def add_handler(sig, &b)
       @signal_handler.add_handler(sig, &b)
+    end
+
+    def after_spawn(options={}, &hook)
+      self.waitloop.hooks << WaitLoop::TimerHook.new(options, &hook)
     end
 
     def bootstrap
