@@ -284,18 +284,23 @@ module Haconiwa
     }
 
     def initialize
-      @use_ns = []
+      @namespaces = {}
       @ns_to_path = {}
       @uid_mapping = nil
       @gid_mapping = nil
     end
+    attr_reader :namespaces
 
-    def unshare(ns)
+    def unshare(ns, options={})
       flag = to_bit(ns)
       if flag == ::Namespace::CLONE_NEWPID
         @use_pid_ns = true
       end
-      @use_ns << flag
+      @namespaces[flag] = options
+    end
+
+    def active_namespaces
+      @namespaces.keys
     end
 
     def enter(ns, path_or_opt)
@@ -331,6 +336,10 @@ module Haconiwa
       !!@uid_mapping or !!@gid_mapping
     end
 
+    def enter_existing_pidns?
+      @ns_to_path.has_key? ::Namespace::CLONE_NEWPID
+    end
+
     attr_reader :use_pid_ns, :ns_to_path, :uid_mapping, :gid_mapping
 
     def use_netns(name)
@@ -351,7 +360,7 @@ module Haconiwa
     end
 
     def to_flag
-      @use_ns.inject(0x00000000) { |dst, flag|
+      active_namespaces.inject(0x00000000) { |dst, flag|
         dst |= flag
       }
     end
