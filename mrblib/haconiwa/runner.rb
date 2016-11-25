@@ -227,8 +227,11 @@ module Haconiwa
               ::Namespace.unshare(::Namespace::CLONE_NEWPID)
             elsif base.namespace.enter_existing_pidns?
               f = File.open(namespace.ns_to_path[::Namespace::CLONE_NEWPID])
-              ::Namespace.setns(ns, fd: f.fileno)
+              r = ::Namespace.setns(ns, fd: f.fileno)
               f.close
+              r
+            else
+              0
             end
       if ret < 0
         Logger.err "Unsharing or setting PID namespace failed"
