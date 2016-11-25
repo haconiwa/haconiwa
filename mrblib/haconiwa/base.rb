@@ -289,6 +289,7 @@ module Haconiwa
       @uid_mapping = nil
       @gid_mapping = nil
     end
+    attr_reader :namespaces
 
     def unshare(ns, options={})
       flag = to_bit(ns)

@@ -26,9 +26,11 @@ module Haconiwa
           r,  w  = IO.pipe
           r2, w2 = IO.pipe
         end
+        done, kick_ok = IO.pipe
 
         pid = Process.fork do
           [r, w2].each {|io| io.close if io }
+          done.close
           ::Procutil.setsid
 
           apply_namespace(base.namespace)
@@ -54,11 +56,14 @@ module Haconiwa
 
           apply_capability(base.capabilities)
           switch_guid(base.guid)
+          kick_ok.puts "done"
+          kick_ok.close
 
           Logger.info "Container is going to exec: #{base.init_command.inspect}"
           ::Procutil.mark_cloexec
           Exec.exec(*base.init_command)
         end
+        kick_ok.close
 
         File.open(base.container_pid_file, 'w') {|f| f.write pid }
         if base.namespace.use_guid_mapping?
@@ -74,6 +79,10 @@ module Haconiwa
         end
 
         base.signal_handler.register_handlers!
+
+        done.read # wait for container is done
+        done.close
+        persist_namespace(pid, base.namespace)
 
         if notifier
           notifier.puts pid.to_s
@@ -376,6 +385,15 @@ module Haconiwa
         ::Process::Sys.setgid(guid.uid) if guid.uid
       end
       ::Process::Sys.setuid(guid.uid) if guid.uid
+    end
+
+    def persist_namespace(pid, namespace)
+      namespace.namespaces.each do |flag, options|
+        if path = options[:persist_in]
+          ::Namespace.persist_ns pid, flag, path
+          Logger.info "Namespace is persisted: #{path}"
+        end
+      end
     end
   end
 end
