@@ -29,6 +29,7 @@ module Haconiwa
         done, kick_ok = IO.pipe
 
         pid = Process.fork do
+          ::Procutil.mark_cloexec
           [r, w2].each {|io| io.close if io }
           done.close
           ::Procutil.setsid
@@ -60,7 +61,6 @@ module Haconiwa
           kick_ok.close
 
           Logger.info "Container is going to exec: #{base.init_command.inspect}"
-          ::Procutil.mark_cloexec
           Exec.exec(*base.init_command)
         end
         kick_ok.close
