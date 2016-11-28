@@ -101,7 +101,8 @@ module Haconiwa
         end
 
         Logger.puts "Container fork success and going to wait: pid=#{pid}"
-        pid, status = Process.waitpid2 pid
+        base.waitloop.register_hooks(base)
+        pid, status = base.waitloop.run_and_wait(pid)
         cleanup_supervisor(base, @etcd)
         if status.success?
           Logger.puts "Container successfully exited: #{status.inspect}"
