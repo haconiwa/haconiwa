@@ -9,6 +9,10 @@ module Haconiwa
       @handlers.keys
     end
 
+    def each(&b)
+      @handlers.each(&b)
+    end
+
     def add_handler(sig, &b)
       if [:USR1, :USR2, :TTIN, :TTOU].include? sig.to_sym
         @handlers[sig.to_sym] = b
