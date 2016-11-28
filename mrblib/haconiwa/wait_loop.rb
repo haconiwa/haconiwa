@@ -15,7 +15,19 @@ module Haconiwa
       timers
     end
 
-    def register_sighandlers(base)
+    def register_sighandlers(base, runner, etcd)
+      sigs = []
+      [:SIGTERM, :SIGINT, :SIGHUP, :SIGPIPE].each do |sig|
+        s = UV::Signal.new()
+        s.start(UV::Signal.const_get(sig)) do |signo|
+          unless base.cleaned
+            Logger.warning "Supervisor received unintended kill. Cleanup..."
+            runner.cleanup_supervisor(base, etcd)
+          end
+          UV::default_loop.stop()
+          exit 127
+        end
+      end
     end
 
     def run_and_wait(pid)

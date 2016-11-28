@@ -89,19 +89,9 @@ module Haconiwa
           notifier.close # notify container is up
         end
 
-        runner, etcd = self, @etcd
-        [:SIGTERM, :SIGINT, :SIGHUP, :SIGPIPE].each do |sig|
-          Signal.trap(sig) do |signo|
-            unless base.cleaned
-              Logger.warning "Supervisor received unintended kill. Cleanup..."
-              runner.cleanup_supervisor(base, etcd)
-            end
-            exit 127
-          end
-        end
-
         Logger.puts "Container fork success and going to wait: pid=#{pid}"
         base.waitloop.register_hooks(base)
+        base.waitloop.register_sighandlers(base, self, @etcd)
         pid, status = base.waitloop.run_and_wait(pid)
         cleanup_supervisor(base, @etcd)
         if status.success?
