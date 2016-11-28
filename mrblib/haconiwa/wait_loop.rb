@@ -16,7 +16,7 @@ module Haconiwa
     end
 
     def register_sighandlers(base, runner, etcd)
-      sigs = []
+      done = []
       [:SIGTERM, :SIGINT, :SIGHUP, :SIGPIPE].each do |sig|
         s = UV::Signal.new()
         s.start(UV::Signal.const_get(sig)) do |signo|
@@ -28,6 +28,19 @@ module Haconiwa
           exit 127
         end
       end
+      done
+    end
+
+    def register_custom_sighandlers(base, handlers)
+      done = []
+      handlers.each do |sig, callback|
+        s = UV::Signal.new()
+        s.start(UV::Signal.const_get(sig)) do |signo|
+          callback.call(base)
+        end
+        done << s
+      end
+      done
     end
 
     def run_and_wait(pid)

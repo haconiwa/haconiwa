@@ -44,7 +44,7 @@ module Haconiwa
       @namespace = Namespace.new
       @capabilities = Capabilities.new
       @guid = Guid.new
-      @signal_handler = SignalHandler.new(self)
+      @signal_handler = SignalHandler.new
       @attached_capabilities = nil
       @name = "haconiwa-#{Time.now.to_i}"
       @init_command = ["/bin/bash"] # FIXME: maybe /sbin/init is better
