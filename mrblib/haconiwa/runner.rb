@@ -78,8 +78,6 @@ module Haconiwa
           w2.close
         end
 
-        base.signal_handler.register_handlers!
-
         done.read # wait for container is done
         done.close
         persist_namespace(pid, base.namespace)
@@ -92,6 +90,8 @@ module Haconiwa
         Logger.puts "Container fork success and going to wait: pid=#{pid}"
         base.waitloop.register_hooks(base)
         base.waitloop.register_sighandlers(base, self, @etcd)
+        base.waitloop.register_custom_sighandlers(base, base.signal_handler)
+
         pid, status = base.waitloop.run_and_wait(pid)
         cleanup_supervisor(base, @etcd)
         if status.success?
