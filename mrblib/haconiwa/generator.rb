@@ -67,8 +67,13 @@ apk add --update bash
   # config.cgroup["cpu.cfs_period_us"] = 100000
   # config.cgroup["cpu.cfs_quota_us"]  =  30000
 
-  # The linux capability blacklist
-  # These are useful when you run container as root:
+  # The linux kernel capability:
+  # Haconiwa has default capability whitelist and applies it when there's no config
+  # If you want to use customized blacklist, first uncomment below:
+  # config.capabilities.reset_to_privileged!
+
+  # Then declare:
+  # config.capabilities.allow :all
   # config.capabilities.drop "cap_sys_time"
   # config.capabilities.drop "cap_kill"
 

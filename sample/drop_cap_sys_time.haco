@@ -16,6 +16,8 @@ haconiwa = Haconiwa::Base.define do |config|
   config.namespace.unshare "uts"
   config.namespace.unshare "pid"
 
+  # Allow all but cap_sys_time
+  config.capabilities.reset_to_privileged!
   config.capabilities.allow :all
   config.capabilities.drop "cap_sys_time"
 
