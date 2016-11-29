@@ -77,9 +77,13 @@ module Haconiwa
 
       def register(t, base)
         t.start(@timing, 0) do
-          Logger.debug "The timer hook(#{@id}) invoked after #{@timing} msec"
-          @proc.call(base)
-          Logger.debug "The timer hook(#{@id}) success"
+          begin
+            Logger.debug "The timer hook(#{@id}) invoked after #{@timing} msec"
+            @proc.call(base)
+            Logger.debug "The timer hook(#{@id}) success"
+          rescue => e
+            Logger.debug "Something is wrong on timer hook(#{@id}): #{e.class}/#{e.message}"
+          end
         end
       end
     end
