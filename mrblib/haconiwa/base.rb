@@ -235,9 +235,27 @@ module Haconiwa
   end
 
   class Capabilities
+    DEFAULT_SAFE_CAPABILITIES = %w(
+      cap_audit_read
+      cap_chown
+      cap_dac_override
+      cap_fowner
+      cap_fsetid
+      cap_net_raw
+      cap_setgid
+      cap_setfcap
+      cap_setpcap
+      cap_setuid
+    )
+
     def initialize
       @blacklist = []
-      @whitelist = []
+      @whitelist = DEFAULT_SAFE_CAPABILITIES.dup
+    end
+
+    def reset_to_privileged!
+      @blacklist.clear
+      @whitelist.clear
     end
 
     def allow(*keys)
