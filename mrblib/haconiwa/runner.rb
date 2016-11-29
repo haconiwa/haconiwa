@@ -63,6 +63,7 @@ module Haconiwa
           Logger.info "Container is going to exec: #{base.init_command.inspect}"
           Exec.exec(*base.init_command)
         end
+        base.pid = pid
         kick_ok.close
 
         File.open(base.container_pid_file, 'w') {|f| f.write pid }

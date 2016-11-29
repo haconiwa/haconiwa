@@ -71,7 +71,7 @@ module Haconiwa
                     raise(ArgumentError, "Invalid option: #{timing.inspect}")
                   end
         @proc = b
-        @id = SecureRandom.secure_uuid
+        @id = UUID.secure_uuid
       end
       attr_reader :timing, :proc, :id
 
