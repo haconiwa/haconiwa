@@ -143,7 +143,7 @@ And `attach` is not concerned with capabilities which is granted to container. S
   * We can declare `run_shell` multiple times
   * Set name by `name:` option, then you can specify provision operation by `haconiwa provision --run-only=...`
 
-#### Running environment
+#### Running container environment
 
 * `config.resource.set_limit` - Set the resource limit of container, using `setrlimit`
 * `config.cgroup` - Assign cgroup parameters via `[]=`
@@ -155,10 +155,14 @@ And `attach` is not concerned with capabilities which is granted to container. S
 * `config.mount_independent` - Mount the independent filesystems: `"procfs", "sysfs", "devtmpfs", "devpts" and "shm"` in the newborn container. Useful if `"pid"` or `"net"` are unshared
 * `config.chroot_to` - The new chroot root
 * `config.uid=/config.gid=` - The new container's running uid/gid. `groups=` is also respected
-* `config.add_handler` - Define signal handler at supervisor process(not container itself). Available signals are `SIGTTIN/SIGTTOU/SIGUSR1/SIGUSR2`. See [handler example](./sample/cpu.haco).
 
 You can pick your own parameters for your use case of container.
 e.g. just using `mount` namespace unshared, container with common filesystem, limit the cgroups for big resource job and so on.
+
+#### Hooks
+
+* `config.after_spawn(option, &block)` - Define timer handler. Pass option like `msec: 10 * 60 * 1000`, then after 10 min passed, the defined hook will be invoked
+* `config.add_signal_handler(signame, &block)` - Define signal handler at supervisor process(not container itself). Available signals are `SIGTTIN/SIGTTOU/SIGUSR1/SIGUSR2`. See [handler example](./sample/cpu.haco).
 
 Please look into [`sample`](./sample) directory.
 
