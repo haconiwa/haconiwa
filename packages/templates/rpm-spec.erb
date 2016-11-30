@@ -49,7 +49,7 @@ fi
 %{_bindir}/*
 
 %changelog
-<% @changelog.each do |change| %>* <%= Time.parse(change["date"]).strftime("%a %b %e %Y") %> <%= change["author"] %> - 1:<%= change["version"] %>-1
+<% @changelog[0..5].each do |change| %>* <%= Time.parse(change["date"]).strftime("%a %b %e %Y") %> <%= change["author"] %> - 1:<%= change["version"] %>-1
 <% change["messages"].each do |msg| %>- <%= msg %>
 <% end %>
 <% end %>

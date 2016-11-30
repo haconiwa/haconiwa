@@ -1,6 +1,6 @@
 Name: haconiwa
 Epoch: 1
-Version: 0.4.6
+Version: 0.5.0
 Release: 1
 Summary: MRuby on Container
 License: GPLv3+
@@ -49,6 +49,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Wed Nov 30 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.5.0-1
+- Add after_spawn hook, intoduce default caps, persistant namespace
+
 * Wed Nov 16 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.4.6-1
 - Small fixes in uid mapped attach, support archive subcommand
 
@@ -63,38 +66,3 @@ fi
 
 * Wed Nov  9 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.4.2-1
 - Logs are now put to syslog, and added CentOS 6 experimental support
-
-* Mon Sep  5 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.4.1-1
-- Experimental support for uid/gid mapping, note that some feature might be broken
-
-* Tue Aug 30 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.4.0-1
-- Experimental support haconiwa watch, bump mruby, fix some bugs
-
-* Mon Aug 29 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.3.5-1
-- Add network etc sharing options
-
-* Fri Aug 26 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.3.4-1
-- Support ENV in DSL, fix some bug on run
-
-* Wed Aug 24 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.3.3-1
-- Enhance ps subcommand with one more fix
-
-* Tue Aug 23 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.3.3-1
-- Fix some haconiwa ps troubles
-
-* Tue Aug 23 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.3.1-1
-- Support haconiwa ps, cooperating with etcd
-
-* Fri Aug 19 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.3.0-1
-- Support new subcommand to generate DSL boilerplate
-- Support entering existing namespace(useful with netns)
-- Add mount_independent, deprecate mount_independent_procfs
-
-* Fri Aug  5 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.2.4-1
-- Support create/provision subcommand
-
-* Tue Jul 26 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.2.3-1
-- Update licenses
-
-* Fri Jul 22 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.2.2-1
-- Initial release of haconiwa package

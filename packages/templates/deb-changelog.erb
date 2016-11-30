@@ -1,4 +1,4 @@
-<% @changelog.each do |change| %>haconiwa (<%= change["version"] %>-1) unstable; urgency=medium
+<% @changelog[0..5].each do |change| %>haconiwa (<%= change["version"] %>-1) unstable; urgency=medium
 
   * <%= change["messages"].join(", ") %>
 
