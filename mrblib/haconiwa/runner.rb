@@ -63,6 +63,7 @@ module Haconiwa
           Logger.info "Container is going to exec: #{base.init_command.inspect}"
           Exec.exec(*base.init_command)
         end
+        base.pid = pid
         kick_ok.close
 
         File.open(base.container_pid_file, 'w') {|f| f.write pid }
@@ -78,8 +79,6 @@ module Haconiwa
           w2.close
         end
 
-        base.signal_handler.register_handlers!
-
         done.read # wait for container is done
         done.close
         persist_namespace(pid, base.namespace)
@@ -89,19 +88,12 @@ module Haconiwa
           notifier.close # notify container is up
         end
 
-        runner, etcd = self, @etcd
-        [:SIGTERM, :SIGINT, :SIGHUP, :SIGPIPE].each do |sig|
-          Signal.trap(sig) do |signo|
-            unless base.cleaned
-              Logger.warning "Supervisor received unintended kill. Cleanup..."
-              runner.cleanup_supervisor(base, etcd)
-            end
-            exit 127
-          end
-        end
-
         Logger.puts "Container fork success and going to wait: pid=#{pid}"
-        pid, status = Process.waitpid2 pid
+        base.waitloop.register_hooks(base)
+        base.waitloop.register_sighandlers(base, self, @etcd)
+        base.waitloop.register_custom_sighandlers(base, base.signal_handler)
+
+        pid, status = base.waitloop.run_and_wait(pid)
         cleanup_supervisor(base, @etcd)
         if status.success?
           Logger.puts "Container successfully exited: #{status.inspect}"

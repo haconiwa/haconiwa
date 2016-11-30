@@ -19,7 +19,8 @@ module Haconiwa
                   :network_mountpoint,
                   :cleaned
 
-    attr_reader   :init_command
+    attr_reader   :init_command,
+                  :waitloop
 
     delegate     [:uid,
                   :uid=,
@@ -43,7 +44,7 @@ module Haconiwa
       @namespace = Namespace.new
       @capabilities = Capabilities.new
       @guid = Guid.new
-      @signal_handler = SignalHandler.new(self)
+      @signal_handler = SignalHandler.new
       @attached_capabilities = nil
       @name = "haconiwa-#{Time.now.to_i}"
       @init_command = ["/bin/bash"] # FIXME: maybe /sbin/init is better
@@ -52,6 +53,8 @@ module Haconiwa
       @daemon = false
       @network_mountpoint = []
       @cleaned = false
+
+      @waitloop = WaitLoop.new
     end
 
     def init_command=(cmd)
@@ -97,8 +100,13 @@ module Haconiwa
       self.network_mountpoint << MountPoint.new("#{from}/hosts",       to: "#{root}/etc/hosts")
     end
 
-    def add_handler(sig, &b)
+    def add_signal_handler(sig, &b)
       @signal_handler.add_handler(sig, &b)
+    end
+    alias add_handler add_signal_handler
+
+    def after_spawn(options={}, &hook)
+      self.waitloop.hooks << WaitLoop::TimerHook.new(options, &hook)
     end
 
     def bootstrap
