@@ -1,0 +1,38 @@
+# -*- mode: ruby -*-
+Haconiwa.define do |config|
+  config.name = "haconiwa-auto-droptest"
+  # Ruby loop daemon:
+  config.init_command = ["/usr/bin/ruby", "-e", "loop { sleep 1 }"]
+  config.daemonize!
+
+  root = Pathname.new("/var/lib/haconiwa/#{config.name}")
+  config.chroot_to root
+
+  config.bootstrap do |b|
+    b.strategy = "git"
+    b.git_url = "https://github.com/haconiwa/haconiwa-image-alpine"
+  end
+
+  config.provision do |p|
+    p.run_shell <<-SHELL
+apk add --update bash
+apk add --update ruby
+    SHELL
+  end
+
+  config.after_spawn(msec: 30 * 1000) do |base|
+    Haconiwa::Logger.info("Process killed: #{base.pid}")
+    ::Process.kill :TERM, base.pid
+  end
+
+  config.mount_independent "procfs"
+  config.mount_independent "sysfs"
+  config.mount_independent "devtmpfs"
+  config.mount_independent "devpts"
+  config.mount_independent "shm"
+
+  config.namespace.unshare "mount"
+  config.namespace.unshare "ipc"
+  config.namespace.unshare "uts"
+  config.namespace.unshare "pid"
+end

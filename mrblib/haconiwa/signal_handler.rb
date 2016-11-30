@@ -1,12 +1,16 @@
 module Haconiwa
   class SignalHandler
-    def initialize(base)
-      @base = base
+    def initialize
       @handlers = {}
     end
+    attr_reader :handlers
 
     def registered_signals
       @handlers.keys
+    end
+
+    def each(&b)
+      @handlers.each(&b)
     end
 
     def add_handler(sig, &b)
@@ -14,15 +18,6 @@ module Haconiwa
         @handlers[sig.to_sym] = b
       else
         raise TypeError, "Unsupported signal: #{sig.inspect}"
-      end
-    end
-
-    def register_handlers!
-      base = @base
-      @handlers.each do |sig, handler|
-        ::Signal.trap(sig) do |signo|
-          handler.call(base, signo)
-        end
       end
     end
   end

@@ -26,9 +26,9 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.add_dependency 'mruby-etcd'      , :mgem => 'mruby-etcd'
   spec.add_dependency 'mruby-io'        , :mgem => 'mruby-io'
   spec.add_dependency 'mruby-linux-namespace', :mgem => 'mruby-linux-namespace'
-  spec.add_dependency 'mruby-process'   , :mgem => 'mruby-process'
+  # spec.add_dependency 'mruby-process'   , :mgem => 'mruby-process'
+  spec.add_dependency 'mruby-process'   , :github => 'udzura/mruby-process', :branch => 'add-some-consts'
   #spec.add_dependency 'mruby-regexp-pcre', :mgem => 'mruby-regexp-pcre'
-  spec.add_dependency 'mruby-signal'    , :mgem => 'mruby-signal'
   spec.add_dependency 'mruby-socket'    , :mgem => 'mruby-socket'
 
   spec.add_dependency 'mruby-argtable'  , :github => 'udzura/mruby-argtable', :branch => 'static-link-argtable3'
