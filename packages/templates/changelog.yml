@@ -1,5 +1,10 @@
-latest: 0.4.6
+latest: 0.5.0
 changelog:
+  - version: 0.5.0
+    messages:
+      - Add after_spawn hook, intoduce default caps, persistant namespace
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Wed, 30 Nov 2016 13:01:45 +0900
   - version: 0.4.6
     messages:
       - Small fixes in uid mapped attach, support archive subcommand
