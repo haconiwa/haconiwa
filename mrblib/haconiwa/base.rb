@@ -100,9 +100,10 @@ module Haconiwa
       self.network_mountpoint << MountPoint.new("#{from}/hosts",       to: "#{root}/etc/hosts")
     end
 
-    def add_handler(sig, &b)
+    def add_signal_handler(sig, &b)
       @signal_handler.add_handler(sig, &b)
     end
+    alias add_handler add_signal_handler
 
     def after_spawn(options={}, &hook)
       self.waitloop.hooks << WaitLoop::TimerHook.new(options, &hook)
