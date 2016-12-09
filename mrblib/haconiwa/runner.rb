@@ -32,7 +32,7 @@ module Haconiwa
           ::Procutil.mark_cloexec
           [r, w2].each {|io| io.close if io }
           done.close
-          ::Procutil.setsid
+          ::Procutil.setsid if base.daemon?
 
           apply_namespace(base.namespace)
           apply_filesystem(base)
