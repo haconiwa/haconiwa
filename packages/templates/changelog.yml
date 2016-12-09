@@ -1,5 +1,10 @@
-latest: 0.5.0
+latest: 0.5.1
 changelog:
+  - version: 0.5.1
+    messages:
+      - Fix that cannot define signal handlers for supervisor
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Fri,  9 Dec 2016 19:14:39 +0900
   - version: 0.5.0
     messages:
       - Add after_spawn hook, intoduce default caps, persistant namespace
