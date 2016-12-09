@@ -15,7 +15,7 @@ module Haconiwa
 
     def add_handler(sig, &b)
       if [:USR1, :USR2, :TTIN, :TTOU].include? sig.to_sym
-        @handlers[sig.to_sym] = b
+        @handlers["SIG#{sig}".to_sym] = b
       else
         raise TypeError, "Unsupported signal: #{sig.inspect}"
       end
