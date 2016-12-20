@@ -146,6 +146,7 @@ And `attach` is not concerned with capabilities which is granted to container. S
 #### Running container environment
 
 * `config.environ` - A hash to pass environment variables to a created container. e.g. `config.environ = {"FOO_KEY" => "value", ...}`
+* `config.workdir` - The working directory of haconiwa's init command
 * `config.resource.set_limit` - Set the resource limit of container, using `setrlimit`
 * `config.cgroup` - Assign cgroup parameters via `[]=`
 * `config.namespace.unshare` - Unshare the namespaces like `"mount"`, `"ipc"` or `"pid" ...`. `persist_in` option make the specified namespace persist in a bind-moounted-file
@@ -153,7 +154,7 @@ And `attach` is not concerned with capabilities which is granted to container. S
 * `config.capabilities.reset_to_privileged!` - Haconiwa has default capability whitelist to use. If you want to use customized black/whitelist, declare this first
 * `config.capabilities.allow` - Allow capabilities on container root. Setting parameters other than `:all` should make this acts as whitelist
 * `config.capabilities.drop` - Drop capabilities of container root. Default to act as blacklist
-* `config.add_mount_point` - Add the mount point odf container
+* `config.add_mount_point` - Add the mount point of container. Source directory is resolved from the directory where a user run haconiwa
 * `config.mount_independent` - Mount the independent filesystems: `"procfs", "sysfs", "devtmpfs", "devpts" and "shm"` in the newborn container. Useful if `"pid"` or `"net"` are unshared
 * `config.chroot_to` - The new chroot root
 * `config.uid=/config.gid=` - The new container's running uid/gid. `groups=` is also respected
