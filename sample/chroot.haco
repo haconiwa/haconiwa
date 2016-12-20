@@ -11,6 +11,8 @@ Haconiwa.define do |config|
     b.os_type = "alpine"
   end
 
+  config.environ = {"CONTAINER_POWERED_BY" => "haconiwa"}
+
   config.add_mount_point root, to: root, readonly: true
   #config.add_mount_point "/lib64", to: root.join("lib64"), readonly: true
   #config.add_mount_point "/usr/bin", to: root.join("usr/bin"), readonly: true

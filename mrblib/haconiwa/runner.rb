@@ -61,7 +61,7 @@ module Haconiwa
           kick_ok.close
 
           Logger.info "Container is going to exec: #{base.init_command.inspect}"
-          Exec.exec(*base.init_command)
+          Exec.execve(base.environ, *base.init_command)
         end
         base.pid = pid
         kick_ok.close
