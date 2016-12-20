@@ -10,6 +10,7 @@ module Haconiwa
                   :namespace,
                   :capabilities,
                   :guid,
+                  :environ,
                   :attached_capabilities,
                   :signal_handler,
                   :pid,
@@ -44,6 +45,7 @@ module Haconiwa
       @namespace = Namespace.new
       @capabilities = Capabilities.new
       @guid = Guid.new
+      @environ = {}
       @signal_handler = SignalHandler.new
       @attached_capabilities = nil
       @name = "haconiwa-#{Time.now.to_i}"
