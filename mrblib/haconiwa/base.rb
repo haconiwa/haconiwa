@@ -499,7 +499,8 @@ module Haconiwa
   class MountPoint
     def initialize(point, options={})
       @src = point.to_s
-      @dest = options.delete(:to).to_s
+      @dest = options.delete(:to)
+      @dest = @dest.to_s if @dest
       @fs = options.delete(:fs)
       @options = options
     end
