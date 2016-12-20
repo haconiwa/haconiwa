@@ -498,12 +498,21 @@ module Haconiwa
 
   class MountPoint
     def initialize(point, options={})
-      @src = point
-      @dest = options.delete(:to)
+      @src = point.to_s
+      @dest = options.delete(:to).to_s
       @fs = options.delete(:fs)
       @options = options
     end
     attr_accessor :src, :dest, :fs, :options
+
+    def normalized_src(cwd="/")
+      if @src.start_with?('/')
+        @src
+      else
+        fullpath = File.expand_path [cwd, @src].join("/")
+        File.exist?(fullpath) ? fullpath : @src
+      end
+    end
   end
 
   def self.define(&b)
