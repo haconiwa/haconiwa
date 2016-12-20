@@ -145,6 +145,7 @@ And `attach` is not concerned with capabilities which is granted to container. S
 
 #### Running container environment
 
+* `config.environ` - A hash to pass environment variables to a created container. e.g. `config.environ = {"FOO_KEY" => "value", ...}`
 * `config.resource.set_limit` - Set the resource limit of container, using `setrlimit`
 * `config.cgroup` - Assign cgroup parameters via `[]=`
 * `config.namespace.unshare` - Unshare the namespaces like `"mount"`, `"ipc"` or `"pid" ...`. `persist_in` option make the specified namespace persist in a bind-moounted-file
