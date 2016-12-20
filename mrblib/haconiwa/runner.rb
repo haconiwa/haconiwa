@@ -53,7 +53,7 @@ module Haconiwa
           end
 
           do_chroot(base)
-          ::Procutil.daemon_fd_reopen if base.daemon?
+          reopen_fds(base.command) if base.daemon?
 
           apply_capability(base.capabilities)
           switch_guid(base.guid)
@@ -368,6 +368,14 @@ module Haconiwa
         opts = ["tmpfs", "devpts"].include?(mp.fs) ? {type: mp.fs}.merge(owner_options) : {type: mp.fs}
         m.mount mp.src, "#{base.filesystem.chroot}#{mp.dest}",opts
       end
+    end
+
+    def reopen_fds(command)
+      devnull = "/dev/null"
+      inio  = command.stdin  || File.open(devnull, 'r')
+      outio = command.stdout || File.open(devnull, 'a')
+      errio = command.stderr || File.open(devnull, 'a')
+      ::Procutil.fd_reopen3(inio.fileno, outio.fileno, errio.fileno)
     end
 
     def do_chroot(base)
