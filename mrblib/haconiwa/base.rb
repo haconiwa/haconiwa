@@ -4,6 +4,7 @@ module Haconiwa
 
     attr_accessor :name,
                   :container_pid_file,
+                  :workdir,
                   :filesystem,
                   :resource,
                   :cgroup,
@@ -39,6 +40,7 @@ module Haconiwa
     end
 
     def initialize
+      @workdir = "/"
       @filesystem = Filesystem.new
       @resource = Resource.new
       @cgroup = CGroup.new
