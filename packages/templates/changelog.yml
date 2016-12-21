@@ -1,5 +1,10 @@
-latest: 0.5.1
+latest: 0.5.2
 changelog:
+  - version: 0.5.2
+    messages:
+      - Add command.set_stdin/stdout/stderr, and workdir
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Wed, 21 Dec 2016 13:47:13 +0900
   - version: 0.5.1
     messages:
       - Fix that cannot define signal handlers for supervisor
