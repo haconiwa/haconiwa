@@ -10,6 +10,11 @@ Haconiwa.define do |config|
   # If your first process is a daemon, please explicitly daemonize by:
   # config.daemonize!
 
+  # If you want to emit command's stdout/err to files, uncomment here
+  # This is active only on daemon mode:
+  # config.command.set_stdout(file: "/var/log/haconiwa-container.stdout")
+  # config.command.set_stderr(file: "/var/log/haconiwa-container.stderr")
+
   # The rootfs location on your host OS
   # Pathname class is useful:
   root = Pathname.new(!__ROOT__!)

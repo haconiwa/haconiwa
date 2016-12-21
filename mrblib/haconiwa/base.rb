@@ -5,6 +5,7 @@ module Haconiwa
     attr_accessor :name,
                   :container_pid_file,
                   :workdir,
+                  :command,
                   :filesystem,
                   :resource,
                   :cgroup,
@@ -21,8 +22,7 @@ module Haconiwa
                   :network_mountpoint,
                   :cleaned
 
-    attr_reader   :init_command,
-                  :waitloop
+    attr_reader   :waitloop
 
     delegate     [:uid,
                   :uid=,
@@ -41,6 +41,7 @@ module Haconiwa
 
     def initialize
       @workdir = "/"
+      @command = Command.new
       @filesystem = Filesystem.new
       @resource = Resource.new
       @cgroup = CGroup.new
@@ -51,7 +52,6 @@ module Haconiwa
       @signal_handler = SignalHandler.new
       @attached_capabilities = nil
       @name = "haconiwa-#{Time.now.to_i}"
-      @init_command = ["/bin/bash"] # FIXME: maybe /sbin/init is better
       @container_pid_file = nil
       @pid = nil
       @daemon = false
@@ -62,11 +62,11 @@ module Haconiwa
     end
 
     def init_command=(cmd)
-      if cmd.is_a?(Array)
-        @init_command = cmd
-      else
-        @init_command = [cmd]
-      end
+      self.command.init_command = cmd
+    end
+
+    def init_command
+      self.command.init_command
     end
 
     # aliases
@@ -206,6 +206,35 @@ module Haconiwa
       unless obj
         raise(msg)
       end
+    end
+  end
+
+  class Command
+    def initialize
+      @init_command = ["/bin/bash"] # FIXME: maybe /sbin/init is better
+      @stdin = @stdout = @stderr = nil
+    end
+    attr_reader :init_command, :stdin, :stdout, :stderr
+
+    def init_command=(cmd)
+      if cmd.is_a?(Array)
+        @init_command = cmd
+      else
+        @init_command = [cmd]
+      end
+    end
+
+    # TODO: support options other than file:
+    def set_stdin(options)
+      @stdin = File.open(options[:file], 'r+')
+    end
+
+    def set_stdout(options)
+      @stdout = File.open(options[:file], 'a+')
+    end
+
+    def set_stderr(options)
+      @stderr = File.open(options[:file], 'a+')
     end
   end
 
