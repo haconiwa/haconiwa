@@ -226,15 +226,15 @@ module Haconiwa
 
     # TODO: support options other than file:
     def set_stdin(options)
-      @stdin = File.open(options[:file], 'r')
+      @stdin = File.open(options[:file], 'r+')
     end
 
     def set_stdout(options)
-      @stdout = File.open(options[:file], 'a')
+      @stdout = File.open(options[:file], 'a+')
     end
 
     def set_stderr(options)
-      @stderr = File.open(options[:file], 'a')
+      @stderr = File.open(options[:file], 'a+')
     end
   end
 
