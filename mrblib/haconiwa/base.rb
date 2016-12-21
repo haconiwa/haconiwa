@@ -1,5 +1,5 @@
 module Haconiwa
-  class Base
+  class DSLInterfce
     extend ::Forwardable
 
     attr_accessor :name,
@@ -22,15 +22,15 @@ module Haconiwa
                   :network_mountpoint,
                   :cleaned
 
-    attr_reader   :waitloop
-
     delegate     [:uid,
                   :uid=,
                   :gid,
                   :gid=,
                   :groups,
                   :groups=] => :@guid
+  end
 
+  class Barn < DSLInterfce
     def self.define(&b)
       base = new
       b.call(base)
@@ -57,6 +57,7 @@ module Haconiwa
       @daemon = false
       @network_mountpoint = []
       @cleaned = false
+      @bootstrap = @provision = nil
 
       @waitloop = WaitLoop.new
     end
@@ -125,6 +126,79 @@ module Haconiwa
       @provision
     end
 
+    def default_container_pid_file
+      "/var/run/haconiwa-#{@name}.pid"
+    end
+
+    def daemonize!
+      @daemon = true
+    end
+
+    def cancel_daemonize!
+      @daemon = false
+    end
+
+    def daemon?
+      !! @daemon
+    end
+
+    def to_container_json
+      {
+        name: self.name,
+        etcd_name: self.etcd_name,
+        root: self.filesystem.chroot,
+        command: self.init_command.join(" "),
+        created_at: self.created_at,
+        status: "running", # TODO: support status
+        metadata: {dummy: "dummy"}, # TODO: support metadata/tagging
+        pid: self.pid,
+        supervisor_pid: self.supervisor_pid,
+      }.to_json
+    end
+
+    def etcd_key
+      "haconiwa.mruby.org/#{etcd_name}/#{name}"
+    end
+
+    def validate_non_nil(obj, msg)
+      unless obj
+        raise(msg)
+      end
+    end
+  end
+
+  class Base < Barn
+    def initialize(barn)
+      [
+        :@workdir,
+        :@command,
+        :@filesystem,
+        :@resource,
+        :@cgroup,
+        :@namespace,
+        :@capabilities,
+        :@guid,
+        :@environ,
+        :@signal_handler,
+        :@attached_capabilities,
+        :@name,
+        :@container_pid_file,
+        :@network_mountpoint,
+        :@bootstrap,
+        :@provision,
+      ].each do |varname|
+        value = barn.instance_variable_get(varname)
+        case value
+        when Integer, NilClass, TrueClass, FalseClass
+          self.instance_variable_set(varname, value)
+        else
+          self.instance_variable_set(varname, value.dup)
+        end
+      end
+
+      @waitloop = WaitLoop.new
+    end
+
     def create(no_provision)
       validate_non_nil(@bootstrap, "`config.bootstrap' block must be defined to create rootfs")
       @bootstrap.boot!(self.rootfs)
@@ -166,46 +240,6 @@ module Haconiwa
     def kill(signame)
       self.container_pid_file ||= default_container_pid_file
       LinuxRunner.new(self).kill(signame)
-    end
-
-    def default_container_pid_file
-      "/var/run/haconiwa-#{@name}.pid"
-    end
-
-    def daemonize!
-      @daemon = true
-    end
-
-    def cancel_daemonize!
-      @daemon = false
-    end
-
-    def daemon?
-      !! @daemon
-    end
-
-    def to_container_json
-      {
-        name: self.name,
-        etcd_name: self.etcd_name,
-        root: self.filesystem.chroot,
-        command: self.init_command.join(" "),
-        created_at: self.created_at,
-        status: "running", # TODO: support status
-        metadata: {dummy: "dummy"}, # TODO: support metadata/tagging
-        pid: self.pid,
-        supervisor_pid: self.supervisor_pid,
-      }.to_json
-    end
-
-    def etcd_key
-      "haconiwa.mruby.org/#{etcd_name}/#{name}"
-    end
-
-    def validate_non_nil(obj, msg)
-      unless obj
-        raise(msg)
-      end
     end
   end
 
