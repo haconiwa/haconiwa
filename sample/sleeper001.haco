@@ -9,6 +9,10 @@ Haconiwa.define do |config|
   # If your first process is a daemon, please explicitly daemonize by:
   config.daemonize!
 
+  config.command.set_stdout(file: "/tmp/test.stdout")
+  # config.command.set_stdout(file: "/var/run/fifotest.pipe")
+  config.command.set_stderr(file: "/tmp/test.stderr")
+
   # The rootfs location on your host OS
   # Pathname class is useful:
   root = Pathname.new("/var/lib/haconiwa/8cfccb3d")
