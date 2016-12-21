@@ -147,6 +147,7 @@ And `attach` is not concerned with capabilities which is granted to container. S
 
 * `config.environ` - A hash to pass environment variables to a created container. e.g. `config.environ = {"FOO_KEY" => "value", ...}`
 * `config.workdir` - The working directory of haconiwa's init command
+* `config.command.set_stdout/set_stderr` - Emit command's stdout/err to specified files. This is active only on daemon mode
 * `config.resource.set_limit` - Set the resource limit of container, using `setrlimit`
 * `config.cgroup` - Assign cgroup parameters via `[]=`
 * `config.namespace.unshare` - Unshare the namespaces like `"mount"`, `"ipc"` or `"pid" ...`. `persist_in` option make the specified namespace persist in a bind-moounted-file
