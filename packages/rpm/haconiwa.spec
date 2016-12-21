@@ -1,6 +1,6 @@
 Name: haconiwa
 Epoch: 1
-Version: 0.5.1
+Version: 0.5.2
 Release: 1
 Summary: MRuby on Container
 License: GPLv3+
@@ -49,6 +49,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Wed Dec 21 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.5.2-1
+- Add command.set_stdin/stdout/stderr, and workdir
+
 * Fri Dec  9 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.5.1-1
 - Fix that cannot define signal handlers for supervisor
 
@@ -63,6 +66,3 @@ fi
 
 * Fri Nov 11 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.4.4-1
 - Fix failing to drop caps when g/uid mappping is active
-
-* Thu Nov 10 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.4.3-1
-- Support postprocess hooks for bootstrap, add run -b option

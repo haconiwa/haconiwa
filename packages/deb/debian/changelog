@@ -1,3 +1,9 @@
+haconiwa (0.5.2-1) unstable; urgency=medium
+
+  * Add command.set_stdin/stdout/stderr, and workdir
+
+ -- Uchio Kondo <udzura@udzura.jp>  Wed, 21 Dec 2016 13:47:13 +0900
+
 haconiwa (0.5.1-1) unstable; urgency=medium
 
   * Fix that cannot define signal handlers for supervisor
@@ -27,9 +33,3 @@ haconiwa (0.4.4-1) unstable; urgency=medium
   * Fix failing to drop caps when g/uid mappping is active
 
  -- Uchio Kondo <udzura@udzura.jp>  Fri, 11 Nov 2016 15:28:45 +0900
-
-haconiwa (0.4.3-1) unstable; urgency=medium
-
-  * Support postprocess hooks for bootstrap, add run -b option
-
- -- Uchio Kondo <udzura@udzura.jp>  Thu, 10 Nov 2016 15:23:17 +0900
