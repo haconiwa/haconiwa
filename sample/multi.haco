@@ -1,0 +1,43 @@
+# -*- mode: ruby -*-
+Haconiwa.define do |config|
+  # The first process when invoking haconiwa run:
+  # If your first process is a daemon, please explicitly daemonize by:
+  config.daemonize!
+
+  root = Pathname.new("/var/lib/haconiwa/8cfccb3d")
+  config.chroot_to root
+
+  config.bootstrap do |b|
+    b.strategy = "git"
+    b.git_url = "https://github.com/haconiwa/haconiwa-image-php-tester"
+  end
+
+  config.provision do |p|
+    p.run_shell <<-SHELL
+apk add --update bash
+    SHELL
+  end
+
+  config.add_mount_point "tmpfs", to: root.join("tmp"), fs: "tmpfs"
+  config.mount_independent "procfs"
+  config.mount_independent "sysfs"
+  config.mount_independent "devtmpfs"
+  config.mount_independent "devpts"
+  config.mount_independent "shm"
+
+  # The namespaces to unshare:
+  config.namespace.unshare "mount"
+  config.namespace.unshare "ipc"
+  config.namespace.unshare "uts"
+  config.namespace.unshare "pid"
+
+  3.times do |i|
+    config.define do |c|
+      suffix = UUID.secure_uuid("%x%x")
+      c.name = "haconiwa-#{suffix}"
+      c.init_command = ["/bin/sleep", (30 + i*10).to_s]
+      c.command.set_stdout(file: "/tmp/test-#{suffix}.stdout")
+      c.command.set_stderr(file: "/tmp/test-#{suffix}.stderr")
+    end
+  end
+end
