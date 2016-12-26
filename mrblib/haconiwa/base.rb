@@ -184,8 +184,15 @@ module Haconiwa
     end
 
     def start(options, *init_command)
-      containers_real_run.each do |c|
-        c.start(options, *init_command)
+      targets = containers_real_run
+      LinuxRunner.new(self).waitall do |_w|
+        targets.map do |c|
+          pid = ::Process.fork do
+            _w.close if _w
+            c.start(options, *init_command)
+          end
+          pid
+        end
       end
     end
     alias run start
@@ -214,7 +221,6 @@ module Haconiwa
         :@network_mountpoint,
         :@bootstrap,
         :@provision,
-        :@daemon,
       ].each do |varname|
         value = barn.instance_variable_get(varname)
         case value
@@ -257,7 +263,7 @@ module Haconiwa
         create(options[:no_provision])
       end
       self.container_pid_file ||= default_container_pid_file
-      LinuxRunner.new(self).run(init_command)
+      LinuxRunner.new(self).run(options, init_command)
     end
     alias run start
 
