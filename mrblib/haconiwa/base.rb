@@ -32,11 +32,17 @@ module Haconiwa
 
   class Barn < DSLInterfce
     def self.define(&b)
-      base = new
-      b.call(base)
-      Logger.setup(base)
+      barn = new
+      b.call(barn)
+      Logger.setup(barn)
       Logger.info("Base setting DSL is evaluated")
-      base
+      barn
+    end
+
+    def define(&b)
+      base = Base.new(self)
+      b.call(base)
+      self.containers << base
     end
 
     def initialize
@@ -60,6 +66,17 @@ module Haconiwa
       @bootstrap = @provision = nil
 
       @waitloop = WaitLoop.new
+
+      @containers = []
+    end
+    attr_reader :containers, :waitloop
+
+    def containers_real_run
+      if containers.empty?
+        [Base.new(self)]
+      else
+        containers
+      end
     end
 
     def init_command=(cmd)
@@ -165,9 +182,20 @@ module Haconiwa
         raise(msg)
       end
     end
+
+    def start(options, *init_command)
+      containers_real_run.each do |c|
+        c.start(options, *init_command)
+      end
+    end
+    alias run start
   end
 
   class Base < Barn
+    def self.define
+      raise "Direct call of Haconiwa::Base.define is deprecated. Please rewrite into Haconiwa.define"
+    end
+
     def initialize(barn)
       [
         :@workdir,
@@ -186,6 +214,7 @@ module Haconiwa
         :@network_mountpoint,
         :@bootstrap,
         :@provision,
+        :@daemon,
       ].each do |varname|
         value = barn.instance_variable_get(varname)
         case value
@@ -580,6 +609,6 @@ module Haconiwa
   end
 
   def self.define(&b)
-    Base.define(&b)
+    Barn.define(&b)
   end
 end
