@@ -33,7 +33,7 @@ apk add --update bash
 
   3.times do |i|
     config.define do |c|
-      suffix = UUID.secure_uuid("%x%x")
+      suffix = "child-#{i}"
       c.name = "haconiwa-#{suffix}"
       c.init_command = ["/bin/sleep", (30 + i*10).to_s]
       c.command.set_stdout(file: "/tmp/test-#{suffix}.stdout")
