@@ -38,6 +38,10 @@ apk add --update bash
       c.init_command = ["/bin/sleep", (30 + i*10).to_s]
       c.command.set_stdout(file: "/tmp/test-#{suffix}.stdout")
       c.command.set_stderr(file: "/tmp/test-#{suffix}.stderr")
+
+      if i > 0
+        c.skip_bootstrap
+      end
     end
   end
 end

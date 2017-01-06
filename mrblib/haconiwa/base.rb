@@ -287,8 +287,19 @@ module Haconiwa
       end
     end
 
+    def skip_bootstrap
+      @bootstrap.skip = true
+      @provision.skip = true
+    end
+    alias skip_provision skip_bootstrap
+
     def create(no_provision)
       validate_non_nil(@bootstrap, "`config.bootstrap' block must be defined to create rootfs")
+      if @bootstrap.skip
+        puts "Bootstrap for #{self.name} marked to skip."
+        return
+      end
+
       @bootstrap.boot!(self.rootfs)
       if @provision and !no_provision
         @provision.provision!(self.rootfs)
@@ -296,11 +307,16 @@ module Haconiwa
     end
 
     def do_provision(ops)
+      validate_non_nil(@provision, "`config.provision' block must be defined to run provisioning")
+      if @provision.skip
+        puts "Provision for #{self.name} marked to skip."
+        return
+      end
+
       unless ::File.directory?(self.rootfs.root)
         raise "Rootfs #{rootfs.root} not yet bootstrapped. Run `haconiwa create' before provision."
       end
 
-      validate_non_nil(@provision, "`config.provision' block must be defined to run provisioning")
       @provision.select_ops(ops) unless ops.empty?
       @provision.provision!(self.rootfs)
     end
