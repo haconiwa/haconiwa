@@ -183,6 +183,20 @@ module Haconiwa
       end
     end
 
+    def create(opt)
+      containers_real_run.each do |c|
+        Haconiwa::Logger.puts "Creating rootfs of #{c.name}..."
+        c.create(opt)
+      end
+    end
+
+    def do_provision(ops)
+      containers_real_run.each do |c|
+        Haconiwa::Logger.puts "Provisioning rootfs of #{c.name}..."
+        c.do_provision(ops)
+      end
+    end
+
     def start(options, *init_command)
       targets = containers_real_run
       LinuxRunner.new(self).waitall do |_w|
@@ -196,6 +210,30 @@ module Haconiwa
       end
     end
     alias run start
+
+    def attach(*cmd)
+      target = containers_real_run
+      if target.size == 1
+        c = target.first
+        c.copy_attach_context(self)
+        c.attach(*cmd)
+      else
+        puts "Please choose container:"
+        target.each_with_index {|c, i| puts "#{i + 1}) #{c.name}" }
+        print "Selest[1-#{target.size}]: "
+        ans = gets
+        raise("Invalid input") if ans.to_i < 1
+        c = target[ans.to_i - 1]
+        c.copy_attach_context(self)
+        c.attach(*cmd)
+      end
+    end
+
+    def kill(signame)
+      containers_real_run.each do |c|
+        c.kill(signame)
+      end
+    end
   end
 
   class Base < Barn
@@ -232,6 +270,21 @@ module Haconiwa
       end
 
       @waitloop = WaitLoop.new
+    end
+
+    def copy_attach_context(barn)
+      [
+        :@guid,
+        :@attached_capabilities,
+      ].each do |varname|
+        value = barn.instance_variable_get(varname)
+        case value
+        when Integer, NilClass, TrueClass, FalseClass
+          self.instance_variable_set(varname, value)
+        else
+          self.instance_variable_set(varname, value.dup)
+        end
+      end
     end
 
     def create(no_provision)
