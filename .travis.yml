@@ -28,6 +28,7 @@ env:
 branches:
   only:
     - master
+    - multicontainer
 cache:
   directories:
     - mruby

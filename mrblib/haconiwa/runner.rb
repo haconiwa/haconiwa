@@ -11,7 +11,25 @@ module Haconiwa
       end
     end
 
-    def run(init_command)
+    def waitall(&how_you_run)
+      wrap_daemonize do |base, n|
+        pids = how_you_run.call(n)
+
+        if n
+          n.print pids.join(',')
+          n.close
+        end
+
+        while res = ::Process.waitpid2(-1)
+          pid, status = res[0], res[1]
+          pids.delete(pid)
+          Logger.puts "A container finished: #{pid}, #{status.inspect}"
+          break if pids.empty?
+        end
+      end
+    end
+
+    def run(options, init_command)
       if File.exist? @base.container_pid_file
         Logger.err "PID file #{@base.container_pid_file} exists. You may be creating the container with existing name #{@base.name}!"
       end
@@ -19,7 +37,7 @@ module Haconiwa
         @base.init_command = init_command
       end
 
-      wrap_daemonize do |base, notifier|
+      raise_container do |base|
         jail_pid(base)
         # The pipe to set guid maps
         if base.namespace.use_guid_mapping?
@@ -83,9 +101,11 @@ module Haconiwa
         done.close
         persist_namespace(pid, base.namespace)
 
-        if notifier
-          notifier.puts pid.to_s
-          notifier.close # notify container is up
+        base.created_at = Time.now
+        base.pid = pid.to_i
+        base.supervisor_pid = ::Process.pid
+        if @etcd
+          @etcd.put base.etcd_key, base.to_container_json
         end
 
         Logger.puts "Container fork success and going to wait: pid=#{pid}"
@@ -144,7 +164,7 @@ module Haconiwa
       end
     end
 
-    def kill(sigtype)
+    def kill(sigtype, timeout)
       if !@base.pid
         if File.exist? @base.container_pid_file
           @base.pid = File.read(@base.container_pid_file).to_i
@@ -164,7 +184,7 @@ module Haconiwa
         raise "Invalid or unsupported signal type: #{sigtype}"
       end
 
-      10.times do
+      (timeout * 10).times do
         sleep 0.1
         unless File.exist?(@base.container_pid_file)
           Logger.puts "Kill success"
@@ -172,7 +192,7 @@ module Haconiwa
         end
       end
 
-      Logger.warning "Killing seemd to be failed in 1 second"
+      Logger.warning "Killing seemd to be failed in #{timeout} seconds"
       Process.exit 1
     end
 
@@ -187,28 +207,25 @@ module Haconiwa
 
     private
 
+    def raise_container(&b)
+      b.call(@base)
+    end
+
     def wrap_daemonize(&b)
       if @base.daemon?
-        Logger.info "Container is running in daemon mode"
         r, w = IO.pipe
         ppid = Process.fork do
-          # TODO: logging
           r.close
           ::Procutil.daemon_fd_reopen
           b.call(@base, w)
         end
         w.close
-        pid = r.read
+        _pids = r.read
+        Logger.puts "pids: #{_pids}"
+        pids = _pids.split(',').map{|v| v.to_i }
         r.close
 
-        @base.created_at = Time.now
-        @base.pid = pid.to_i
-        @base.supervisor_pid = ppid
-        if @etcd
-          @etcd.put @base.etcd_key, @base.to_container_json
-        end
-
-        Logger.puts "Container successfully up. PID={container: #{@base.pid}, supervisor: #{@base.supervisor_pid}}"
+        Logger.puts "Container cluster successfully up. PID={supervisors: #{pids.inspect}, root: #{ppid}}"
       else
         b.call(@base, nil)
       end
