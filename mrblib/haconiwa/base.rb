@@ -229,9 +229,9 @@ module Haconiwa
       end
     end
 
-    def kill(signame)
+    def kill(signame, timeout)
       containers_real_run.each do |c|
-        c.kill(signame)
+        c.kill(signame, timeout)
       end
     end
   end
@@ -341,9 +341,9 @@ module Haconiwa
       LinuxRunner.new(self).attach(run_command)
     end
 
-    def kill(signame)
+    def kill(signame, timeout)
       self.container_pid_file ||= default_container_pid_file
-      LinuxRunner.new(self).kill(signame)
+      LinuxRunner.new(self).kill(signame, timeout)
     end
   end
 

@@ -164,7 +164,7 @@ module Haconiwa
       end
     end
 
-    def kill(sigtype)
+    def kill(sigtype, timeout)
       if !@base.pid
         if File.exist? @base.container_pid_file
           @base.pid = File.read(@base.container_pid_file).to_i
@@ -184,7 +184,7 @@ module Haconiwa
         raise "Invalid or unsupported signal type: #{sigtype}"
       end
 
-      10.times do
+      (timeout * 10).times do
         sleep 0.1
         unless File.exist?(@base.container_pid_file)
           Logger.puts "Kill success"
@@ -192,7 +192,7 @@ module Haconiwa
         end
       end
 
-      Logger.warning "Killing seemd to be failed in 1 second"
+      Logger.warning "Killing seemd to be failed in #{timeout} seconds"
       Process.exit 1
     end
 
