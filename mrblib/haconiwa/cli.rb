@@ -127,13 +127,15 @@ module Haconiwa
 
       opt = parse_opts(args) do |o|
         o.integer('t', 'target', 'PID', "Container's PID to kill.")
+        o.integer('T', 'timeout', 'SECONDS', "Wait time to be killed. Default to (about) 10 sec")
         o.string('s', 'signal', 'SIGFOO', "Signal name. default to TERM")
       end
 
       base, _  = get_script_and_eval(opt.catchall.values)
       base.pid = opt['t'].value if opt['t'].exist?
       signame  = opt['s'].exist? ? opt['s'].value : "TERM"
-      base.kill(signame)
+      timeout  = opt['T'].exist? ? opt['T'].value : 10
+      base.kill(signame, timeout)
     end
 
     def self.watch(args)

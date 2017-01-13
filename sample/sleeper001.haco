@@ -1,6 +1,6 @@
 # -*- mode: ruby -*-
 Haconiwa.define do |config|
-  suffix = UUID.secure_uuid("%x%x")
+  suffix = ENV["SUFFIX"] || UUID.secure_uuid("%x%x")
 
   # The container name and container's hostname:
   config.name = "haconiwa-#{suffix}"

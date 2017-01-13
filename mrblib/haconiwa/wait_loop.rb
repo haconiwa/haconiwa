@@ -46,7 +46,7 @@ module Haconiwa
     def run_and_wait(pid)
       main = UV::Timer.new
       p = s = nil
-      main.start(100, 100) do
+      main.start(50, 50) do
         p, s = Process.waitpid2(pid, Process::WNOHANG)
         if p
           Logger.puts "Container(#{p}) finish detected: #{s.inspect}"
