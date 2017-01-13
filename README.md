@@ -218,6 +218,12 @@ See dependent gem's READMEs.
 * `rake` won't be passed unless you are not on Linux.
 * This project is built upon great [mruby-cli](https://github.com/hone/mruby-cli). Please browse its README.
 
+## Release policy
+
+* Versions whose minor versions are *even* numbers (`0.6, 0.8, 0.10, 1.0...`): Stable release
+* Versions whose minor versions are *odd* numbers (`0.7, 0.9, 0.11, 1.1...`): Unstable release. Features added at this version should be broken
+* I introduced this policy after version `0.5.x`
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/haconiwa/haconiwa. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
