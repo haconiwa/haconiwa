@@ -223,6 +223,8 @@ See dependent gem's READMEs.
 * Versions whose minor versions are *even* numbers (`0.6, 0.8, 0.10, 1.0...`): Stable release
 * Versions whose minor versions are *odd* numbers (`0.7, 0.9, 0.11, 1.1...`): Unstable release. Features added at this version should be broken
 * I introduced this policy after version `0.5.x`
+* We create branches as `0.6.x-dev` for release
+* PRs can be proposed to `master` branch. Maintainers will pick these to stable/unstable dev branches
 
 ## Contributing
 
