@@ -1,5 +1,5 @@
 module Haconiwa
-  class Base
+  class DSLInterfce
     extend ::Forwardable
 
     attr_accessor :name,
@@ -22,21 +22,27 @@ module Haconiwa
                   :network_mountpoint,
                   :cleaned
 
-    attr_reader   :waitloop
-
     delegate     [:uid,
                   :uid=,
                   :gid,
                   :gid=,
                   :groups,
                   :groups=] => :@guid
+  end
 
+  class Barn < DSLInterfce
     def self.define(&b)
-      base = new
-      b.call(base)
-      Logger.setup(base)
+      barn = new
+      b.call(barn)
+      Logger.setup(barn)
       Logger.info("Base setting DSL is evaluated")
-      base
+      barn
+    end
+
+    def define(&b)
+      base = Base.new(self)
+      b.call(base)
+      self.containers << base
     end
 
     def initialize
@@ -57,8 +63,20 @@ module Haconiwa
       @daemon = false
       @network_mountpoint = []
       @cleaned = false
+      @bootstrap = @provision = nil
 
       @waitloop = WaitLoop.new
+
+      @containers = []
+    end
+    attr_reader :containers, :waitloop
+
+    def containers_real_run
+      if containers.empty?
+        [Base.new(self)]
+      else
+        containers
+      end
     end
 
     def init_command=(cmd)
@@ -125,49 +143,6 @@ module Haconiwa
       @provision
     end
 
-    def create(no_provision)
-      validate_non_nil(@bootstrap, "`config.bootstrap' block must be defined to create rootfs")
-      @bootstrap.boot!(self.rootfs)
-      if @provision and !no_provision
-        @provision.provision!(self.rootfs)
-      end
-    end
-
-    def do_provision(ops)
-      unless ::File.directory?(self.rootfs.root)
-        raise "Rootfs #{rootfs.root} not yet bootstrapped. Run `haconiwa create' before provision."
-      end
-
-      validate_non_nil(@provision, "`config.provision' block must be defined to run provisioning")
-      @provision.select_ops(ops) unless ops.empty?
-      @provision.provision!(self.rootfs)
-    end
-
-    def archive(options)
-      create(options[:no_provision])
-      Archive.new(self, options).do_archive
-    end
-
-    def start(options, *init_command)
-      if options[:booting]
-        Logger.puts "Bootstrapping rootfs on run..."
-        create(options[:no_provision])
-      end
-      self.container_pid_file ||= default_container_pid_file
-      LinuxRunner.new(self).run(init_command)
-    end
-    alias run start
-
-    def attach(*run_command)
-      self.container_pid_file ||= default_container_pid_file
-      LinuxRunner.new(self).attach(run_command)
-    end
-
-    def kill(signame)
-      self.container_pid_file ||= default_container_pid_file
-      LinuxRunner.new(self).kill(signame)
-    end
-
     def default_container_pid_file
       "/var/run/haconiwa-#{@name}.pid"
     end
@@ -206,6 +181,169 @@ module Haconiwa
       unless obj
         raise(msg)
       end
+    end
+
+    def create(opt)
+      containers_real_run.each do |c|
+        Haconiwa::Logger.puts "Creating rootfs of #{c.name}..."
+        c.create(opt)
+      end
+    end
+
+    def do_provision(ops)
+      containers_real_run.each do |c|
+        Haconiwa::Logger.puts "Provisioning rootfs of #{c.name}..."
+        c.do_provision(ops)
+      end
+    end
+
+    def start(options, *init_command)
+      targets = containers_real_run
+      LinuxRunner.new(self).waitall do |_w|
+        targets.map do |c|
+          pid = ::Process.fork do
+            _w.close if _w
+            c.start(options, *init_command)
+          end
+          pid
+        end
+      end
+    end
+    alias run start
+
+    def attach(*cmd)
+      target = containers_real_run
+      if target.size == 1
+        c = target.first
+        c.copy_attach_context(self)
+        c.attach(*cmd)
+      else
+        puts "Please choose container:"
+        target.each_with_index {|c, i| puts "#{i + 1}) #{c.name}" }
+        print "Selest[1-#{target.size}]: "
+        ans = gets
+        raise("Invalid input") if ans.to_i < 1
+        c = target[ans.to_i - 1]
+        c.copy_attach_context(self)
+        c.attach(*cmd)
+      end
+    end
+
+    def kill(signame, timeout)
+      containers_real_run.each do |c|
+        c.kill(signame, timeout)
+      end
+    end
+  end
+
+  class Base < Barn
+    def self.define
+      raise "Direct call of Haconiwa::Base.define is deprecated. Please rewrite into Haconiwa.define"
+    end
+
+    def initialize(barn)
+      [
+        :@workdir,
+        :@command,
+        :@filesystem,
+        :@resource,
+        :@cgroup,
+        :@namespace,
+        :@capabilities,
+        :@guid,
+        :@environ,
+        :@signal_handler,
+        :@attached_capabilities,
+        :@name,
+        :@container_pid_file,
+        :@network_mountpoint,
+        :@bootstrap,
+        :@provision,
+      ].each do |varname|
+        value = barn.instance_variable_get(varname)
+        case value
+        when Integer, NilClass, TrueClass, FalseClass
+          self.instance_variable_set(varname, value)
+        else
+          self.instance_variable_set(varname, value.dup)
+        end
+      end
+
+      @waitloop = WaitLoop.new
+    end
+
+    def copy_attach_context(barn)
+      [
+        :@guid,
+        :@attached_capabilities,
+      ].each do |varname|
+        value = barn.instance_variable_get(varname)
+        case value
+        when Integer, NilClass, TrueClass, FalseClass
+          self.instance_variable_set(varname, value)
+        else
+          self.instance_variable_set(varname, value.dup)
+        end
+      end
+    end
+
+    def skip_bootstrap
+      @bootstrap.skip = true
+      @provision.skip = true
+    end
+    alias skip_provision skip_bootstrap
+
+    def create(no_provision)
+      validate_non_nil(@bootstrap, "`config.bootstrap' block must be defined to create rootfs")
+      if @bootstrap.skip
+        puts "Bootstrap for #{self.name} marked to skip."
+        return
+      end
+
+      @bootstrap.boot!(self.rootfs)
+      if @provision and !no_provision
+        @provision.provision!(self.rootfs)
+      end
+    end
+
+    def do_provision(ops)
+      validate_non_nil(@provision, "`config.provision' block must be defined to run provisioning")
+      if @provision.skip
+        puts "Provision for #{self.name} marked to skip."
+        return
+      end
+
+      unless ::File.directory?(self.rootfs.root)
+        raise "Rootfs #{rootfs.root} not yet bootstrapped. Run `haconiwa create' before provision."
+      end
+
+      @provision.select_ops(ops) unless ops.empty?
+      @provision.provision!(self.rootfs)
+    end
+
+    def archive(options)
+      create(options[:no_provision])
+      Archive.new(self, options).do_archive
+    end
+
+    def start(options, *init_command)
+      if options[:booting]
+        Logger.puts "Bootstrapping rootfs on run..."
+        create(options[:no_provision])
+      end
+      self.container_pid_file ||= default_container_pid_file
+      LinuxRunner.new(self).run(options, init_command)
+    end
+    alias run start
+
+    def attach(*run_command)
+      self.container_pid_file ||= default_container_pid_file
+      LinuxRunner.new(self).attach(run_command)
+    end
+
+    def kill(signame, timeout)
+      self.container_pid_file ||= default_container_pid_file
+      LinuxRunner.new(self).kill(signame, timeout)
     end
   end
 
@@ -546,6 +684,6 @@ module Haconiwa
   end
 
   def self.define(&b)
-    Base.define(&b)
+    Barn.define(&b)
   end
 end
