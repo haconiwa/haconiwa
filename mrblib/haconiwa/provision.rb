@@ -3,7 +3,7 @@ module Haconiwa
     def initialize
       @ops = []
     end
-    attr_accessor :root, :ops,
+    attr_accessor :root, :ops, :skip,
                   :extra_bind # TODO
 
     class ProvisionOps
