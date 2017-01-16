@@ -143,7 +143,7 @@ namespace :release do
     branch = `cd #{pwd} && git rev-parse --abbrev-ref HEAD`.chomp
     raise("Invalid branch") if branch != "0.6.x-dev" and branch != "0.7.x-dev"
     sh "cd #{pwd} && git pull --rebase --prune origin #{branch}"
-    sh "cd #{pwd} && ghr -u haconiwa v#{Haconiwa::VERSION} pkg/"
+    sh "cd #{pwd} && ghr -c #{branch} -u haconiwa v#{Haconiwa::VERSION} pkg/"
     sh "cd #{pwd} && git fetch origin"
   end
 
