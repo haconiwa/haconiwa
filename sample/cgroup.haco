@@ -1,0 +1,58 @@
+# -*- mode: ruby -*-
+ENV['CGROUP'] ||= 'cpu'
+
+haconiwa = Haconiwa.define do |config|
+  config.name = "#{ENV['CGROUP']}-quota-test" # to be hostname
+  config.init_command = ["/usr/sbin/sshd", '-D'] # to be first process
+  config.daemonize!
+
+  root = Pathname.new("/var/lib/haconiwa/2a1042d9")
+  config.mount_independent "procfs"
+  config.mount_independent "sysfs"
+  config.mount_independent "devtmpfs"
+  config.mount_independent "devpts"
+  config.chroot_to root
+
+  config.namespace.unshare "mount"
+  config.namespace.unshare "ipc"
+  config.namespace.unshare "uts"
+  config.namespace.unshare "pid"
+
+  if ENV['CGROUP'] == 'cpu'
+    config.cgroup["cpu.cfs_period_us"] = 100000
+    config.cgroup["cpu.cfs_quota_us"]  =  30000
+
+    config.add_handler :USR1 do |b, sig|
+      File.open("/tmp/log_#{b.name}.txt", "a+") {|f| f.puts "Hello signal: #{Time.now.to_s}" }
+    end
+
+    config.add_handler :USR2 do |b, sig|
+      cpu = ::Cgroup::CPU.new(b.name)
+      File.open("/tmp/log_#{b.name}.txt", "a+") {|f| f.puts "Current cpu.cfs_quota_us = #{cpu.cfs_quota_us}" }
+    end
+
+    config.add_handler :TTIN do |b, sig|
+      cpu = ::Cgroup::CPU.new(b.name)
+      cpu.cfs_quota_us = cpu.cfs_quota_us - 10000
+      if cpu.cfs_quota_us > 0
+        cpu.modify
+        File.open("/tmp/log_#{b.name}.txt", "a+") {|f| f.puts "Changed cpu.cfs_quota_us = #{cpu.cfs_quota_us}" }
+      end
+    end
+
+    config.add_handler :TTOU do |b, sig|
+      cpu = ::Cgroup::CPU.new(b.name)
+      cpu.cfs_quota_us = cpu.cfs_quota_us + 10000
+      if cpu.cfs_quota_us <= cpu.cfs_period_us
+        cpu.modify
+        File.open("/tmp/log_#{b.name}.txt", "a+") {|f| f.puts "Changed cpu.cfs_quota_us = #{cpu.cfs_quota_us}" }
+      end
+    end
+  elsif ENV['CGROUP'] = 'memory'
+    config.cgroup["memory.limit_in_bytes"] = 128 * 1024 * 1024 # 128MB
+    config.cgroup["memory.memsw.limit_in_bytes"] = 128 * 1024 * 1024 # 128MB
+  end
+
+  # sshd needs chroot!
+  config.capabilities.allow "cap_sys_chroot"
+end
