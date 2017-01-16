@@ -52,4 +52,7 @@ haconiwa = Haconiwa.define do |config|
     config.cgroup["memory.limit_in_bytes"] = 128 * 1024 * 1024 # 128MB
     config.cgroup["memory.memsw.limit_in_bytes"] = 128 * 1024 * 1024 # 128MB
   end
+
+  # sshd needs chroot!
+  config.capabilities.allow "cap_sys_chroot"
 end
