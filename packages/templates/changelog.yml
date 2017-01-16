@@ -1,5 +1,10 @@
-latest: 0.6.0
+latest: 0.7.0
 changelog:
+  - version: 0.7.0
+    messages:
+      - First implementation of multicontainer DSL
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Mon, 16 Jan 2017 17:13:57 +0900
   - version: 0.6.0
     messages:
       - First 0.6 stable, fix to set cgroup two dot parameters
