@@ -262,10 +262,10 @@ module Haconiwa
 
     def []=(key, value)
       @groups[key] = value
-      c, attr = key.split('.')
-      raise("Invalid cgroup name #{key}") unless attr
+      c, *attr = key.split('.')
+      raise("Invalid cgroup name #{key}") if attr.empty?
       @groups_by_controller[c] ||= Array.new
-      @groups_by_controller[c] << [key, attr]
+      @groups_by_controller[c] << [key, attr.join('_')]
       return value
     end
 
