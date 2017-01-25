@@ -320,6 +320,16 @@ module Haconiwa
         c.create
         c.attach
       end
+
+      unless base.cgroupv2.groups.empty?
+        cg = ::CgroupV2.new_group(base.name)
+        cg.create
+        base.cgroupv2.groups.each do |key, value|
+          cg[key.to_s] = value.to_s
+        end
+        cg.commit
+        cg.attach
+      end
     end
 
     def cleanup_cgroup(base)
