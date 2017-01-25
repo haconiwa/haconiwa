@@ -324,7 +324,7 @@ module Haconiwa
       unless base.cgroupv2.groups.empty?
         cg = ::CgroupV2.new_group(base.name)
         cg.create
-        base.cgroupv2.groups.each_pair do |key, value|
+        base.cgroupv2.groups.each do |key, value|
           cg[key.to_s] = value.to_s
         end
         cg.commit
