@@ -37,6 +37,7 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.add_dependency 'mruby-process-sys', :github => 'haconiwa/mruby-process-sys'
   spec.add_dependency 'mruby-procutil'  , :github => 'haconiwa/mruby-procutil'
   spec.add_dependency 'mruby-resource'  , :github => 'harasou/mruby-resource'
+  spec.add_dependency 'mruby-cgroupv2'  , :github => 'haconiwa/mruby-cgroupv2'
 
   spec.add_dependency 'mruby-syslog'    , :github => 'iij/mruby-syslog'
   spec.add_dependency 'mruby-uv'        , :github => 'mattn/mruby-uv'

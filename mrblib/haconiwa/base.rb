@@ -9,6 +9,7 @@ module Haconiwa
                   :filesystem,
                   :resource,
                   :cgroup,
+                  :cgroupv2,
                   :namespace,
                   :capabilities,
                   :guid,
@@ -45,6 +46,7 @@ module Haconiwa
       @filesystem = Filesystem.new
       @resource = Resource.new
       @cgroup = CGroup.new
+      @cgroupv2 = CGroupV2.new
       @namespace = Namespace.new
       @capabilities = Capabilities.new
       @guid = Guid.new
@@ -81,6 +83,18 @@ module Haconiwa
 
     def rootfs
       filesystem.rootfs
+    end
+
+    def cgroup(v=nil, &blk)
+      cg = if v.to_s == "v2"
+             @cgroupv2
+           else
+             @cgroup
+           end
+      if blk
+        blk.call(cg)
+      end
+      cg
     end
 
     def add_mount_point(point, options)
@@ -273,6 +287,15 @@ module Haconiwa
       @groups_by_controller.keys.uniq
     end
     alias controllers to_controllers
+  end
+
+  class CGroupV2 < CGroup
+    def []=(key, value)
+      @groups[key] = value
+      c, *attr = key.split('.')
+      raise("Invalid cgroup name #{key}") if attr.empty?
+      return value
+    end
   end
 
   class Capabilities

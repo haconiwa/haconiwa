@@ -6,7 +6,7 @@ haconiwa = Haconiwa.define do |config|
   config.init_command = ["/usr/sbin/sshd", '-D'] # to be first process
   config.daemonize!
 
-  root = Pathname.new("/var/lib/haconiwa/2a1042d9")
+  root = Pathname.new("/var/lib/haconiwa/8cfccb3d")
   config.mount_independent "procfs"
   config.mount_independent "sysfs"
   config.mount_independent "devtmpfs"
@@ -48,11 +48,16 @@ haconiwa = Haconiwa.define do |config|
         File.open("/tmp/log_#{b.name}.txt", "a+") {|f| f.puts "Changed cpu.cfs_quota_us = #{cpu.cfs_quota_us}" }
       end
     end
-  elsif ENV['CGROUP'] = 'memory'
+  elsif ENV['CGROUP'] == 'memory'
     config.cgroup["memory.limit_in_bytes"] = 128 * 1024 * 1024 # 128MB
     config.cgroup["memory.memsw.limit_in_bytes"] = 128 * 1024 * 1024 # 128MB
+  elsif ENV['CGROUP'] == 'io'
+    config.cgroup :v2 do |cgroup|
+      cgroup["io.max"] = "8:0 rbps=#{1024 ** 2} wbps=#{1024 ** 2}"
+    end
   end
 
   # sshd needs chroot!
   config.capabilities.allow "cap_sys_chroot"
+  config.capabilities.allow "cap_kill"
 end
