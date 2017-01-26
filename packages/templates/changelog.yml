@@ -1,5 +1,10 @@
-latest: 0.6.0
+latest: 0.6.1
 changelog:
+  - version: 0.6.1
+    messages:
+      - Support cgroup-v2 DSL
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Thu, 26 Jan 2017 18:07:15 +0900
   - version: 0.6.0
     messages:
       - First 0.6 stable, fix to set cgroup two dot parameters
