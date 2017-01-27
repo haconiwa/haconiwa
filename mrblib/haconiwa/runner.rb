@@ -141,8 +141,12 @@ module Haconiwa
         ::Namespace.setns(::Namespace::CLONE_NEWPID, pid: base.pid)
       end
       pid = Process.fork do
-        flag = base.namespace.to_flag & (~(::Namespace::CLONE_NEWPID))
+        flag = base.namespace.to_flag_without_pid_and_user
         ::Namespace.setns(flag, pid: base.pid)
+
+        if base.namespace.to_flag & ::Namespace::CLONE_NEWUSER != 0
+          ::Namespace.setns(::Namespace::CLONE_NEWUSER, pid: base.pid)
+        end
 
         apply_cgroup(base)
         do_chroot(base)
