@@ -29,39 +29,44 @@ module Haconiwa
         done, kick_ok = IO.pipe
 
         pid = Process.fork do
-          ::Procutil.mark_cloexec
-          [r, w2].each {|io| io.close if io }
-          done.close
-          ::Procutil.setsid if base.daemon?
+          begin
+            ::Procutil.mark_cloexec
+            [r, w2].each {|io| io.close if io }
+            done.close
+            ::Procutil.setsid if base.daemon?
 
-          apply_namespace(base.namespace)
-          apply_filesystem(base)
-          apply_rlimit(base.resource)
-          apply_cgroup(base)
-          apply_remount(base)
-          ::Procutil.sethostname(base.name)
+            apply_namespace(base.namespace)
+            apply_filesystem(base)
+            apply_rlimit(base.resource)
+            apply_cgroup(base)
+            apply_remount(base)
+            ::Procutil.sethostname(base.name)
 
-          apply_user_namespace(base.namespace)
-          if base.namespace.use_guid_mapping?
-            # ping and pong between parent
-            w.puts "unshared"
-            w.close
+            apply_user_namespace(base.namespace)
+            if base.namespace.use_guid_mapping?
+              # ping and pong between parent
+              w.puts "unshared"
+              w.close
 
-            r2.read
-            r2.close
-            switch_current_namespace_root
+              r2.read
+              r2.close
+              switch_current_namespace_root
+            end
+
+            do_chroot(base)
+            reopen_fds(base.command) if base.daemon?
+
+            apply_capability(base.capabilities)
+            switch_guid(base.guid)
+            kick_ok.puts "done"
+            kick_ok.close
+
+            Logger.info "Container is going to exec: #{base.init_command.inspect}"
+            Exec.execve(base.environ, *base.init_command)
+          rescue => >e
+            Logger.exception(e)
+            exit(127)
           end
-
-          do_chroot(base)
-          reopen_fds(base.command) if base.daemon?
-
-          apply_capability(base.capabilities)
-          switch_guid(base.guid)
-          kick_ok.puts "done"
-          kick_ok.close
-
-          Logger.info "Container is going to exec: #{base.init_command.inspect}"
-          Exec.execve(base.environ, *base.init_command)
         end
         base.pid = pid
         kick_ok.close
@@ -196,10 +201,14 @@ module Haconiwa
         Logger.info "Container is running in daemon mode"
         r, w = IO.pipe
         ppid = Process.fork do
-          # TODO: logging
-          r.close
-          ::Procutil.daemon_fd_reopen
-          b.call(@base, w)
+          begin
+            # TODO: logging
+            r.close
+            ::Procutil.daemon_fd_reopen
+            b.call(@base, w)
+          rescue => >e
+            Logger.exception(e)
+          end
         end
         w.close
         pid = r.read

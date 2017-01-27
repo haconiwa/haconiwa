@@ -9,9 +9,21 @@ module Haconiwa
     end
 
     # Calling this will stop haconiwa process
+    def exception(*args)
+      if args.first.is_a? Exception
+        e = args.first
+        Syslog.err("An exception is occurred when spawning haconiwa:")
+        Syslog.err("#{e.inspect}")
+        Syslog.err("...Shutting down haconiwa")
+        raise(e)
+      else
+        Syslog.err(*args)
+        raise(*args)
+      end
+    end
+
     def err(*args)
       Syslog.err(*args)
-      raise(*args)
     end
 
     # Warning is forced to be teed to stderr
