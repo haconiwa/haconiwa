@@ -142,7 +142,7 @@ module Haconiwa
       end
       pid = Process.fork do
         flag = base.namespace.to_flag_without_pid_and_user
-        ::Namespace.setns(flag, pid: base.pi:)
+        ::Namespace.setns(flag, pid: base.pid)
 
         apply_user_namespace(base.namespace)
 
