@@ -144,7 +144,9 @@ module Haconiwa
         flag = base.namespace.to_flag_without_pid_and_user
         ::Namespace.setns(flag, pid: base.pid)
 
-        apply_user_namespace(base.namespace)
+        if base.namespace.to_flag & ::Namespace::CLONE_NEWUSER != 0
+          ::Namespace.setns(::Namespace::CLONE_NEWUSER, pid: base.pid)
+        end
 
         apply_cgroup(base)
         do_chroot(base)
