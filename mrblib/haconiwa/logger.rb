@@ -10,7 +10,7 @@ module Haconiwa
 
     # Calling this will stop haconiwa process
     def exception(*args)
-      if args.first.is_a? Exception
+      if args.first.is_a? HacoFatalError
         e = args.first
         Syslog.err("An exception is occurred when spawning haconiwa:")
         Syslog.err("#{e.inspect}")
@@ -18,7 +18,7 @@ module Haconiwa
         raise(e)
       else
         Syslog.err(*args)
-        raise(*args)
+        raise(HacoFatalError, *args)
       end
     end
 
