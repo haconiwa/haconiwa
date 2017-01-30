@@ -22,7 +22,8 @@ module Haconiwa
                   :created_at,
                   :etcd_name,
                   :network_mountpoint,
-                  :cleaned
+                  :cleaned,
+                  :exit_status
 
     attr_reader   :waitloop
 
