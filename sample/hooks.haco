@@ -1,6 +1,12 @@
 # -*- mode: ruby -*-
+IKACHAN_HOST = ENV['IKACHAN_HOST'] || "ikachan.local:4979"
 def slack(msg)
-  system "curl -d message='#{msg}' -d channel='#haconiwa-dev' ikachan.local:4979/notice"
+  http = HttpRequest.new
+  http.post(
+    "http://#{IKACHAN_HOST}/notice",
+    {message: msg, channel: '#test'},
+    {"Content-Type" => 'application/x-www-form-urlencoded', 'User-Agent' => "Haconiwa v#{Haconiwa::VERSION}"}
+  )
 end
 
 Haconiwa.define do |config|
@@ -17,6 +23,10 @@ Haconiwa.define do |config|
 
   config.add_general_hook :before_start_wait do |base|
     slack("Container is UP!! Everything is OK!!1 #{base.name}")
+  end
+
+  config.add_general_hook :teardown do |base|
+    slack("Container is Exited. #{base.name} => #{base.exit_status.inspect}")
   end
 
   config.add_general_hook :after_fork do |base|
