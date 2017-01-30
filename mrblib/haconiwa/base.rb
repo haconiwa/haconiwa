@@ -222,6 +222,10 @@ module Haconiwa
           pid
         end
       end
+    rescue HacoFatalError => e
+      raise e
+    rescue => e
+      Logger.exception(e)
     end
     alias run start
 
