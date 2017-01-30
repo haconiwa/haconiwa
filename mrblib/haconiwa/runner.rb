@@ -255,8 +255,8 @@ module Haconiwa
       hook = base.general_hooks[hookpoint]
       hook.call(base) if hook
     rescue => e
-      Logger.warn("General container hook at #{hookpoint.inspect} failed. Skip")
-      Logger.warn("#{e.class} - #{e.message}")
+      Logger.warning("General container hook at #{hookpoint.inspect} failed. Skip")
+      Logger.warning("#{e.class} - #{e.message}")
     end
 
     def apply_namespace(namespace)
