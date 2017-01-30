@@ -63,7 +63,7 @@ module Haconiwa
 
             Logger.info "Container is going to exec: #{base.init_command.inspect}"
             Exec.execve(base.environ, *base.init_command)
-          rescue => >e
+          rescue => e
             Logger.exception(e)
             exit(127)
           end
@@ -206,7 +206,7 @@ module Haconiwa
             r.close
             ::Procutil.daemon_fd_reopen
             b.call(@base, w)
-          rescue => >e
+          rescue => e
             Logger.exception(e)
           end
         end
