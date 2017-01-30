@@ -141,8 +141,12 @@ module Haconiwa
         ::Namespace.setns(::Namespace::CLONE_NEWPID, pid: base.pid)
       end
       pid = Process.fork do
-        flag = base.namespace.to_flag & (~(::Namespace::CLONE_NEWPID))
+        flag = base.namespace.to_flag_without_pid_and_user
         ::Namespace.setns(flag, pid: base.pid)
+
+        if base.namespace.to_flag & ::Namespace::CLONE_NEWUSER != 0
+          ::Namespace.setns(::Namespace::CLONE_NEWUSER, pid: base.pid)
+        end
 
         apply_cgroup(base)
         do_chroot(base)
@@ -336,6 +340,16 @@ module Haconiwa
         end
         c.create
         c.attach
+      end
+
+      unless base.cgroupv2.groups.empty?
+        cg = ::CgroupV2.new_group(base.name)
+        cg.create
+        base.cgroupv2.groups.each do |key, value|
+          cg[key.to_s] = value.to_s
+        end
+        cg.commit
+        cg.attach
       end
     end
 
