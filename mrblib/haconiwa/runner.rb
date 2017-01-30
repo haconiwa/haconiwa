@@ -20,6 +20,8 @@ module Haconiwa
       end
 
       wrap_daemonize do |base, notifier|
+        invoke_general_hook(:before_fork, base)
+
         jail_pid(base)
         # The pipe to set guid maps
         if base.namespace.use_guid_mapping?
@@ -27,8 +29,9 @@ module Haconiwa
           r2, w2 = IO.pipe
         end
         done, kick_ok = IO.pipe
-
         pid = Process.fork do
+          invoke_general_hook(:after_fork, base)
+
           begin
             ::Procutil.mark_cloexec
             [r, w2].each {|io| io.close if io }
@@ -53,7 +56,11 @@ module Haconiwa
               switch_current_namespace_root
             end
 
+            invoke_general_hook(:before_chroot, base)
+
             do_chroot(base)
+            invoke_general_hook(:after_chroot, base)
+
             reopen_fds(base.command) if base.daemon?
 
             apply_capability(base.capabilities)
@@ -98,6 +105,7 @@ module Haconiwa
         base.waitloop.register_sighandlers(base, self, @etcd)
         base.waitloop.register_custom_sighandlers(base, base.signal_handler)
 
+        invoke_general_hook(:before_start_wait, base)
         pid, status = base.waitloop.run_and_wait(pid)
         cleanup_supervisor(base, @etcd)
         if status.success?
@@ -241,6 +249,14 @@ module Haconiwa
       if ret < 0
         Logger.exception "Unsharing or setting PID namespace failed"
       end
+    end
+
+    def invoke_general_hook(hookpoint, base)
+      hook = base.general_hooks[hookpoint]
+      hook.call(base) if hook
+    rescue => e
+      Logger.warn("General container hook at #{hookpoint.inspect} failed. Skip")
+      Logger.warn("#{e.class} - #{e.message}")
     end
 
     def apply_namespace(namespace)
