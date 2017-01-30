@@ -13,7 +13,7 @@ module Haconiwa
 
     def run(init_command)
       if File.exist? @base.container_pid_file
-        Logger.err "PID file #{@base.container_pid_file} exists. You may be creating the container with existing name #{@base.name}!"
+        Logger.exception "PID file #{@base.container_pid_file} exists. You may be creating the container with existing name #{@base.name}!"
       end
       unless init_command.empty?
         @base.init_command = init_command
@@ -29,39 +29,44 @@ module Haconiwa
         done, kick_ok = IO.pipe
 
         pid = Process.fork do
-          ::Procutil.mark_cloexec
-          [r, w2].each {|io| io.close if io }
-          done.close
-          ::Procutil.setsid if base.daemon?
+          begin
+            ::Procutil.mark_cloexec
+            [r, w2].each {|io| io.close if io }
+            done.close
+            ::Procutil.setsid if base.daemon?
 
-          apply_namespace(base.namespace)
-          apply_filesystem(base)
-          apply_rlimit(base.resource)
-          apply_cgroup(base)
-          apply_remount(base)
-          ::Procutil.sethostname(base.name)
+            apply_namespace(base.namespace)
+            apply_filesystem(base)
+            apply_rlimit(base.resource)
+            apply_cgroup(base)
+            apply_remount(base)
+            ::Procutil.sethostname(base.name)
 
-          apply_user_namespace(base.namespace)
-          if base.namespace.use_guid_mapping?
-            # ping and pong between parent
-            w.puts "unshared"
-            w.close
+            apply_user_namespace(base.namespace)
+            if base.namespace.use_guid_mapping?
+              # ping and pong between parent
+              w.puts "unshared"
+              w.close
 
-            r2.read
-            r2.close
-            switch_current_namespace_root
+              r2.read
+              r2.close
+              switch_current_namespace_root
+            end
+
+            do_chroot(base)
+            reopen_fds(base.command) if base.daemon?
+
+            apply_capability(base.capabilities)
+            switch_guid(base.guid)
+            kick_ok.puts "done"
+            kick_ok.close
+
+            Logger.info "Container is going to exec: #{base.init_command.inspect}"
+            Exec.execve(base.environ, *base.init_command)
+          rescue => e
+            Logger.exception(e)
+            exit(127)
           end
-
-          do_chroot(base)
-          reopen_fds(base.command) if base.daemon?
-
-          apply_capability(base.capabilities)
-          switch_guid(base.guid)
-          kick_ok.puts "done"
-          kick_ok.close
-
-          Logger.info "Container is going to exec: #{base.init_command.inspect}"
-          Exec.execve(base.environ, *base.init_command)
         end
         base.pid = pid
         kick_ok.close
@@ -109,7 +114,7 @@ module Haconiwa
         if File.exist? base.container_pid_file
           base.pid = File.read(base.container_pid_file).to_i
         else
-          Logger.err "PID file #{base.container_pid_file} doesn't exist. You may be specifying container PID by -t option"
+          Logger.exception "PID file #{base.container_pid_file} doesn't exist. You may be specifying container PID by -t option"
         end
       end
 
@@ -121,8 +126,12 @@ module Haconiwa
         ::Namespace.setns(::Namespace::CLONE_NEWPID, pid: base.pid)
       end
       pid = Process.fork do
-        flag = base.namespace.to_flag & (~(::Namespace::CLONE_NEWPID))
+        flag = base.namespace.to_flag_without_pid_and_user
         ::Namespace.setns(flag, pid: base.pid)
+
+        if base.namespace.to_flag & ::Namespace::CLONE_NEWUSER != 0
+          ::Namespace.setns(::Namespace::CLONE_NEWUSER, pid: base.pid)
+        end
 
         apply_cgroup(base)
         do_chroot(base)
@@ -192,10 +201,14 @@ module Haconiwa
         Logger.info "Container is running in daemon mode"
         r, w = IO.pipe
         ppid = Process.fork do
-          # TODO: logging
-          r.close
-          ::Procutil.daemon_fd_reopen
-          b.call(@base, w)
+          begin
+            # TODO: logging
+            r.close
+            ::Procutil.daemon_fd_reopen
+            b.call(@base, w)
+          rescue => e
+            Logger.exception(e)
+          end
         end
         w.close
         pid = r.read
@@ -226,13 +239,13 @@ module Haconiwa
               0
             end
       if ret < 0
-        Logger.err "Unsharing or setting PID namespace failed"
+        Logger.exception "Unsharing or setting PID namespace failed"
       end
     end
 
     def apply_namespace(namespace)
       if ::Namespace.unshare(namespace.to_flag_for_unshare) < 0
-        Logger.err "Some namespace is unsupported by this kernel. Please check"
+        Logger.exception "Some namespace is unsupported by this kernel. Please check"
       end
 
       if namespace.setns_on_run?
@@ -241,7 +254,7 @@ module Haconiwa
           next if ns == ::Namespace::CLONE_NEWUSER
           f = File.open(path)
           if ::Namespace.setns(ns, fd: f.fileno) < 0
-            Logger.err "Some namespace is unsupported by this kernel. Please check"
+            Logger.exception "Some namespace is unsupported by this kernel. Please check"
           end
           f.close
         end
@@ -309,7 +322,7 @@ module Haconiwa
     def apply_cgroup(base)
       base.cgroup.controllers.each do |controller|
         Logger.debug "Creating cgroup controller #{controller}"
-        Logger.err("Invalid or unsupported controller name: #{controller}") unless CG_MAPPING.has_key?(controller)
+        Logger.exception("Invalid or unsupported controller name: #{controller}") unless CG_MAPPING.has_key?(controller)
 
         c = CG_MAPPING[controller].new(base.name)
         base.cgroup.groups_by_controller[controller].each do |pair|
@@ -334,7 +347,7 @@ module Haconiwa
 
     def cleanup_cgroup(base)
       base.cgroup.controllers.each do |controller|
-        Logger.err("Invalid or unsupported controller name: #{controller}") unless CG_MAPPING.has_key?(controller)
+        Logger.exception("Invalid or unsupported controller name: #{controller}") unless CG_MAPPING.has_key?(controller)
 
         c = CG_MAPPING[controller].new(base.name)
         c.delete
@@ -360,7 +373,7 @@ module Haconiwa
       end
     rescue => e
       showid = capabilities.acts_as_whitelist? ? capabilities.whitelist_ids : capabilities.blacklist_ids
-      Logger.err "Maybe there are unsupported caps in #{showid.inspect}: #{e.class} - #{e.message}"
+      Logger.exception "Maybe there are unsupported caps in #{showid.inspect}: #{e.class} - #{e.message}"
     end
 
     def apply_rlimit(rlimit)

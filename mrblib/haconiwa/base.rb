@@ -169,6 +169,10 @@ module Haconiwa
       end
       self.container_pid_file ||= default_container_pid_file
       LinuxRunner.new(self).run(init_command)
+    rescue HacoFatalError => e
+      raise e
+    rescue => e
+      Logger.exception(e)
     end
     alias run start
 
