@@ -13,6 +13,7 @@ module Haconiwa
                   :namespace,
                   :capabilities,
                   :guid,
+                  :general_hooks,
                   :environ,
                   :attached_capabilities,
                   :signal_handler,
@@ -50,6 +51,7 @@ module Haconiwa
       @namespace = Namespace.new
       @capabilities = Capabilities.new
       @guid = Guid.new
+      @general_hooks = {}
       @environ = {}
       @signal_handler = SignalHandler.new
       @attached_capabilities = nil
@@ -116,6 +118,10 @@ module Haconiwa
       from = options[:host_root] || '/etc'
       self.network_mountpoint << MountPoint.new("#{from}/resolv.conf", to: "#{root}/etc/resolv.conf")
       self.network_mountpoint << MountPoint.new("#{from}/hosts",       to: "#{root}/etc/hosts")
+    end
+
+    def add_general_hook(hookpoint, &b)
+      @general_hooks[hookpoint.to_sym] = b
     end
 
     def add_signal_handler(sig, &b)
