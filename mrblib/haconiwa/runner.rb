@@ -107,6 +107,9 @@ module Haconiwa
 
         invoke_general_hook(:before_start_wait, base)
         pid, status = base.waitloop.run_and_wait(pid)
+        base.exit_status = status
+        invoke_general_hook(:teardown, base)
+
         cleanup_supervisor(base, @etcd)
         if status.success?
           Logger.puts "Container successfully exited: #{status.inspect}"
