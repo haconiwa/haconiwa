@@ -262,6 +262,7 @@ module Haconiwa
         :@filesystem,
         :@resource,
         :@cgroup,
+        :@cgroupv2,
         :@namespace,
         :@capabilities,
         :@guid,
