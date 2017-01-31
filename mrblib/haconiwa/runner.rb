@@ -11,6 +11,15 @@ module Haconiwa
       end
     end
 
+    VALID_HOOKS = [
+      :before_fork,
+      :after_fork,
+      :before_chroot,
+      :after_chroot,
+      :before_start_wait,
+      :teardown,
+    ]
+
     def run(init_command)
       if File.exist? @base.container_pid_file
         Logger.exception "PID file #{@base.container_pid_file} exists. You may be creating the container with existing name #{@base.name}!"
