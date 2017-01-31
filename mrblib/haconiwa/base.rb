@@ -392,6 +392,10 @@ module Haconiwa
       @namespaces[flag] = options
     end
 
+    def flag?(flag)
+      @namespaces.has_key? to_bit(flag)
+    end
+
     def active_namespaces
       @namespaces.keys
     end
