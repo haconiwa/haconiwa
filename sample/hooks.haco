@@ -26,11 +26,18 @@ Haconiwa.define do |config|
   end
 
   config.add_general_hook :teardown do |base|
-    slack("Container is Exited. #{base.name} => #{base.exit_status.inspect}")
+    hostname = `hostname`.chomp
+    slack("Container is Exited. #{base.name} => #{base.exit_status.inspect}, current hostname: #{hostname}")
   end
 
   config.add_general_hook :after_fork do |base|
-    slack("Container is forked!! #{base.name}")
+    hostname = `hostname`.chomp
+    slack("Container is forked!! #{base.name}, current hostname: #{hostname}")
+  end
+
+  config.add_general_hook :after_chroot do |base|
+    hostname = `hostname`.chomp
+    slack("Container is going to be done!! #{base.name}, current hostname: #{hostname}")
   end
 
   root = Pathname.new("/var/lib/haconiwa/8cfccb3d")

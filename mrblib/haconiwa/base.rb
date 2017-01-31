@@ -122,6 +122,7 @@ module Haconiwa
     end
 
     def add_general_hook(hookpoint, &b)
+      raise("Invalid hook point: #{hookpoint.inspect}") unless LinuxRunner::VALID_HOOKS.include?(hookpoint.to_sym)
       @general_hooks[hookpoint.to_sym] = b
     end
 
