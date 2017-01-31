@@ -1,3 +1,9 @@
+haconiwa (0.6.2-1) unstable; urgency=medium
+
+  * Support general hooks, enhanced exception handling/logging
+
+ -- Uchio Kondo <udzura@udzura.jp>  Tue, 31 Jan 2017 16:32:23 +0900
+
 haconiwa (0.6.1-1) unstable; urgency=medium
 
   * Support cgroup-v2 DSL
@@ -27,9 +33,3 @@ haconiwa (0.5.0-1) unstable; urgency=medium
   * Add after_spawn hook, intoduce default caps, persistant namespace
 
  -- Uchio Kondo <udzura@udzura.jp>  Wed, 30 Nov 2016 13:01:45 +0900
-
-haconiwa (0.4.6-1) unstable; urgency=medium
-
-  * Small fixes in uid mapped attach, support archive subcommand
-
- -- Uchio Kondo <udzura@udzura.jp>  Wed, 16 Nov 2016 16:29:46 +0900

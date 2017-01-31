@@ -1,6 +1,6 @@
 Name: haconiwa
 Epoch: 1
-Version: 0.6.1
+Version: 0.6.2
 Release: 1
 Summary: MRuby on Container
 License: GPLv3+
@@ -49,6 +49,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Tue Jan 31 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.6.2-1
+- Support general hooks, enhanced exception handling/logging
+
 * Thu Jan 26 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.6.1-1
 - Support cgroup-v2 DSL
 
@@ -63,6 +66,3 @@ fi
 
 * Wed Nov 30 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.5.0-1
 - Add after_spawn hook, intoduce default caps, persistant namespace
-
-* Wed Nov 16 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.4.6-1
-- Small fixes in uid mapped attach, support archive subcommand
