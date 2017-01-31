@@ -22,6 +22,13 @@ module Haconiwa
       wrap_daemonize do |base, notifier|
         invoke_general_hook(:before_fork, base)
 
+        init_pidns_fd = nil
+        begin
+          init_pidns_fd = File.open("/proc/1/ns/pid", 'r')
+        rescue => e
+          Logger.warning "Failed to open original PID namespace file. This restricts some features of Haconiwa"
+        end if base.namespace.flag?(::Namespace::CLONE_NEWPID)
+
         jail_pid(base)
         # The pipe to set guid maps
         if base.namespace.use_guid_mapping?
@@ -75,6 +82,7 @@ module Haconiwa
             exit(127)
           end
         end
+        ::Namespace.setns(::Namespace::CLONE_NEWPID, fd: init_pidns_fd.fileno) if init_pidns_fd
         base.pid = pid
         kick_ok.close
 
