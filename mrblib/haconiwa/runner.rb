@@ -11,6 +11,15 @@ module Haconiwa
       end
     end
 
+    VALID_HOOKS = [
+      :before_fork,
+      :after_fork,
+      :before_chroot,
+      :after_chroot,
+      :before_start_wait,
+      :teardown,
+    ]
+
     def run(init_command)
       if File.exist? @base.container_pid_file
         Logger.exception "PID file #{@base.container_pid_file} exists. You may be creating the container with existing name #{@base.name}!"
@@ -20,6 +29,15 @@ module Haconiwa
       end
 
       wrap_daemonize do |base, notifier|
+        invoke_general_hook(:before_fork, base)
+
+        init_pidns_fd = nil
+        begin
+          init_pidns_fd = File.open("/proc/1/ns/pid", 'r')
+        rescue => e
+          Logger.warning "Failed to open original PID namespace file. This restricts some features of Haconiwa"
+        end if base.namespace.flag?(::Namespace::CLONE_NEWPID)
+
         jail_pid(base)
         # The pipe to set guid maps
         if base.namespace.use_guid_mapping?
@@ -27,8 +45,9 @@ module Haconiwa
           r2, w2 = IO.pipe
         end
         done, kick_ok = IO.pipe
-
         pid = Process.fork do
+          invoke_general_hook(:after_fork, base)
+
           begin
             ::Procutil.mark_cloexec
             [r, w2].each {|io| io.close if io }
@@ -53,7 +72,11 @@ module Haconiwa
               switch_current_namespace_root
             end
 
+            invoke_general_hook(:before_chroot, base)
+
             do_chroot(base)
+            invoke_general_hook(:after_chroot, base)
+
             reopen_fds(base.command) if base.daemon?
 
             apply_capability(base.capabilities)
@@ -68,6 +91,7 @@ module Haconiwa
             exit(127)
           end
         end
+        ::Namespace.setns(::Namespace::CLONE_NEWPID, fd: init_pidns_fd.fileno) if init_pidns_fd
         base.pid = pid
         kick_ok.close
 
@@ -98,7 +122,11 @@ module Haconiwa
         base.waitloop.register_sighandlers(base, self, @etcd)
         base.waitloop.register_custom_sighandlers(base, base.signal_handler)
 
+        invoke_general_hook(:before_start_wait, base)
         pid, status = base.waitloop.run_and_wait(pid)
+        base.exit_status = status
+        invoke_general_hook(:teardown, base)
+
         cleanup_supervisor(base, @etcd)
         if status.success?
           Logger.puts "Container successfully exited: #{status.inspect}"
@@ -241,6 +269,14 @@ module Haconiwa
       if ret < 0
         Logger.exception "Unsharing or setting PID namespace failed"
       end
+    end
+
+    def invoke_general_hook(hookpoint, base)
+      hook = base.general_hooks[hookpoint]
+      hook.call(base) if hook
+    rescue => e
+      Logger.warning("General container hook at #{hookpoint.inspect} failed. Skip")
+      Logger.warning("#{e.class} - #{e.message}")
     end
 
     def apply_namespace(namespace)

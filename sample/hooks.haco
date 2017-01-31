@@ -1,0 +1,63 @@
+# -*- mode: ruby -*-
+IKACHAN_HOST = ENV['IKACHAN_HOST'] || "ikachan.local:4979"
+def slack(msg)
+  http = HttpRequest.new
+  http.post(
+    "http://#{IKACHAN_HOST}/notice",
+    {message: msg, channel: '#test'},
+    {"Content-Type" => 'application/x-www-form-urlencoded', 'User-Agent' => "Haconiwa v#{Haconiwa::VERSION}"}
+  )
+end
+
+Haconiwa.define do |config|
+  # The container name and container's hostname:
+  config.name = "hooks-test"
+  # The first process when invoking haconiwa run:
+  config.init_command = ["/bin/sleep", (ENV['SLEEP'] || (30 + (UUID.secure_uuid("%d").to_i / 256).floor).to_s)]
+  # If your first process is a daemon, please explicitly daemonize by:
+  config.daemonize!
+
+  config.add_general_hook :before_fork do |base|
+    slack("Container is being created... #{base.name}")
+  end
+
+  config.add_general_hook :before_start_wait do |base|
+    slack("Container is UP!! Everything is OK!!1 #{base.name}")
+  end
+
+  config.add_general_hook :teardown do |base|
+    hostname = `hostname`.chomp
+    slack("Container is Exited. #{base.name} => #{base.exit_status.inspect}, current hostname: #{hostname}")
+  end
+
+  config.add_general_hook :after_fork do |base|
+    hostname = `hostname`.chomp
+    slack("Container is forked!! #{base.name}, current hostname: #{hostname}")
+  end
+
+  config.add_general_hook :after_chroot do |base|
+    hostname = `hostname`.chomp
+    slack("Container is going to be done!! #{base.name}, current hostname: #{hostname}")
+  end
+
+  root = Pathname.new("/var/lib/haconiwa/8cfccb3d")
+  config.chroot_to root
+
+  config.bootstrap do |b|
+    b.strategy = "git"
+    b.git_url = "https://github.com/haconiwa/haconiwa-image-php-tester"
+  end
+
+  config.add_mount_point "tmpfs", to: root.join("tmp"), fs: "tmpfs"
+
+  config.mount_independent "procfs"
+  config.mount_independent "sysfs"
+  config.mount_independent "devtmpfs"
+  config.mount_independent "devpts"
+  config.mount_independent "shm"
+
+  config.namespace.unshare "mount"
+  config.namespace.unshare "ipc"
+  config.namespace.unshare "uts"
+  config.namespace.unshare "pid"
+end
