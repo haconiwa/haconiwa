@@ -165,6 +165,14 @@ e.g. just using `mount` namespace unshared, container with common filesystem, li
 
 #### Hooks
 
+* `config.add_general_hook` - Define hook codes that are invoked through the Haconiwa's spawning process. Hook points are below:
+  * `:before_fork` - Hooked just before the container process is forked
+  * `:after_fork` - Hooked just after the container process is forked, in forked process
+  * `:before_chroot` - Hooked just after container settins are applied (e.g. namespace, cgroup, caps, fs mounting) and just before do chroot in forked process
+  * `:after_chroot` - Hooked just after the chroot is successful, in forked process. This is the last timing before doing `exec()` and becoming a new program
+  * `:before_start_wait` - Hooked before starting to `wait()` the container process. Hook itself is invoked in the parent process
+  * `:teardown` - Hooked after the container process has quitted, in the parent process
+  * Every hook can accept one argument `base`, which is Haconiwa::Base object.
 * `config.after_spawn(option, &block)` - Define timer handler. Pass option like `msec: 10 * 60 * 1000`, then after 10 min passed, the defined hook will be invoked
 * `config.add_signal_handler(signame, &block)` - Define signal handler at supervisor process(not container itself). Available signals are `SIGTTIN/SIGTTOU/SIGUSR1/SIGUSR2`. See [handler example](./sample/cpu.haco).
 
