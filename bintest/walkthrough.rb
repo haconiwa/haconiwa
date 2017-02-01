@@ -25,6 +25,7 @@ def run_haconiwa(subcommand, *args)
   if s.coredump?
     raise "[BUG] haconiwa got SEGV. Abort testing"
   end
+  puts(o) if ENV['DEBUGGING']
   return [o, s]
 end
 
