@@ -14,6 +14,7 @@ module Haconiwa
         e = args.first
         Syslog.err("An exception is occurred when spawning haconiwa:")
         Syslog.err("#{e.inspect}")
+        e.backtrace[1..-1].each{|l| Syslog.err "=> #{l}" } if e.backtrace
         Syslog.err("...Shutting down haconiwa")
         raise(e)
       else
