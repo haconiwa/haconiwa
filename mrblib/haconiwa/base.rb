@@ -189,9 +189,9 @@ module Haconiwa
       LinuxRunner.new(self).attach(run_command)
     end
 
-    def kill(signame)
+    def kill(signame, timeout)
       self.container_pid_file ||= default_container_pid_file
-      LinuxRunner.new(self).kill(signame)
+      LinuxRunner.new(self).kill(signame, timeout)
     end
 
     def default_container_pid_file
