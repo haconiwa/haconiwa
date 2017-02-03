@@ -13,6 +13,7 @@ module Haconiwa
                   :namespace,
                   :capabilities,
                   :guid,
+                  :general_hooks,
                   :environ,
                   :attached_capabilities,
                   :signal_handler,
@@ -21,7 +22,8 @@ module Haconiwa
                   :created_at,
                   :etcd_name,
                   :network_mountpoint,
-                  :cleaned
+                  :cleaned,
+                  :exit_status
 
     delegate     [:uid,
                   :uid=,
@@ -56,6 +58,7 @@ module Haconiwa
       @namespace = Namespace.new
       @capabilities = Capabilities.new
       @guid = Guid.new
+      @general_hooks = {}
       @environ = {}
       @signal_handler = SignalHandler.new
       @attached_capabilities = nil
@@ -134,6 +137,11 @@ module Haconiwa
       from = options[:host_root] || '/etc'
       self.network_mountpoint << MountPoint.new("#{from}/resolv.conf", to: "#{root}/etc/resolv.conf")
       self.network_mountpoint << MountPoint.new("#{from}/hosts",       to: "#{root}/etc/hosts")
+    end
+
+    def add_general_hook(hookpoint, &b)
+      raise("Invalid hook point: #{hookpoint.inspect}") unless LinuxRunner::VALID_HOOKS.include?(hookpoint.to_sym)
+      @general_hooks[hookpoint.to_sym] = b
     end
 
     def add_signal_handler(sig, &b)
@@ -270,6 +278,7 @@ module Haconiwa
         :@namespace,
         :@capabilities,
         :@guid,
+        :@general_hooks,
         :@environ,
         :@signal_handler,
         :@attached_capabilities,
@@ -522,6 +531,10 @@ module Haconiwa
         @use_pid_ns = true
       end
       @namespaces[flag] = options
+    end
+
+    def flag?(flag)
+      @namespaces.has_key? to_bit(flag)
     end
 
     def active_namespaces
