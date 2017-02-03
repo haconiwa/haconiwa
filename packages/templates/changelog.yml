@@ -1,5 +1,10 @@
-latest: 0.7.0
+latest: 0.7.20170203
 changelog:
+  - version: 0.7.20170203
+    messages:
+      - Snapshot with forwardports from 0.6
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Fri,  3 Feb 2017 16:18:08 +0900
   - version: 0.7.0
     messages:
       - First implementation of multicontainer DSL

@@ -1,3 +1,9 @@
+haconiwa (0.7.20170203-1) unstable; urgency=medium
+
+  * Snapshot with forwardports from 0.6
+
+ -- Uchio Kondo <udzura@udzura.jp>  Fri,  3 Feb 2017 16:18:08 +0900
+
 haconiwa (0.7.0-1) unstable; urgency=medium
 
   * First implementation of multicontainer DSL
@@ -27,9 +33,3 @@ haconiwa (0.5.0-1) unstable; urgency=medium
   * Add after_spawn hook, intoduce default caps, persistant namespace
 
  -- Uchio Kondo <udzura@udzura.jp>  Wed, 30 Nov 2016 13:01:45 +0900
-
-haconiwa (0.4.6-1) unstable; urgency=medium
-
-  * Small fixes in uid mapped attach, support archive subcommand
-
- -- Uchio Kondo <udzura@udzura.jp>  Wed, 16 Nov 2016 16:29:46 +0900

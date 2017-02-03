@@ -1,6 +1,6 @@
 Name: haconiwa
 Epoch: 1
-Version: 0.7.0
+Version: 0.7.20170203
 Release: 1
 Summary: MRuby on Container
 License: GPLv3+
@@ -49,6 +49,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Fri Feb  3 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.7.20170203-1
+- Snapshot with forwardports from 0.6
+
 * Mon Jan 16 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.7.0-1
 - First implementation of multicontainer DSL
 
@@ -63,6 +66,3 @@ fi
 
 * Wed Nov 30 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.5.0-1
 - Add after_spawn hook, intoduce default caps, persistant namespace
-
-* Wed Nov 16 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.4.6-1
-- Small fixes in uid mapped attach, support archive subcommand
