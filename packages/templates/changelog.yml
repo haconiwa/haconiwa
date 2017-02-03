@@ -1,5 +1,10 @@
-latest: 0.6.2
+latest: 0.6.3
 changelog:
+  - version: 0.6.3
+    messages:
+      - Bump mruby and mgem versions, more verbose exception logs
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Fri,  3 Feb 2017 15:08:11 +0900
   - version: 0.6.2
     messages:
       - Support general hooks, enhanced exception handling/logging
