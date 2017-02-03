@@ -25,6 +25,7 @@ def run_haconiwa(subcommand, *args)
   if s.coredump?
     raise "[BUG] haconiwa got SEGV. Abort testing"
   end
+  puts(o) if ENV['DEBUGGING']
   return [o, s]
 end
 
@@ -47,6 +48,7 @@ assert('walkthrough') do
     dummy_daemon = %q(["/bin/sh", "-c", "trap exit 15; while true; do : ; done"])
     system %Q(sed -i 's!config.init_command.*!config.init_command = #{dummy_daemon}!' #{haconame})
     system %Q(sed -i 's/# config.daemonize\!/config.daemonize\!/' #{haconame})
+    system %Q(sed -i 's!apk add.*!apk update\\napk upgrade\\napk add ruby!' #{haconame})
     # FIXME: /dev/shm does not exist after lxc-create'd on trusty?
     system %Q(sed -i '/config.mount_independent "shm"/d' #{haconame})
 
