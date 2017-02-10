@@ -1,5 +1,10 @@
-latest: 0.7.20170203
+latest: 0.7.20170210
 changelog:
+  - version: 0.7.20170210
+    messages:
+      - Snapshot with fix cgroup creation
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Fri, 10 Feb 2017 16:41:43 +0900
   - version: 0.7.20170203
     messages:
       - Snapshot with forwardports from 0.6
