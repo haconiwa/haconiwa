@@ -23,8 +23,8 @@ module Haconiwa
     def run(init_command)
       begin
         confirm_existence_pid_file(@base.container_pid_file)
-      rescue
-        Logger.exception $!
+      rescue => e
+        Logger.exception e
       end
 
       unless init_command.empty?
