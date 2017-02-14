@@ -488,9 +488,15 @@ module Haconiwa
       end
     end
 
+    def process_exists?(pid)
+      ::Process.kill(0, pid)
+      rescue
+        false
+    end
+
     def confirm_existence_pid_file(pid_file)
       if File.exist? pid_file
-        if ::Process.kill(0, File.read(pid_file).to_i)
+        if process_exists?(File.read(pid_file).to_i)
           raise "PID file #{pid_file} exists. You may be creating the container with existing name #{@base.name}!"
         else
           begin

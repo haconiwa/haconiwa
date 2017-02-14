@@ -12,7 +12,7 @@ assert("Haconiwa::LinuxRunner#confirm_existence_pid_file") do
 
   # Because it is a pid that does not exist
   File.open(t.path, "w+") {|f| f.print "-1000" }
-  assert_not_raised(runner.send('confirm_existence_pid_file', t.path))
+  assert_nothing_raised(runner.send('confirm_existence_pid_file', t.path))
 
   assert_false(File.exist?(t.path))
 end
