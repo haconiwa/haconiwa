@@ -472,7 +472,7 @@ module Haconiwa
 
     def confirm_existence_pid_file(pid_file)
       if File.exist? pid_file
-        if Process.kill 0, File.read(pid_file).to_i
+        if ::Process.kill 0, File.read(pid_file).to_i
           raise "PID file #{pid_file} exists. You may be creating the container with existing name #{@base.name}!"
         else
           begin
