@@ -384,7 +384,7 @@ module Haconiwa
           value = base.cgroup[key]
           c.send "#{attr}=", value
         end
-        c.create unless c.exist?
+        c.create
         c.attach
       end
 
