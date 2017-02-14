@@ -479,7 +479,7 @@ module Haconiwa
             File.unlink(pid_file)
             Haconiwa::Logger.debug("Since the process does not exist, delete the PID file #{pid_file}")
           rescue
-            raise "Filed to delete PID file #{pid_file}."
+            raise "Failed to delete PID file #{pid_file}."
           end
         end
       end
