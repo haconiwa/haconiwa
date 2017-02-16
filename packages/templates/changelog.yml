@@ -1,5 +1,10 @@
-latest: 0.6.3
+latest: 0.6.4
 changelog:
+  - version: 0.6.4
+    messages:
+      - Spawn new haconiwa even if pid file exists, when no process is alive
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Thu, 16 Feb 2017 16:17:35 +0900
   - version: 0.6.3
     messages:
       - Bump mruby and mgem versions, more verbose exception logs
