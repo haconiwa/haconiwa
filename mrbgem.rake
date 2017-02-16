@@ -27,7 +27,7 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.add_dependency 'mruby-io'        , :mgem => 'mruby-io'
   spec.add_dependency 'mruby-linux-namespace', :mgem => 'mruby-linux-namespace'
   # spec.add_dependency 'mruby-process'   , :mgem => 'mruby-process'
-  spec.add_dependency 'mruby-process'   , :github => 'udzura/mruby-process', :branch => 'add-some-consts'
+  spec.add_dependency 'mruby-process'   , :github => 'iij/mruby-process'
   #spec.add_dependency 'mruby-regexp-pcre', :mgem => 'mruby-regexp-pcre'
   spec.add_dependency 'mruby-socket'    , :mgem => 'mruby-socket'
 
