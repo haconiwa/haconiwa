@@ -1,6 +1,6 @@
 Name: haconiwa
 Epoch: 1
-Version: 0.7.20170210
+Version: 0.7.20170216
 Release: 1
 Summary: MRuby on Container
 License: GPLv3+
@@ -49,6 +49,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Thu Feb 16 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.7.20170216-1
+- Snapshot with pid check
+
 * Fri Feb 10 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.7.20170210-1
 - Snapshot with fix cgroup creation
 
@@ -63,6 +66,3 @@ fi
 
 * Wed Dec 21 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.5.2-1
 - Add command.set_stdin/stdout/stderr, and workdir
-
-* Fri Dec  9 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.5.1-1
-- Fix that cannot define signal handlers for supervisor
