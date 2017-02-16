@@ -1,6 +1,5 @@
 assert("Haconiwa::LinuxRunner#confirm_existence_pid_file") do
-  barn = Haconiwa::Barn.new
-  base = Haconiwa::Base.new(barn)
+  base = Haconiwa::Base.new
   runner = Haconiwa::LinuxRunner.new(base)
 
   # Probably init is always running
