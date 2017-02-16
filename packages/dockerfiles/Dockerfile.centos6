@@ -17,7 +17,7 @@ RUN yum -y install ruby200 ruby200-rubygem-rake
 RUN mkdir -p /root/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 RUN sed -i "s;%_build_name_fmt.*;%_build_name_fmt\t%%{ARCH}/%%{NAME}-%%{VERSION}-%%{RELEASE}.el6.%%{ARCH}.rpm;" /usr/lib/rpm/macros
 
-ENV VERSION 0.7.20170210
+ENV VERSION 0.7.20170216
 ENV USER root
 ENV HOME /root
 VOLUME /out

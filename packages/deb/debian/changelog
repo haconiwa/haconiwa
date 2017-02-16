@@ -1,3 +1,9 @@
+haconiwa (0.7.20170216-1) unstable; urgency=medium
+
+  * Snapshot with pid check
+
+ -- Uchio Kondo <udzura@udzura.jp>  Thu, 16 Feb 2017 17:10:47 +0900
+
 haconiwa (0.7.20170210-1) unstable; urgency=medium
 
   * Snapshot with fix cgroup creation
@@ -27,9 +33,3 @@ haconiwa (0.5.2-1) unstable; urgency=medium
   * Add command.set_stdin/stdout/stderr, and workdir
 
  -- Uchio Kondo <udzura@udzura.jp>  Wed, 21 Dec 2016 13:47:13 +0900
-
-haconiwa (0.5.1-1) unstable; urgency=medium
-
-  * Fix that cannot define signal handlers for supervisor
-
- -- Uchio Kondo <udzura@udzura.jp>  Fri,  9 Dec 2016 19:14:39 +0900

@@ -1,5 +1,10 @@
-latest: 0.7.20170210
+latest: 0.7.20170216
 changelog:
+  - version: 0.7.20170216
+    messages:
+      - Snapshot with pid check
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Thu, 16 Feb 2017 17:10:47 +0900
   - version: 0.7.20170210
     messages:
       - Snapshot with fix cgroup creation
