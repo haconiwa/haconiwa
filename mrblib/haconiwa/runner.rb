@@ -39,9 +39,12 @@ module Haconiwa
     end
 
     def run(options, init_command)
-      if File.exist? @base.container_pid_file
-        Logger.exception "PID file #{@base.container_pid_file} exists. You may be creating the container with existing name #{@base.name}!"
+      begin
+        confirm_existence_pid_file(@base.container_pid_file)
+      rescue => e
+        Logger.exception e
       end
+
       unless init_command.empty?
         @base.init_command = init_command
       end
@@ -481,6 +484,27 @@ module Haconiwa
         if path = options[:persist_in]
           ::Namespace.persist_ns pid, flag, path
           Logger.info "Namespace is persisted: #{path}"
+        end
+      end
+    end
+
+    def process_exists?(pid)
+      ::Process.kill(0, pid)
+      rescue
+        false
+    end
+
+    def confirm_existence_pid_file(pid_file)
+      if File.exist? pid_file
+        if process_exists?(File.read(pid_file).to_i)
+          raise "PID file #{pid_file} exists. You may be creating the container with existing name #{@base.name}!"
+        else
+          begin
+            File.unlink(pid_file)
+            Haconiwa::Logger.debug("Since the process does not exist, delete the PID file #{pid_file}")
+          rescue
+            raise "Failed to delete PID file #{pid_file}."
+          end
         end
       end
     end
