@@ -38,7 +38,7 @@ script:
   - rake consistent
   - rake compile
   - sudo /usr/bin/rake test:bintest
-  - /usr/bin/rake test:mtest || find . -name '*core*'
+  - sudo script/coredump /usr/bin/rake test:mtest || find . -name '*core*'
 
 notifications:
   slack:
