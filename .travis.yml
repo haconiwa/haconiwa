@@ -9,6 +9,7 @@ before_install:
 addons:
   apt:
     packages:
+      - gdb
       - rake
       - psmisc
       - bison
