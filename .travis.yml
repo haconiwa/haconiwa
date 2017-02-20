@@ -38,7 +38,7 @@ script:
   - rake consistent
   - rake compile
   - sudo /usr/bin/rake test:bintest
-  - sudo /usr/bin/rake test:mtest
+  - sudo /usr/bin/rake test:mtest || ls -l mruby
 
 notifications:
   slack:
