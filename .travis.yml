@@ -39,7 +39,7 @@ script:
   - rake consistent
   - rake compile
   - sudo /usr/bin/rake test:bintest
-  - sudo gdb -batch -ex "run" -ex "bt" --args /usr/bin/rake test:mtest
+  - sudo gdb -batch -ex "file ruby" -ex "run /usr/bin/rake test:mtest" -ex "bt"
 
 notifications:
   slack:
