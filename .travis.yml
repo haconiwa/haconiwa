@@ -39,8 +39,7 @@ script:
   - rake consistent
   - rake compile
   - sudo /usr/bin/rake test:bintest
-  - sudo /usr/bin/rake test:mtest || true
-  - sudo gdb -batch -ex "run" -ex "bt" mruby/build/host/bin/mrbtest
+  - sudo gdb -batch -ex "run" -ex "bt" --args /usr/bin/rake test:mtest
 
 notifications:
   slack:
