@@ -38,7 +38,8 @@ script:
   - rake consistent
   - rake compile
   - sudo /usr/bin/rake test:bintest
-  - sudo script/coredump /usr/bin/rake test:mtest || find . -name '*core*'
+  - sudo /usr/bin/rake test:mtest || true
+  - sudo gdb -batch -ex "run" -ex "bt" mruby/build/host/bin/mrbtest
 
 notifications:
   slack:
