@@ -31,6 +31,7 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   #spec.add_dependency 'mruby-regexp-pcre', :mgem => 'mruby-regexp-pcre'
   spec.add_dependency 'mruby-socket'    , :mgem => 'mruby-socket'
 
+  spec.add_dependency 'mruby-onig-regexp', :github => 'udzura/mruby-onig-regexp'
   spec.add_dependency 'mruby-argtable'  , :github => 'udzura/mruby-argtable', :branch => 'static-link-argtable3'
   spec.add_dependency 'mruby-exec'      , :github => 'haconiwa/mruby-exec'
   spec.add_dependency 'mruby-mount'     , :github => 'haconiwa/mruby-mount'
