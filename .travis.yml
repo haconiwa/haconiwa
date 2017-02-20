@@ -38,7 +38,7 @@ script:
   - rake consistent
   - rake compile
   - sudo /usr/bin/rake test:bintest
-  - sudo /usr/bin/rake test:mtest || ls -l mruby
+  - /usr/bin/rake test:mtest || find . -name '*core*'
 
 notifications:
   slack:
