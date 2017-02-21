@@ -1,0 +1,22 @@
+machine:
+  pre:
+    - curl -L  https://github.com/coreos/etcd/releases/download/v2.3.7/etcd-v2.3.7-linux-amd64.tar.gz -o etcd-v2.3.7-linux-amd64.tar.gz
+    - tar xzvf etcd-v2.3.7-linux-amd64.tar.gz
+    - cd etcd-v2.3.7-linux-amd64 && sudo nohup ./etcd &
+  environment:
+    MRUBY_VERSION: ""
+dependencies:
+  pre:
+    - sudo apt-get update; sudo apt-get install rake psmisc bison git gperf cgroup-lite libpam0g-dev autotools-dev libcap-dev libargtable2-dev
+    - rake consistent
+    - rake compile
+  cache_directories:
+    - "mruby"   # relative to the build directory
+test:
+  override:
+    - sudo /usr/bin/rake test:bintest
+## Custom notifications
+#notify:
+#  webhooks:
+#    # A list of hashes representing hooks. Only the url field is supported.
+#    - url: https://someurl.com/hooks/circle
