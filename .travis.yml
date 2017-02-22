@@ -8,7 +8,12 @@ before_install:
   - cd etcd-v2.3.7-linux-amd64 && sudo nohup ./etcd &
 addons:
   apt:
+    sources:
+      - ubuntu-toolchain-r-test
     packages:
+      - gcc-5
+      - g++-5
+      - clang
       - rake
       - psmisc
       - bison
@@ -24,7 +29,6 @@ compiler:
   - clang
 env:
   - MRUBY_VERSION=""
-  # - MRUBY_VERSION=master
 branches:
   only:
     - master
@@ -35,11 +39,13 @@ cache:
     - mruby
 
 script:
+  - sudo unlink /usr/bin/gcc && sudo ln -s /usr/bin/gcc-5 /usr/bin/gcc
+  - gcc --help
   - rake consistent
   - rake compile
   - sudo /usr/bin/rake test:bintest
   # FIXME: mruby-uv test is broken only on Travis CI
-  # - sudo /usr/bin/rake test:mtest
+  - sudo /usr/bin/rake test:mtest
 
 notifications:
   slack:
