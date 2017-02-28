@@ -34,12 +34,16 @@ cache:
   directories:
     - mruby
 
+before_script:
+  # mruby-uv test failed when disabled ipv6 loopback 
+  - sudo sysctl net.ipv6.conf.all.disable_ipv6=0
+  # clang path was not found when using sudo
+  - sudo sed -e "s?/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin?${PATH}:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin?g" --in-place /etc/sudoers
 script:
   - rake consistent
   - rake compile
   - sudo /usr/bin/rake test:bintest
-  # FIXME: mruby-uv test is broken only on Travis CI
-  # - sudo /usr/bin/rake test:mtest
+  - sudo /usr/bin/rake test:mtest
 
 notifications:
   slack:
