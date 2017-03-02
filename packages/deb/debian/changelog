@@ -1,3 +1,9 @@
+haconiwa (0.6.5-1) unstable; urgency=medium
+
+  * Suppress cgroup-related warnings
+
+ -- Uchio Kondo <udzura@udzura.jp>  Thu,  2 Mar 2017 16:44:10 +0900
+
 haconiwa (0.6.4-1) unstable; urgency=medium
 
   * Spawn new haconiwa even if pid file exists, when no process is alive
@@ -27,9 +33,3 @@ haconiwa (0.6.0-1) unstable; urgency=medium
   * First 0.6 stable, fix to set cgroup two dot parameters
 
  -- Uchio Kondo <udzura@udzura.jp>  Mon, 16 Jan 2017 15:36:57 +0900
-
-haconiwa (0.5.2-1) unstable; urgency=medium
-
-  * Add command.set_stdin/stdout/stderr, and workdir
-
- -- Uchio Kondo <udzura@udzura.jp>  Wed, 21 Dec 2016 13:47:13 +0900

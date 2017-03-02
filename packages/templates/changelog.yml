@@ -1,5 +1,10 @@
-latest: 0.6.4
+latest: 0.6.5
 changelog:
+  - version: 0.6.5
+    messages:
+      - Suppress cgroup-related warnings
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Thu,  2 Mar 2017 16:44:10 +0900
   - version: 0.6.4
     messages:
       - Spawn new haconiwa even if pid file exists, when no process is alive
