@@ -1,6 +1,6 @@
 Name: haconiwa
 Epoch: 1
-Version: 0.7.20170216
+Version: 0.7.20170302
 Release: 1
 Summary: MRuby on Container
 License: GPLv3+
@@ -49,6 +49,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Thu Mar  2 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.7.20170302-1
+- Snapshot with cgroup warning fix
+
 * Thu Feb 16 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.7.20170216-1
 - Snapshot with pid check
 
@@ -63,6 +66,3 @@ fi
 
 * Mon Jan 16 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.6.0-1
 - First 0.6 stable, fix to set cgroup two dot parameters
-
-* Wed Dec 21 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.5.2-1
-- Add command.set_stdin/stdout/stderr, and workdir
