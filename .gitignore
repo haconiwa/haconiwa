@@ -8,3 +8,5 @@ tmp/
 /.bundle
 
 /*.haco
+
+/.ruby-version

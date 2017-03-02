@@ -20,7 +20,7 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.add_dependency 'mruby-forwardable', :mgem => 'mruby-forwardable'
   spec.add_dependency 'mruby-shellwords', :mgem => 'mruby-shellwords'
   spec.add_dependency 'mruby-capability', :mgem => 'mruby-capability'
-  spec.add_dependency 'mruby-cgroup'    , :mgem => 'mruby-cgroup'
+  spec.add_dependency 'mruby-cgroup'    , :github => 'matsumotory/mruby-cgroup', :checksum_hash => '03a63db6014f4319d62d004061cd89eb39230658'
   spec.add_dependency 'mruby-dir'       , :mgem => 'mruby-dir' # with Dir#chroot
   spec.add_dependency 'mruby-env'       , :mgem => 'mruby-env'
   spec.add_dependency 'mruby-etcd'      , :mgem => 'mruby-etcd'
@@ -40,7 +40,9 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
 
   spec.add_dependency 'mruby-syslog'    , :github => 'iij/mruby-syslog'
   spec.add_dependency 'mruby-uv'        , :github => 'mattn/mruby-uv'
+
   spec.add_test_dependency('mruby-tempfile', :github => 'iij/mruby-tempfile')
+
   def spec.save_dependent_mgem_revisions
     file DEFS_FILE do
       f = open(DEFS_FILE, 'w')
