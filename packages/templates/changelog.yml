@@ -1,5 +1,10 @@
-latest: 0.7.20170216
+latest: 0.7.20170302
 changelog:
+  - version: 0.7.20170302
+    messages:
+      - Snapshot with cgroup warning fix
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Thu,  2 Mar 2017 17:28:47 +0900
   - version: 0.7.20170216
     messages:
       - Snapshot with pid check
