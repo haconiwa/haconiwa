@@ -441,8 +441,12 @@ module Haconiwa
     end
 
     def do_chroot(base)
-      Dir.chdir File.expand_path([base.filesystem.chroot, base.workdir].join('/'))
-      Dir.chroot base.filesystem.chroot
+      if base.filesystem.chroot
+        Dir.chdir File.expand_path([base.filesystem.chroot, base.workdir].join('/'))
+        Dir.chroot base.filesystem.chroot
+      else
+        Dir.chdir base.workdir
+      end
     end
 
     def switch_current_namespace_root
