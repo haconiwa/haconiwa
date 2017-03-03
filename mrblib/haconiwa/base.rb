@@ -657,7 +657,7 @@ module Haconiwa
 
   class Rootfs
     def initialize(rootpath, options={})
-      @root = rootpath.to_str
+      @root = rootpath.to_str if rootpath
       @owner_uid = options[:owner_uid] || 0
       @owner_gid = options[:owner_gid] || 0
     end
@@ -679,6 +679,7 @@ module Haconiwa
     def initialize
       @mount_points = []
       @independent_mount_points = []
+      @rootfs = Rootfs.new(nil)
     end
     attr_accessor :mount_points,
                   :independent_mount_points,
