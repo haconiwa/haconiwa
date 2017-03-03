@@ -62,7 +62,7 @@ module Haconiwa
             apply_rlimit(base.resource)
             apply_cgroup(base)
             apply_remount(base)
-            ::Procutil.sethostname(base.name)
+            ::Procutil.sethostname(base.name) if base.namespace.flag?(::Namespace::CLONE_NEWUTS)
 
             apply_user_namespace(base.namespace)
             if base.namespace.use_guid_mapping?
@@ -441,8 +441,12 @@ module Haconiwa
     end
 
     def do_chroot(base)
-      Dir.chdir File.expand_path([base.filesystem.chroot, base.workdir].join('/'))
-      Dir.chroot base.filesystem.chroot
+      if base.filesystem.chroot
+        Dir.chdir File.expand_path([base.filesystem.chroot, base.workdir].join('/'))
+        Dir.chroot base.filesystem.chroot
+      else
+        Dir.chdir base.workdir
+      end
     end
 
     def switch_current_namespace_root
