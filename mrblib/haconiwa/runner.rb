@@ -8,13 +8,16 @@ module Haconiwa
     end
 
     VALID_HOOKS = [
+      :setup,
       :before_fork,
       :after_fork,
       :before_chroot,
       :after_chroot,
       :before_start_wait,
+      :teardown_container,
       :teardown,
       :after_reload,
+      :after_failure,
     ]
 
     def waitall(&how_you_run)
@@ -144,7 +147,7 @@ module Haconiwa
 
         pid, status = base.waitloop.run_and_wait(pid)
         base.exit_status = status
-        invoke_general_hook(:teardown, base)
+        invoke_general_hook(:teardown_container, base)
 
         cleanup_supervisor(base)
         if status.success?
