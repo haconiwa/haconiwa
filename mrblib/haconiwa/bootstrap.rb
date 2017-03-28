@@ -1,7 +1,7 @@
 module Haconiwa
   class Bootstrap
     attr_reader :strategy
-    attr_accessor :root,
+    attr_accessor :root, :skip,
                   :project_name, :os_type, # for LXC
                   :arch, :variant, :components, :debian_release, :mirror_url, # for Deb
                   :git_url, :git_options, # for git clone

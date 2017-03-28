@@ -20,7 +20,25 @@ module Haconiwa
       :teardown,
     ]
 
-    def run(init_command)
+    def waitall(&how_you_run)
+      wrap_daemonize do |base, n|
+        pids = how_you_run.call(n)
+
+        if n
+          n.print pids.join(',')
+          n.close
+        end
+
+        while res = ::Process.waitpid2(-1)
+          pid, status = res[0], res[1]
+          pids.delete(pid)
+          Logger.puts "A container finished: #{pid}, #{status.inspect}"
+          break if pids.empty?
+        end
+      end
+    end
+
+    def run(options, init_command)
       begin
         confirm_existence_pid_file(@base.container_pid_file)
       rescue => e
@@ -31,7 +49,7 @@ module Haconiwa
         @base.init_command = init_command
       end
 
-      wrap_daemonize do |base, notifier|
+      raise_container do |base|
         invoke_general_hook(:before_fork, base)
 
         init_pidns_fd = nil
@@ -115,9 +133,11 @@ module Haconiwa
         done.close
         persist_namespace(pid, base.namespace)
 
-        if notifier
-          notifier.puts pid.to_s
-          notifier.close # notify container is up
+        base.created_at = Time.now
+        base.pid = pid.to_i
+        base.supervisor_pid = ::Process.pid
+        if @etcd
+          @etcd.put base.etcd_key, base.to_container_json
         end
 
         Logger.puts "Container fork success and going to wait: pid=#{pid}"
@@ -227,9 +247,12 @@ module Haconiwa
 
     private
 
+    def raise_container(&b)
+      b.call(@base)
+    end
+
     def wrap_daemonize(&b)
       if @base.daemon?
-        Logger.info "Container is running in daemon mode"
         r, w = IO.pipe
         ppid = Process.fork do
           begin
@@ -242,17 +265,12 @@ module Haconiwa
           end
         end
         w.close
-        pid = r.read
+        _pids = r.read
+        Logger.puts "pids: #{_pids}"
+        pids = _pids.split(',').map{|v| v.to_i }
         r.close
 
-        @base.created_at = Time.now
-        @base.pid = pid.to_i
-        @base.supervisor_pid = ppid
-        if @etcd
-          @etcd.put @base.etcd_key, @base.to_container_json
-        end
-
-        Logger.puts "Container successfully up. PID={container: #{@base.pid}, supervisor: #{@base.supervisor_pid}}"
+        Logger.puts "Container cluster successfully up. PID={supervisors: #{pids.inspect}, root: #{ppid}}"
       else
         b.call(@base, nil)
       end

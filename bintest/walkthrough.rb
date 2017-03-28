@@ -1,5 +1,6 @@
 require 'open3'
 require 'fileutils'
+require 'timeout'
 
 if `whoami` =~ /root/
 ### start sudo test
@@ -48,13 +49,13 @@ assert('walkthrough') do
     dummy_daemon = %q(["/bin/sh", "-c", "trap exit 15; while true; do : ; done"])
     system %Q(sed -i 's!config.init_command.*!config.init_command = #{dummy_daemon}!' #{haconame})
     system %Q(sed -i 's/# config.daemonize\!/config.daemonize\!/' #{haconame})
-    system %Q(sed -i 's!apk add.*!apk update\\napk upgrade\\napk add ruby!' #{haconame})
     # FIXME: /dev/shm does not exist after lxc-create'd on trusty?
     system %Q(sed -i '/config.mount_independent "shm"/d' #{haconame})
 
     # change to git strategy
     system %Q(sed -i 's!b.strategy.*!b.strategy = "git"!' #{haconame})
     system %Q(sed -i 's!b.os_type.*!b.git_url = "https://github.com/haconiwa/haconiwa-image-alpine"!' #{haconame})
+    system %Q(sed -i 's!apk add.*!apk update\\napk upgrade\\napk add ruby!' #{haconame})
 
     output, status = run_haconiwa "create", haconame
     assert_true status.success?, "Process did not exit cleanly: create"
@@ -68,16 +69,25 @@ assert('walkthrough') do
 
     output, status = run_haconiwa "run", haconame
     assert_true status.success?, "Process did not exit cleanly: run"
+
     processes = `ps axf`
     assert_include processes, "haconiwa run #{haconame}"
 
-    subprocess = `pstree -Al $(pgrep haconiwa) | awk -F'---' '{print $2}'`
-    assert_false subprocess.empty?
+    subprocess = nil
+    timeout 3 do
+      ready = false
+      until ready
+        subprocess = `pstree -Al $(pgrep haconiwa | sort | head -1)`.chomp
+        ready = (subprocess.split('---').size >= 3)
+        sleep 0.1
+      end
+    end
+    ps = assert_true subprocess.split('---')
 
-    output, status = run_haconiwa "ps"
-    assert_include output, "NAME"
-    assert_include output, test_name
-    assert_include output, HACONIWA_TMP_ROOT
+    assert_true  ps.size, 3
+    assert_equal ps[0], "haconiwa"
+    assert_equal ps[1], "haconiwa"
+    assert_equal ps[2], "sh"
 
     output, status = run_haconiwa "kill", haconame
     assert_true status.success?, "Process did not exit cleanly: kill"
@@ -85,12 +95,6 @@ assert('walkthrough') do
     processes = `ps axf`
     assert_not_include processes, "haconiwa run #{haconame}"
   end
-end
-
-assert('empty ps') do
-  output, status = run_haconiwa "ps"
-  assert_true status.success?, "Process did not exit cleanly: ps"
-  assert_equal 1, output.chomp.lines.to_a.size
 end
 
 ### end sudo test

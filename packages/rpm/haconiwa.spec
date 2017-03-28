@@ -1,6 +1,6 @@
 Name: haconiwa
 Epoch: 1
-Version: 0.5.2
+Version: 0.7.20170302
 Release: 1
 Summary: MRuby on Container
 License: GPLv3+
@@ -49,20 +49,20 @@ fi
 %{_bindir}/*
 
 %changelog
-* Wed Dec 21 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.5.2-1
-- Add command.set_stdin/stdout/stderr, and workdir
+* Thu Mar  2 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.7.20170302-1
+- Snapshot with cgroup warning fix
 
-* Fri Dec  9 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.5.1-1
-- Fix that cannot define signal handlers for supervisor
+* Thu Feb 16 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.7.20170216-1
+- Snapshot with pid check
 
-* Wed Nov 30 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.5.0-1
-- Add after_spawn hook, intoduce default caps, persistant namespace
+* Fri Feb 10 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.7.20170210-1
+- Snapshot with fix cgroup creation
 
-* Wed Nov 16 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.4.6-1
-- Small fixes in uid mapped attach, support archive subcommand
+* Fri Feb  3 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.7.20170203-1
+- Snapshot with forwardports from 0.6
 
-* Mon Nov 14 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.4.5-1
-- Fix brken option haconiwa attach -t, support centos 6 attach
+* Mon Jan 16 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.7.0-1
+- First implementation of multicontainer DSL
 
-* Fri Nov 11 2016 Uchio Kondo <udzura@udzura.jp> - 1:0.4.4-1
-- Fix failing to drop caps when g/uid mappping is active
+* Mon Jan 16 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.6.0-1
+- First 0.6 stable, fix to set cgroup two dot parameters

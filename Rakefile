@@ -140,9 +140,9 @@ namespace :release do
   end
 
   task :run_ghr do
-    sh "cd #{pwd} && test \"$(git rev-parse --abbrev-ref HEAD)\" = 'master'"
-    sh "cd #{pwd} && git pull --rebase --prune origin master"
-    sh "cd #{pwd} && ghr -u haconiwa v#{Haconiwa::VERSION} pkg/"
+    branch = `cd #{pwd} && git rev-parse --abbrev-ref HEAD`.chomp
+    sh "cd #{pwd} && git pull --rebase --prune origin #{branch}"
+    sh "cd #{pwd} && ghr -c #{branch} -u haconiwa v#{Haconiwa::VERSION} pkg/"
     sh "cd #{pwd} && git fetch origin"
   end
 
@@ -166,13 +166,13 @@ namespace :release do
   desc "release packages to packagecloud"
   task :packagecloud do
     Dir.chdir pwd do
-      sh "package_cloud push udzura/haconiwa/ubuntu/trusty pkg/haconiwa_#{Haconiwa::VERSION}-1_amd64.deb"
-      sh "package_cloud push udzura/haconiwa/ubuntu/xenial pkg/haconiwa_#{Haconiwa::VERSION}-1_amd64.deb"
-      sh "package_cloud push udzura/haconiwa/debian/jessie pkg/haconiwa_#{Haconiwa::VERSION}-1_amd64.deb"
-      sh "package_cloud push udzura/haconiwa/el/7 pkg/haconiwa-#{Haconiwa::VERSION}-1.el7.x86_64.rpm"
-      sh "package_cloud push udzura/haconiwa/el/6 pkg/haconiwa-#{Haconiwa::VERSION}-1.el6.x86_64.rpm"
-      sh "package_cloud push udzura/haconiwa/fedora/23 pkg/haconiwa-#{Haconiwa::VERSION}-1.el7.x86_64.rpm"
-      sh "package_cloud push udzura/haconiwa/fedora/24 pkg/haconiwa-#{Haconiwa::VERSION}-1.el7.x86_64.rpm"
+      sh "package_cloud push udzura/haconiwa-oddmeter/ubuntu/trusty pkg/haconiwa_#{Haconiwa::VERSION}-1_amd64.deb"
+      sh "package_cloud push udzura/haconiwa-oddmeter/ubuntu/xenial pkg/haconiwa_#{Haconiwa::VERSION}-1_amd64.deb"
+      sh "package_cloud push udzura/haconiwa-oddmeter/debian/jessie pkg/haconiwa_#{Haconiwa::VERSION}-1_amd64.deb"
+      sh "package_cloud push udzura/haconiwa-oddmeter/el/7 pkg/haconiwa-#{Haconiwa::VERSION}-1.el7.x86_64.rpm"
+      sh "package_cloud push udzura/haconiwa-oddmeter/el/6 pkg/haconiwa-#{Haconiwa::VERSION}-1.el6.x86_64.rpm"
+      sh "package_cloud push udzura/haconiwa-oddmeter/fedora/23 pkg/haconiwa-#{Haconiwa::VERSION}-1.el7.x86_64.rpm"
+      sh "package_cloud push udzura/haconiwa-oddmeter/fedora/24 pkg/haconiwa-#{Haconiwa::VERSION}-1.el7.x86_64.rpm"
     end
   end
 end

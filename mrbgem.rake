@@ -20,17 +20,16 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.add_dependency 'mruby-forwardable', :mgem => 'mruby-forwardable'
   spec.add_dependency 'mruby-shellwords', :mgem => 'mruby-shellwords'
   spec.add_dependency 'mruby-capability', :mgem => 'mruby-capability'
-  spec.add_dependency 'mruby-cgroup'    , :github => 'matsumotory/mruby-cgroup', :checksum_hash => '03a63db6014f4319d62d004061cd89eb39230658'
+  spec.add_dependency 'mruby-cgroup'    , :github => 'udzura/mruby-cgroup'
   spec.add_dependency 'mruby-dir'       , :mgem => 'mruby-dir' # with Dir#chroot
   spec.add_dependency 'mruby-env'       , :mgem => 'mruby-env'
   spec.add_dependency 'mruby-etcd'      , :mgem => 'mruby-etcd'
   spec.add_dependency 'mruby-io'        , :mgem => 'mruby-io'
   spec.add_dependency 'mruby-linux-namespace', :mgem => 'mruby-linux-namespace'
-  # spec.add_dependency 'mruby-process'   , :mgem => 'mruby-process'
-  spec.add_dependency 'mruby-process'   , :github => 'udzura/mruby-process', :branch => 'add-some-consts'
-  #spec.add_dependency 'mruby-regexp-pcre', :mgem => 'mruby-regexp-pcre'
+  spec.add_dependency 'mruby-process'   , :github => 'iij/mruby-process'
   spec.add_dependency 'mruby-socket'    , :mgem => 'mruby-socket'
 
+  spec.add_dependency 'mruby-onig-regexp', :github => 'udzura/mruby-onig-regexp'
   spec.add_dependency 'mruby-argtable'  , :github => 'udzura/mruby-argtable', :branch => 'static-link-argtable3'
   spec.add_dependency 'mruby-exec'      , :github => 'haconiwa/mruby-exec'
   spec.add_dependency 'mruby-mount'     , :github => 'haconiwa/mruby-mount'
@@ -41,8 +40,9 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
 
   spec.add_dependency 'mruby-syslog'    , :github => 'iij/mruby-syslog'
   spec.add_dependency 'mruby-uv'        , :github => 'mattn/mruby-uv'
-  #spec.add_dependency 'mruby-mutex'     , :github => 'matsumoto-r/mruby-mutex'
+
   spec.add_test_dependency('mruby-tempfile', :github => 'iij/mruby-tempfile')
+
   def spec.save_dependent_mgem_revisions
     file DEFS_FILE do
       f = open(DEFS_FILE, 'w')

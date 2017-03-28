@@ -27,7 +27,7 @@ RUN echo '#!/bin/bash'                                        >  /libexec/buildr
 RUN echo 'set -xe'                                            >> /libexec/buildrpm.sh
 RUN echo 'export PATH=$PATH:/opt/rh/ruby200/root/usr/bin'     >> /libexec/buildrpm.sh
 RUN echo 'export LD_LIBRARY_PATH=/opt/rh/ruby200/root/usr/lib64' >> /libexec/buildrpm.sh
-RUN echo 'git clone --depth=50 https://github.com/haconiwa/haconiwa.git /root/haconiwa-$VERSION' >> /libexec/buildrpm.sh
+RUN echo 'git clone https://github.com/haconiwa/haconiwa.git /root/haconiwa-$VERSION' >> /libexec/buildrpm.sh
 RUN echo 'cd /root'                                           >> /libexec/buildrpm.sh
 RUN echo '( cd haconiwa-$VERSION; git checkout $(git rev-parse v$VERSION) )' >> /libexec/buildrpm.sh
 RUN echo 'tar czf haconiwa-$VERSION.tar.gz haconiwa-$VERSION' >> /libexec/buildrpm.sh
