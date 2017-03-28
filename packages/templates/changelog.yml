@@ -1,5 +1,60 @@
-latest: 0.5.2
+latest: 0.7.20170302
 changelog:
+  - version: 0.7.20170302
+    messages:
+      - Snapshot with cgroup warning fix
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Thu,  2 Mar 2017 17:28:47 +0900
+  - version: 0.7.20170216
+    messages:
+      - Snapshot with pid check
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Thu, 16 Feb 2017 17:10:47 +0900
+  - version: 0.7.20170210
+    messages:
+      - Snapshot with fix cgroup creation
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Fri, 10 Feb 2017 16:41:43 +0900
+  - version: 0.7.20170203
+    messages:
+      - Snapshot with forwardports from 0.6
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Fri,  3 Feb 2017 16:18:08 +0900
+  - version: 0.7.0
+    messages:
+      - First implementation of multicontainer DSL
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Mon, 16 Jan 2017 17:13:57 +0900
+  - version: 0.6.5
+    messages:
+      - Suppress cgroup-related warnings
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Thu,  2 Mar 2017 16:44:10 +0900
+  - version: 0.6.4
+    messages:
+      - Spawn new haconiwa even if pid file exists, when no process is alive
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Thu, 16 Feb 2017 16:17:35 +0900
+  - version: 0.6.3
+    messages:
+      - Bump mruby and mgem versions, more verbose exception logs
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Fri,  3 Feb 2017 15:08:11 +0900
+  - version: 0.6.2
+    messages:
+      - Support general hooks, enhanced exception handling/logging
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Tue, 31 Jan 2017 16:32:23 +0900
+  - version: 0.6.1
+    messages:
+      - Support cgroup-v2 DSL
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Thu, 26 Jan 2017 18:07:15 +0900
+  - version: 0.6.0
+    messages:
+      - First 0.6 stable, fix to set cgroup two dot parameters
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Mon, 16 Jan 2017 15:36:57 +0900
   - version: 0.5.2
     messages:
       - Add command.set_stdin/stdout/stderr, and workdir

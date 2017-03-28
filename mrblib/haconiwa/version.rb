@@ -1,3 +1,3 @@
 module Haconiwa
-  VERSION = "0.5.2"
+  VERSION = "0.7.20170302"
 end
