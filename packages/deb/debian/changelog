@@ -1,3 +1,9 @@
+haconiwa (0.8.0-1) unstable; urgency=medium
+
+  * Bump mruby\'s version
+
+ -- Uchio Kondo <udzura@udzura.jp>  Tue, 28 Mar 2017 17:40:03 +0900
+
 haconiwa (0.7.20170302-1) unstable; urgency=medium
 
   * Snapshot with cgroup warning fix
@@ -27,9 +33,3 @@ haconiwa (0.7.0-1) unstable; urgency=medium
   * First implementation of multicontainer DSL
 
  -- Uchio Kondo <udzura@udzura.jp>  Mon, 16 Jan 2017 17:13:57 +0900
-
-haconiwa (0.6.0-1) unstable; urgency=medium
-
-  * First 0.6 stable, fix to set cgroup two dot parameters
-
- -- Uchio Kondo <udzura@udzura.jp>  Mon, 16 Jan 2017 15:36:57 +0900

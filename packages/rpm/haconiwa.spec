@@ -1,6 +1,6 @@
 Name: haconiwa
 Epoch: 1
-Version: 0.7.20170302
+Version: 0.8.0
 Release: 1
 Summary: MRuby on Container
 License: GPLv3+
@@ -49,6 +49,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Tue Mar 28 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.8.0-1
+- Bump mruby\'s version
+
 * Thu Mar  2 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.7.20170302-1
 - Snapshot with cgroup warning fix
 
@@ -63,6 +66,3 @@ fi
 
 * Mon Jan 16 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.7.0-1
 - First implementation of multicontainer DSL
-
-* Mon Jan 16 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.6.0-1
-- First 0.6 stable, fix to set cgroup two dot parameters
