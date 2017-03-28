@@ -74,20 +74,21 @@ assert('walkthrough') do
     assert_include processes, "haconiwa run #{haconame}"
 
     subprocess = nil
+    ps = []
     timeout 3 do
       ready = false
       until ready
         subprocess = `pstree -Al $(pgrep haconiwa | sort | head -1)`.chomp
-        ready = (subprocess.split('---').size >= 3)
+        ps = subprocess.split('---')
+        ready = (ps.size >= 3 && ps[2] != "haconiwa")
         sleep 0.1
       end
     end
-    ps = assert_true subprocess.split('---')
 
-    assert_true  ps.size, 3
-    assert_equal ps[0], "haconiwa"
-    assert_equal ps[1], "haconiwa"
-    assert_equal ps[2], "sh"
+    assert_equal 3, ps.size
+    assert_equal "haconiwa", ps[0]
+    assert_equal "haconiwa", ps[1]
+    assert_equal "sh"      , ps[2]
 
     output, status = run_haconiwa "kill", haconame
     assert_true status.success?, "Process did not exit cleanly: kill"
