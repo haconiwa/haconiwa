@@ -1,5 +1,10 @@
-latest: 0.7.20170302
+latest: 0.8.0
 changelog:
+  - version: 0.8.0
+    messages:
+      - Bump mruby\'s version
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Tue, 28 Mar 2017 17:40:03 +0900
   - version: 0.7.20170302
     messages:
       - Snapshot with cgroup warning fix
