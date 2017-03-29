@@ -494,8 +494,8 @@ module Haconiwa
 
     def process_exists?(pid)
       ::Process.kill(0, pid)
-      rescue
-        false
+    rescue RuntimeError
+      false
     end
 
     def confirm_existence_pid_file(pid_file)
