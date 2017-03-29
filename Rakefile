@@ -73,6 +73,8 @@ namespace :test do
   desc "run mruby & unit tests"
   # only build mtest for host
   task :mtest => :compile do
+    $verbose = !!ENV['MTEST_VERBOSE']
+    #$mrbtest_verbose = true
     # in order to get mruby/test/t/synatx.rb __FILE__ to pass,
     # we need to make sure the tests are built relative from mruby_root
     MRuby.each_target do |target|
