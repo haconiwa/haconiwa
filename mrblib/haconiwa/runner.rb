@@ -227,7 +227,7 @@ module Haconiwa
       end
 
       (timeout * 10).times do
-        sleep 0.1
+        usleep 1000
         unless File.exist?(@base.container_pid_file)
           Logger.puts "Kill success"
           Process.exit 0
