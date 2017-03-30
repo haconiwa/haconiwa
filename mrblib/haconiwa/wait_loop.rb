@@ -35,7 +35,7 @@ module Haconiwa
             Logger.warning "Supervisor received unintended kill. Cleanup..."
             runner.cleanup_supervisor(base, etcd)
           end
-          Process.kill :SIGTERM, base.pid
+          Process.kill :TERM, base.pid
           exit 127
         end
       end
