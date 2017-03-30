@@ -14,6 +14,7 @@ module Haconiwa
                   :capabilities,
                   :guid,
                   :general_hooks,
+                  :async_hooks,
                   :environ,
                   :attached_capabilities,
                   :signal_handler,
@@ -59,6 +60,7 @@ module Haconiwa
       @capabilities = Capabilities.new
       @guid = Guid.new
       @general_hooks = {}
+      @async_hooks = []
       @environ = {}
       @signal_handler = SignalHandler.new
       @attached_capabilities = nil
@@ -149,9 +151,10 @@ module Haconiwa
     end
     alias add_handler add_signal_handler
 
-    def after_spawn(options={}, &hook)
-      self.waitloop.hooks << WaitLoop::TimerHook.new(options, &hook)
+    def add_async_hook(options={}, &hook)
+      @async_hooks << WaitLoop::TimerHook.new(options, &hook)
     end
+    alias after_spawn add_async_hook
 
     def bootstrap
       @bootstrap ||= Bootstrap.new
@@ -279,6 +282,7 @@ module Haconiwa
         :@capabilities,
         :@guid,
         :@general_hooks,
+        :@async_hooks,
         :@environ,
         :@signal_handler,
         :@attached_capabilities,
