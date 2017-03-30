@@ -1,43 +1,64 @@
 # -*- mode: ruby -*-
 IKACHAN_HOST = ENV['IKACHAN_HOST'] || "ikachan.local:4979"
-def slack(msg)
-  http = HttpRequest.new
-  http.post(
-    "http://#{IKACHAN_HOST}/notice",
-    {message: msg, channel: '#test'},
-    {"Content-Type" => 'application/x-www-form-urlencoded', 'User-Agent' => "Haconiwa v#{Haconiwa::VERSION}"}
-  )
+CHANNEL_NAME = ENV['CHANNEL_NAME'] || "#test"
+LIFETIME     = ENV['LIFETIME'] || 60
+module Kernel
+  def self.slack(msg)
+    system "curl -dchannel='#{CHANNEL_NAME}' -dmessage='#{msg}' #{IKACHAN_HOST}/notice"
+  end
 end
 
 Haconiwa.define do |config|
   # The container name and container's hostname:
   config.name = "hooks-test"
   # The first process when invoking haconiwa run:
-  config.init_command = ["/bin/sleep", (ENV['SLEEP'] || (30 + (UUID.secure_uuid("%d").to_i / 256).floor).to_s)]
+  sleep_time = (ENV['SLEEP'] || (30 + (UUID.secure_uuid("%d").to_i / 256).floor).to_s)
+  config.init_command = ["/usr/bin/ruby", "-e", "sleep #{sleep_time}" ]
   # If your first process is a daemon, please explicitly daemonize by:
   config.daemonize!
 
   config.add_general_hook :before_fork do |base|
-    slack("Container is being created... #{base.name}")
+    Kernel.slack("Container is being created... #{base.name}")
   end
 
   config.add_general_hook :before_start_wait do |base|
-    slack("Container is UP!! Everything is OK!!1 #{base.name}")
+    hostname = `hostname`.chomp
+    Kernel.slack("Container is UP!! Everything is OK!!1 #{base.name}")
   end
 
   config.add_general_hook :teardown do |base|
     hostname = `hostname`.chomp
-    slack("Container is Exited. #{base.name} => #{base.exit_status.inspect}, current hostname: #{hostname}")
+    Kernel.slack("Container is Exited. #{base.name} => #{base.exit_status.inspect}, current hostname: #{hostname}")
   end
 
   config.add_general_hook :after_fork do |base|
     hostname = `hostname`.chomp
-    slack("Container is forked!! #{base.name}, current hostname: #{hostname}")
+    Kernel.slack("Container is forked!! #{base.name}, current hostname: #{hostname}")
   end
 
   config.add_general_hook :after_chroot do |base|
     hostname = `hostname`.chomp
-    slack("Container is going to be done!! #{base.name}, current hostname: #{hostname}")
+    Kernel.slack("Container is going to be done!! #{base.name}, current hostname: #{hostname}")
+  end
+
+  config.add_async_hook(sec: 5, interval_msec: 10 * 1000) do |base|
+    Haconiwa::Logger.info("This is a hook!!!1: [#{base.pid}]")
+    hostname = `hostname`.chomp
+    Kernel.slack("This ia an async hook!!1 #{base.name}##{base.pid}, current hostname: #{hostname}")
+    # ::Process.kill :TERM, base.pid
+  end
+
+  config.add_async_hook(sec: LIFETIME) do |base|
+    msg = "Here comes lifetime... Container abort #{base.name}##{base.pid}"
+    Haconiwa::Logger.info(msg)
+    Kernel.slack(msg)
+    ::Process.kill :TERM, base.pid
+  end
+
+  config.add_signal_handler(:USR1) do |base|
+    Haconiwa::Logger.info("Accept USR1: [#{base.pid}]")
+    hostname = `hostname`.chomp
+    Kernel.slack("Accept USR1: #{base.name}##{base.pid}, current hostname: #{hostname}")
   end
 
   root = Pathname.new("/var/lib/haconiwa/8cfccb3d")

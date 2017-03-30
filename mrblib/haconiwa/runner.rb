@@ -146,6 +146,8 @@ module Haconiwa
         base.waitloop.register_custom_sighandlers(base, base.signal_handler)
 
         invoke_general_hook(:before_start_wait, base)
+        Logger.debug "WaitLoop instance status: #{base.waitloop.inspect}"
+
         pid, status = base.waitloop.run_and_wait(pid)
         base.exit_status = status
         invoke_general_hook(:teardown, base)
@@ -225,7 +227,7 @@ module Haconiwa
       end
 
       (timeout * 10).times do
-        sleep 0.1
+        usleep 1000
         unless File.exist?(@base.container_pid_file)
           Logger.puts "Kill success"
           Process.exit 0
@@ -494,8 +496,8 @@ module Haconiwa
 
     def process_exists?(pid)
       ::Process.kill(0, pid)
-      rescue
-        false
+    rescue RuntimeError
+      false
     end
 
     def confirm_existence_pid_file(pid_file)

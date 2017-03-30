@@ -75,7 +75,7 @@ assert('walkthrough') do
 
     subprocess = nil
     ps = []
-    timeout 3 do
+    Timeout.timeout 5 do
       ready = false
       until ready
         subprocess = `pstree -Al $(pgrep haconiwa | sort | head -1)`.chomp
