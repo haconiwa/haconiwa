@@ -45,6 +45,9 @@ module Haconiwa
     end
 
     def run_and_wait(pid)
+      @hooks.each do |hook|
+        hook.start
+      end
       p, s = Process.waitpid2(pid)
       Logger.puts "Container(#{p}) finish detected: #{s.inspect}"
       return [p, s]

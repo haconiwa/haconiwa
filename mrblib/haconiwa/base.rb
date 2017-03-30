@@ -297,8 +297,10 @@ module Haconiwa
         end
       end
 
+      @parent = barn
       @waitloop = WaitLoop.new
     end
+    attr_reader :parent
 
     def copy_attach_context(barn)
       [
@@ -313,6 +315,10 @@ module Haconiwa
           self.instance_variable_set(varname, value.dup)
         end
       end
+    end
+
+    def daemon?
+      parent.daemon?
     end
 
     def skip_bootstrap
