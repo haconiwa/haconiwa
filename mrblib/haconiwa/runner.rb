@@ -146,6 +146,8 @@ module Haconiwa
         base.waitloop.register_custom_sighandlers(base, base.signal_handler)
 
         invoke_general_hook(:before_start_wait, base)
+        Logger.debug "WaitLoop instance status: #{base.waitloop.inspect}"
+
         pid, status = base.waitloop.run_and_wait(pid)
         base.exit_status = status
         invoke_general_hook(:teardown, base)

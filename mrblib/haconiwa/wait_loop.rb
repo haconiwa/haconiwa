@@ -3,23 +3,28 @@ module Haconiwa
     def initialize
       @sig_threads = []
       @hook_threads = []
-      @hooks = []
+      @registered_hooks = []
     end
-    attr_reader :hooks
 
     def register_hooks(base)
-      @hooks.each do |hook|
+      base.async_hooks.each do |hook|
         hook.set_signal!
         proc = hook.proc
         @hook_threads << SignalThread.trap(hook.signal) do
-          case proc.arity
-          when 1
-            proc.call(base)
-          when 2
-            proc.call(base, hook.active_timer)
-          else
+          ::Haconiwa::Logger.warning("Async hook starting...")
+          begin
+            case proc.arity
+            when 1
+              proc.call(base)
+            when 2
+              proc.call(base, hook.active_timer)
+            else
+            end
+          rescue => e
+            ::Haconiwa::Logger.warning("Async hook failed: #{e.class}, #{e.message}")
           end
         end
+        @registered_hooks << hook
       end
     end
 
@@ -38,14 +43,14 @@ module Haconiwa
 
     def register_custom_sighandlers(base, handlers)
       handlers.each do |sig, callback|
-        @sig_threads << SignalThread.trap do |signo|
+        @sig_threads << SignalThread.trap(sig) do |signo|
           callback.call(base)
         end
       end
     end
 
     def run_and_wait(pid)
-      @hooks.each do |hook|
+      @registered_hooks.each do |hook|
         hook.start
       end
       p, s = Process.waitpid2(pid)
@@ -99,6 +104,7 @@ module Haconiwa
           else
             t.run(@timing)
           end
+          Logger.info("Timer registered: #{t.inspect}")
           @active_timer = t
         end
       end
