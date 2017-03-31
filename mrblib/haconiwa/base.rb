@@ -21,7 +21,6 @@ module Haconiwa
                   :pid,
                   :supervisor_pid,
                   :created_at,
-                  :etcd_name,
                   :network_mountpoint,
                   :cleaned,
                   :exit_status
@@ -192,7 +191,6 @@ module Haconiwa
     def to_container_json
       {
         name: self.name,
-        etcd_name: self.etcd_name,
         root: self.filesystem.chroot,
         command: self.init_command.join(" "),
         created_at: self.created_at,
@@ -201,10 +199,6 @@ module Haconiwa
         pid: self.pid,
         supervisor_pid: self.supervisor_pid,
       }.to_json
-    end
-
-    def etcd_key
-      "haconiwa.mruby.org/#{etcd_name}/#{name}"
     end
 
     def validate_non_nil(obj, msg)
