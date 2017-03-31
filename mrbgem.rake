@@ -21,7 +21,6 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.add_dependency 'mruby-cgroup'    , :mgem => 'mruby-cgroup'
   spec.add_dependency 'mruby-dir'       , :mgem => 'mruby-dir' # with Dir#chroot
   spec.add_dependency 'mruby-env'       , :mgem => 'mruby-env'
-  spec.add_dependency 'mruby-etcd'      , :mgem => 'mruby-etcd'
   spec.add_dependency 'mruby-io'        , :mgem => 'mruby-io'
   spec.add_dependency 'mruby-linux-namespace', :mgem => 'mruby-linux-namespace'
   spec.add_dependency 'mruby-process'   , :github => 'iij/mruby-process'
