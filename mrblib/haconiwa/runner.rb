@@ -234,7 +234,7 @@ module Haconiwa
         end
       end
 
-      Logger.warning "Killing seemd to be failed in #{timeout} seconds"
+      Logger.warning "Killing seemd to be failed in #{timeout} seconds. Check out process PID=#{@base.pid}"
       Process.exit 1
     end
 
@@ -264,9 +264,12 @@ module Haconiwa
             b.call(@base, w)
           rescue => e
             Logger.exception(e)
+          ensure
+            File.unlink @base.supervisor_all_pid_file
           end
         end
         w.close
+        File.open(@base.supervisor_all_pid_file, 'w') {|f| f.write ppid }
         _pids = r.read
         Logger.puts "pids: #{_pids}"
         pids = _pids.split(',').map{|v| v.to_i }

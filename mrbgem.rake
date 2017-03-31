@@ -11,7 +11,6 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.add_dependency 'mruby-bin-mruby' , :core => 'mruby-bin-mruby'
   #spec.add_dependency 'mruby-bin-mirb'  , :core => 'mruby-bin-mirb'
   spec.add_dependency 'mruby-eval'      , :core => 'mruby-eval'
-  spec.add_dependency 'mruby-print'     , :core => 'mruby-print'
   spec.add_dependency 'mruby-random'    , :core => 'mruby-random'
   spec.add_dependency 'mruby-string-ext', :core => 'mruby-string-ext'
   spec.add_dependency 'mruby-time'      , :core => 'mruby-time'
@@ -39,13 +38,13 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
 
   spec.add_dependency 'mruby-syslog'    , :github => 'iij/mruby-syslog'
   spec.add_dependency 'mruby-timer-thread' , :github => 'matsumotory/mruby-timer-thread'
-  spec.add_dependency 'mruby-signal-thread', :github => 'pyama86/mruby-signal-thread',
-                      :checksum_hash => 'fd477b13413ad4f536b7c16d47976b64b3f9012f'
+  spec.add_dependency 'mruby-signal-thread', :github => 'pyama86/mruby-signal-thread'
 
   spec.add_test_dependency 'mruby-tempfile', :github => 'iij/mruby-tempfile'
 
   # The good luck charm for avoiding dependency hell
   spec.add_dependency 'mruby-sprintf'   , :core => 'mruby-sprintf'
+  spec.add_dependency 'mruby-print'     , :core => 'mruby-print'
 
   def spec.save_dependent_mgem_revisions
     file DEFS_FILE do
