@@ -267,12 +267,14 @@ module Haconiwa
       containers_real_run.each do |c|
         c.kill(signame, timeout)
       end
-    end
 
-    Timeout.timeout 3 do
-      while File.exist? supervisor_all_pid_file
-        usleep 1000
+      30.times do
+        unless File.exist? supervisor_all_pid_file
+          return true
+        end
+        usleep 100 * 1000
       end
+      raise "Kill does not seem to be completed. Check process of PID=#{::File.read supervisor_all_pid_file}"
     end
   end
 
