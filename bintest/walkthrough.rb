@@ -75,14 +75,18 @@ assert('walkthrough') do
 
     subprocess = nil
     ps = []
-    Timeout.timeout 5 do
-      ready = false
-      until ready
-        subprocess = `pstree -Al $(pgrep haconiwa | sort | head -1)`.chomp
-        ps = subprocess.split('---')
-        ready = (ps.size >= 3 && ps[2] != "haconiwa")
-        sleep 0.1
+    begin
+      Timeout.timeout 8 do
+        ready = false
+        until ready
+          subprocess = `pstree -Al $(pgrep haconiwa | sort | head -1)`.chomp
+          ps = subprocess.split('---')
+          ready = (ps.size >= 3 && ps[2] != "haconiwa")
+          sleep 0.1
+        end
       end
+    rescue Timeout::Error => e
+      warn "container creation may be failed... skipping: #{e.class}, #{e.message}"
     end
 
     assert_equal 3, ps.size
