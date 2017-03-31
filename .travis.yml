@@ -30,8 +30,6 @@ cache:
     - mruby
 
 before_script:
-  # mruby-uv test failed when disabled ipv6 loopback 
-  - sudo sysctl net.ipv6.conf.all.disable_ipv6=0
   # clang path was not found when using sudo
   - sudo sed -e "s?/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin?${PATH}:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin?g" --in-place /etc/sudoers
 script:
