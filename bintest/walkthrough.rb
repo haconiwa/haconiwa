@@ -74,14 +74,14 @@ assert('walkthrough') do
     assert_include processes, "haconiwa run #{haconame}"
 
     subprocess = nil
-    ps = []
+    tree = []
     begin
-      Timeout.timeout 8 do
+      Timeout.timeout 3 do
         ready = false
         until ready
           subprocess = `pstree -Al $(pgrep haconiwa | sort | head -1)`.chomp
-          ps = subprocess.split('---')
-          ready = (ps.size >= 3 && ps[2] != "haconiwa")
+          tree = subprocess.split(/(-[-+]-|\s+)/)
+          ready = (tree.size >= 7)
           sleep 0.1
         end
       end
@@ -89,10 +89,14 @@ assert('walkthrough') do
       warn "container creation may be failed... skipping: #{e.class}, #{e.message}"
     end
 
-    assert_equal 3, ps.size
-    assert_equal "haconiwa", ps[0]
-    assert_equal "haconiwa", ps[1]
-    assert_equal "sh"      , ps[2]
+    assert_equal 2, tree.count("haconiwa")
+    assert_equal "haconiwa", tree[0]
+    assert_equal "---", tree[1]
+    assert_equal "haconiwa", tree[2]
+    assert_equal "-+-", tree[3]
+    assert_equal "sh", tree[4]
+    # Assert sub threads
+    assert_equal "`-4*[{haconiwa}]", tree[6]
 
     output, status = run_haconiwa "kill", haconame
     assert_true status.success?, "Process did not exit cleanly: kill"
