@@ -234,7 +234,7 @@ module Haconiwa
         end
       end
 
-      Logger.warning "Killing seemd to be failed in #{timeout} seconds"
+      Logger.warning "Killing seemd to be failed in #{timeout} seconds. Check out process PID=#{@base.pid}"
       Process.exit 1
     end
 

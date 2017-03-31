@@ -268,7 +268,7 @@ module Haconiwa
         c.kill(signame, timeout)
       end
 
-      30.times do
+      (timeout * 10).times do
         unless File.exist? supervisor_all_pid_file
           return true
         end
