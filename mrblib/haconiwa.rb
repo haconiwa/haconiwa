@@ -21,8 +21,6 @@ def __main__(argv)
     Haconiwa::Cli.kill(argv)
   when "ps", "list"
     Haconiwa::Cli.ps(argv)
-  when "watch"
-    Haconiwa::Cli.watch(argv)
   else
     puts <<-USAGE
 haconiwa - The MRuby on Container
