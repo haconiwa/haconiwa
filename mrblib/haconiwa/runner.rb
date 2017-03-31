@@ -5,10 +5,6 @@ module Haconiwa
   class LinuxRunner < Runner
     def initialize(base)
       @base = base
-      if Haconiwa.config.etcd_available?
-        @etcd = Etcd::Client.new(Haconiwa.config.etcd_url)
-        base.etcd_name = @etcd.stats["name"]
-      end
     end
 
     VALID_HOOKS = [
@@ -136,13 +132,10 @@ module Haconiwa
         base.created_at = Time.now
         base.pid = pid.to_i
         base.supervisor_pid = ::Process.pid
-        if @etcd
-          @etcd.put base.etcd_key, base.to_container_json
-        end
 
         Logger.puts "Container fork success and going to wait: pid=#{pid}"
         base.waitloop.register_hooks(base)
-        base.waitloop.register_sighandlers(base, self, @etcd)
+        base.waitloop.register_sighandlers(base, self)
         base.waitloop.register_custom_sighandlers(base, base.signal_handler)
 
         invoke_general_hook(:before_start_wait, base)
@@ -152,7 +145,7 @@ module Haconiwa
         base.exit_status = status
         invoke_general_hook(:teardown, base)
 
-        cleanup_supervisor(base, @etcd)
+        cleanup_supervisor(base)
         if status.success?
           Logger.puts "Container successfully exited: #{status.inspect}"
         else
@@ -238,11 +231,8 @@ module Haconiwa
       Process.exit 1
     end
 
-    def cleanup_supervisor(base, etcd=nil)
+    def cleanup_supervisor(base)
       cleanup_cgroup(base)
-      if etcd
-        etcd.delete base.etcd_key
-      end
       File.unlink base.container_pid_file
       base.cleaned = true
     end

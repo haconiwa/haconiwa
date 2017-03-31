@@ -28,12 +28,12 @@ module Haconiwa
       end
     end
 
-    def register_sighandlers(base, runner, etcd)
+    def register_sighandlers(base, runner)
       [:SIGTERM, :SIGINT, :SIGHUP, :SIGPIPE].each do |sig|
         @sig_threads << SignalThread.trap(sig) do
           unless base.cleaned
             Logger.warning "Supervisor received unintended kill. Cleanup..."
-            runner.cleanup_supervisor(base, etcd)
+            runner.cleanup_supervisor(base)
           end
           Process.kill :TERM, base.pid
           exit 127

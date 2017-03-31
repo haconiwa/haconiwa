@@ -2,10 +2,7 @@ dist: trusty
 sudo: required
 
 language: c
-before_install:
-  - curl -L  https://github.com/coreos/etcd/releases/download/v2.3.7/etcd-v2.3.7-linux-amd64.tar.gz -o etcd-v2.3.7-linux-amd64.tar.gz
-  - tar xzvf etcd-v2.3.7-linux-amd64.tar.gz
-  - cd etcd-v2.3.7-linux-amd64 && sudo nohup ./etcd &
+# before_install:
 addons:
   apt:
     packages:
