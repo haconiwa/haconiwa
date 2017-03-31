@@ -86,6 +86,11 @@ module Haconiwa
       end
     end
 
+    def supervisor_all_pid_file
+      names = containers_real_run.map{|b| b.name }.join('-')
+      "/var/run/haconiwa-parent-#{names}.pid"
+    end
+
     def init_command=(cmd)
       self.command.init_command = cmd
     end
@@ -262,6 +267,14 @@ module Haconiwa
       containers_real_run.each do |c|
         c.kill(signame, timeout)
       end
+
+      (timeout * 10).times do
+        unless File.exist? supervisor_all_pid_file
+          return true
+        end
+        usleep 100 * 1000
+      end
+      raise "Kill does not seem to be completed. Check process of PID=#{::File.read supervisor_all_pid_file}"
     end
   end
 
