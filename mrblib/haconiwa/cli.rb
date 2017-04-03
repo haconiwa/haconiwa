@@ -107,21 +107,6 @@ module Haconiwa
       base.attach(*exe)
     end
 
-    def self.ps(args)
-      load_global_config
-      opt = Argtable.new
-      opt.literal('N', 'no-header', "Do not show header line")
-      opt.literal('h', 'help', "Show help")
-      opt.parse(args)
-
-      if opt['h'].exist?
-        opt.glossary
-        exit
-      end
-
-      Haconiwa::ProcessList.new(hide_header: opt['N'].exist?).show
-    end
-
     def self.kill(args)
       load_global_config
 
@@ -136,15 +121,6 @@ module Haconiwa
       signame  = opt['s'].exist? ? opt['s'].value : "TERM"
       timeout  = opt['T'].exist? ? opt['T'].value : 10
       base.kill(signame, timeout)
-    end
-
-    def self.watch(args)
-      load_global_config
-      opt = parse_opts(args, 'WATCH_FILE') do |o|
-      end
-
-      watch = Haconiwa::Watch.from_file(opt.catchall.value(0))
-      Haconiwa::Watch.run(watch)
     end
 
     def self.revisions
