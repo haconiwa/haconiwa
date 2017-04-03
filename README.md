@@ -27,7 +27,7 @@ Available for: `CentOS >= 7 / CentOS ~> 6(Experimental, maybe kernel update requ
 Other linuxes users can just download binaries from [latest](https://github.com/haconiwa/haconiwa/releases):
 
 ```bash
-VERSION=0.2.2
+VERSION=0.8.0
 wget https://github.com/haconiwa/haconiwa/releases/download/v${VERSION}/haconiwa-v${VERSION}.x86_64-pc-linux-gnu.tgz
 tar xzf haconiwa-v${VERSION}.x86_64-pc-linux-gnu.tgz
 sudo install hacorb hacoirb haconiwa /usr/local/bin
@@ -180,22 +180,6 @@ e.g. just using `mount` namespace unshared, container with common filesystem, li
 * `config.add_signal_handler(signame, &block)` - Define signal handler at supervisor process(not container itself). Available signals are `SIGTTIN/SIGTTOU/SIGUSR1/SIGUSR2`. See [handler example](./sample/cpu.haco).
 
 Please check out [`sample`](./sample) directory.
-
-### Clustering
-
-#### Container management with etcd
-
-If there is a `/etc/haconiwa.conf.rb` file like below, as a global config:
-
-```ruby
-Haconiwa.configure do |config|
-  config.etcd_url = "http://localhost:2379/v2"
-end
-```
-
-`haconiwa` cli understands this DSL and uses [etcd](https://coreos.com/etcd/) as a container database backend, with enabled clustering. We recommend to set etcd's server name to host's primary LAN IP(such as: `ETCD_NAME="192.168.0.100"`).
-
-You can run `haconiwa ps` to check container processes (all over the hosts clustered by etcd!).
 
 ### Programming the container world by mruby
 

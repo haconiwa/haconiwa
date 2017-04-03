@@ -101,7 +101,6 @@ end
 
     CONFIG_TEMPLATE = <<-RUBY
 Haconiwa.configure do |config|
-  config.etcd_url = "http://localhost:2379/v2"
 end
     RUBY
 
