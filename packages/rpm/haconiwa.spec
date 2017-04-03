@@ -1,6 +1,6 @@
 Name: haconiwa
 Epoch: 1
-Version: 0.8.0
+Version: 0.8.1
 Release: 1
 Summary: MRuby on Container
 License: GPLv3+
@@ -45,10 +45,13 @@ fi
 %postun
 
 %files
-%doc LICENSE LICENSE_argtable3 LICENSE_libcap LICENSE_libcgroup LICENSE_mruby LICENSE_libuv README.md
+%doc LICENSE LICENSE_argtable3 LICENSE_libcap LICENSE_libcgroup LICENSE_mruby README.md
 %{_bindir}/*
 
 %changelog
+* Mon Apr  3 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.8.1-1
+- Remove experimental features. This destroys some of (minor) backward compatibilities
+
 * Tue Mar 28 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.8.0-1
 - Bump mruby\'s version
 
@@ -63,6 +66,3 @@ fi
 
 * Fri Feb  3 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.7.20170203-1
 - Snapshot with forwardports from 0.6
-
-* Mon Jan 16 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.7.0-1
-- First implementation of multicontainer DSL

@@ -1,5 +1,10 @@
-latest: 0.8.0
+latest: 0.8.1
 changelog:
+  - version: 0.8.1
+    messages:
+      - Remove experimental features. This destroys some of (minor) backward compatibilities
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Mon,  3 Apr 2017 12:45:35 +0900
   - version: 0.8.0
     messages:
       - Bump mruby\'s version

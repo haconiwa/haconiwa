@@ -1,3 +1,9 @@
+haconiwa (0.8.1-1) unstable; urgency=medium
+
+  * Remove experimental features. This destroys some of (minor) backward compatibilities
+
+ -- Uchio Kondo <udzura@udzura.jp>  Mon,  3 Apr 2017 12:45:35 +0900
+
 haconiwa (0.8.0-1) unstable; urgency=medium
 
   * Bump mruby\'s version
@@ -27,9 +33,3 @@ haconiwa (0.7.20170203-1) unstable; urgency=medium
   * Snapshot with forwardports from 0.6
 
  -- Uchio Kondo <udzura@udzura.jp>  Fri,  3 Feb 2017 16:18:08 +0900
-
-haconiwa (0.7.0-1) unstable; urgency=medium
-
-  * First implementation of multicontainer DSL
-
- -- Uchio Kondo <udzura@udzura.jp>  Mon, 16 Jan 2017 17:13:57 +0900
