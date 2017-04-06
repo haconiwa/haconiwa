@@ -29,14 +29,22 @@ module Haconiwa
     end
 
     def register_sighandlers(base, runner)
-      [:SIGTERM, :SIGINT, :SIGHUP, :SIGPIPE].each do |sig|
-        @sig_threads << SignalThread.trap(sig) do
+      # Registers cleanup handler when unintended death
+      [:SIGTERM, :SIGINT, :SIGPIPE].each do |sig|
+        @sig_threads << SignalThread.trap_once(sig) do
           unless base.cleaned
             Logger.warning "Supervisor received unintended kill. Cleanup..."
             runner.cleanup_supervisor(base)
           end
           Process.kill :TERM, base.pid
           exit 127
+        end
+      end
+
+      if base.daemon? # Terminal uses SIGHUP
+        # Registers reload handler
+        @sig_threads << SignalThread.trap(:SIGHUP) do
+          base.reload
         end
       end
     end
