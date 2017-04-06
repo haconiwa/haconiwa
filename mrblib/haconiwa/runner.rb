@@ -199,6 +199,12 @@ module Haconiwa
       end
     end
 
+    def reload(new_base, targets)
+      if targets.include?(:cgroup)
+        apply_cgroup(new_base)
+      end
+    end
+
     def kill(sigtype, timeout)
       if !@base.pid
         if File.exist? @base.container_pid_file
