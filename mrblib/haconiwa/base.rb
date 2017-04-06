@@ -24,6 +24,7 @@ module Haconiwa
                   :network_mountpoint,
                   :cleaned,
                   :hacofile,
+                  :reloadable_attr,
                   :exit_status
 
     delegate     [:uid,
@@ -72,6 +73,7 @@ module Haconiwa
       @pid = nil
       @daemon = false
       @network_mountpoint = []
+      @reloadable_attr = []
       @cleaned = false
       @bootstrap = @provision = nil
 
@@ -118,6 +120,13 @@ module Haconiwa
 
     def rootfs
       filesystem.rootfs
+    end
+
+    def support_reload(name)
+      unless [:cgroup].include?(name)
+        raise ArgumentError, "Unsupported reload attribute: #{name}"
+      end
+      @reloadable_attr << name
     end
 
     def cgroup(v=nil, &blk)
@@ -306,6 +315,7 @@ module Haconiwa
         :@network_mountpoint,
         :@bootstrap,
         :@provision,
+        :@reloadable_attr,
       ].each do |varname|
         value = barn.instance_variable_get(varname)
         case value
@@ -396,6 +406,15 @@ module Haconiwa
     def attach(*run_command)
       self.container_pid_file ||= default_container_pid_file
       LinuxRunner.new(self).attach(run_command)
+    end
+
+    def reload
+      code = File.read(hacofile)
+      tmp_barn = eval(code)
+      tmp_base = tmp_barn.find_child_by_name(self.name)
+      LinuxRunner.new(self).reload(tmp_base, self.reloadable_attr)
+    rescue => e
+      Logger.warning "Reload failed: #{e}. Skipping for now"
     end
 
     def kill(signame, timeout)
