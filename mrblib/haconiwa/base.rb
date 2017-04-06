@@ -23,6 +23,7 @@ module Haconiwa
                   :created_at,
                   :network_mountpoint,
                   :cleaned,
+                  :hacofile,
                   :exit_status
 
     delegate     [:uid,
@@ -330,6 +331,10 @@ module Haconiwa
 
     def daemon?
       parent.daemon?
+    end
+
+    def hacofile
+      parent.hacofile
     end
 
     def skip_bootstrap

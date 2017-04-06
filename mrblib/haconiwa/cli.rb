@@ -177,7 +177,9 @@ module Haconiwa
 
     def self.get_base(args)
       script = File.read(args[0])
-      return Kernel.eval(script)
+      obj = Kernel.eval(script)
+      obj.hacofile = args[0]
+      return obj
     end
 
     def self.get_script_and_eval(args)
@@ -186,8 +188,10 @@ module Haconiwa
       if exe.first == "--"
         exe.shift
       end
+      obj = Kernel.eval(script)
+      obj.hacofile = args[0]
 
-      return [Kernel.eval(script), exe]
+      return [obj, exe]
     end
   end
 end
