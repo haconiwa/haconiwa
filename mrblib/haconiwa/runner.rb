@@ -214,16 +214,7 @@ module Haconiwa
         end
       end
 
-      case sigtype.to_s
-      when "INT"
-        Process.kill :INT, @base.pid
-      when "TERM"
-        Process.kill :TERM, @base.pid
-      when "KILL"
-        Process.kill :KILL, @base.pid
-      else
-        raise "Invalid or unsupported signal type: #{sigtype}"
-      end
+      ::Process.kill sigtype.to_sym, @base.pid
 
       # timeout < 0 means "do not wait"
       if timeout < 0
