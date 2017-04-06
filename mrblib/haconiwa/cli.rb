@@ -107,6 +107,28 @@ module Haconiwa
       base.attach(*exe)
     end
 
+    def self.reload(args)
+      opt = parse_opts(args, '[HACO_FILE]', ignore_catchall: lambda {|o| o['t'].exist? } ) do |o|
+        o.integer('t', 'target', 'PID', "Container's PID to reload one")
+        o.string('n', 'name', 'CONTAINER_NAME', "Container's name to be reloaded, default to all the children")
+      end
+
+      barn = nil
+      if opt.catchall.exist?
+        barn = get_base(opt.catchall.values)
+      end
+
+      if opt['n'].exist?
+        base = barn.find_child_by_name(opt['n'].value)
+        base.kill(:SIGHUP, -1)
+      elsif !barn && opt['t'].exist?
+        ::Process.kill :SIGHUP, opt['t'].value.to_i
+      else
+        barn.kill(:SIGHUP, -1)
+      end
+      STDERR.puts "Reload success"
+    end
+
     def self.kill(args)
       load_global_config
 
@@ -116,11 +138,11 @@ module Haconiwa
         o.string('s', 'signal', 'SIGFOO', "Signal name. default to TERM")
       end
 
-      base, _  = get_script_and_eval(opt.catchall.values)
-      base.pid = opt['t'].value if opt['t'].exist?
+      barn, _  = get_script_and_eval(opt.catchall.values)
+      barn.pid = opt['t'].value if opt['t'].exist?
       signame  = opt['s'].exist? ? opt['s'].value : "TERM"
       timeout  = opt['T'].exist? ? opt['T'].value : 10
-      base.kill(signame, timeout)
+      barn.kill(signame, timeout)
     end
 
     def self.revisions

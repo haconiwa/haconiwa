@@ -225,11 +225,17 @@ module Haconiwa
         raise "Invalid or unsupported signal type: #{sigtype}"
       end
 
+      # timeout < 0 means "do not wait"
+      if timeout < 0
+        Logger.puts "Send signal success"
+        return
+      end
+
       (timeout * 10).times do
         usleep 1000
         unless File.exist?(@base.container_pid_file)
           Logger.puts "Kill success"
-          Process.exit 0
+          return
         end
       end
 
