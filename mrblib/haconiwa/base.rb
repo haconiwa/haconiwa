@@ -46,6 +46,9 @@ module Haconiwa
     def define(&b)
       base = Base.new(self)
       b.call(base)
+      if find_child_by_name(base.name)
+        raise "Duplicated container name: #{base.name}"
+      end
       self.containers << base
     end
 
@@ -84,6 +87,10 @@ module Haconiwa
       else
         containers
       end
+    end
+
+    def find_child_by_name(name)
+      containers_real_run.find{|bs| bs.name == name }
     end
 
     def supervisor_all_pid_file
