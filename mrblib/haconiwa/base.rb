@@ -279,6 +279,9 @@ module Haconiwa
         c.kill(signame, timeout)
       end
 
+      # timeout < 0 means "do not wait"
+      return true if timeout < 0
+
       (timeout * 10).times do
         unless File.exist? supervisor_all_pid_file
           return true
