@@ -136,6 +136,7 @@ module Haconiwa
              @cgroup
            end
       if blk
+        cg.defblock = blk
         blk.call(cg)
       end
       cg
@@ -412,10 +413,16 @@ module Haconiwa
     end
 
     def reload
-      code = File.read(hacofile)
-      tmp_barn = eval(code)
-      tmp_base = tmp_barn.find_child_by_name(self.name)
-      LinuxRunner.new(self).reload(tmp_base, self.reloadable_attr)
+      newcg = CGroup.new
+      if b = self.cgroup(:v1).defblock
+        b.call(newcg)
+      end
+      newcg2 = CGroupV2.new
+      if b = self.cgroup(:v2).defblock
+        b.call(newcg2)
+      end
+
+      LinuxRunner.new(self).reload(newcg, newcg2, self.reloadable_attr)
     rescue => e
       Logger.warning "Reload failed: #{e}. Skipping for now"
     end
@@ -470,8 +477,9 @@ module Haconiwa
     def initialize
       @groups = {}
       @groups_by_controller = {}
+      @defblock = nil
     end
-    attr_reader :groups, :groups_by_controller
+    attr_reader :groups, :groups_by_controller, :defblock
 
     def [](key)
       @groups[key]

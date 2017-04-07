@@ -44,8 +44,12 @@ module Haconiwa
       if base.daemon? # Terminal uses SIGHUP
         # Registers reload handler
         @sig_threads << SignalThread.trap(:SIGHUP) do
-          Haconiwa::Logger.info "Accepted reload: PID=#{base.pid}"
-          base.reload
+          begin
+            Haconiwa::Logger.info "Accepted reload: PID=#{base.pid}"
+            base.reload
+          rescue => e
+            Haconiwa::Logger.warning "Reload failed: #{e.class}, #{e.message}"
+          end
         end
       end
     end

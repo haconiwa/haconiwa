@@ -1,0 +1,27 @@
+# -*- mode: ruby -*-
+haconiwa = Haconiwa.define do |config|
+  config.name = "cgroup-reload-test" # to be hostname
+  config.init_command = ["/usr/bin/ruby", "-e", "def fib(n);n<2?1:fib(n-2)+fib(n-1);end;loop{fib(rand(256));sleep 0.5}"]
+  config.daemonize!
+
+  root = Pathname.new("/var/lib/haconiwa/8cfccb3d")
+  config.mount_independent "procfs"
+  config.mount_independent "sysfs"
+  config.mount_independent "devtmpfs"
+  config.mount_independent "devpts"
+  config.chroot_to root
+
+  config.namespace.unshare "mount"
+  config.namespace.unshare "ipc"
+  config.namespace.unshare "uts"
+  config.namespace.unshare "pid"
+
+  config.cgroup do |cgroup|
+    cgroup["cpuset.mems"] = "0"
+    cgroup["cpuset.cpus"] = "0"
+    cgroup["cpu.cfs_period_us"] = 100000
+    cgroup["cpu.cfs_quota_us"]  = UUID.secure_random(1..8) * 10000
+  end
+
+  config.support_reload :cgroup
+end
