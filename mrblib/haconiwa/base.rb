@@ -479,7 +479,8 @@ module Haconiwa
       @groups_by_controller = {}
       @defblock = nil
     end
-    attr_reader :groups, :groups_by_controller, :defblock
+    attr_reader :groups, :groups_by_controller
+    attr_accessor :defblock
 
     def [](key)
       @groups[key]
