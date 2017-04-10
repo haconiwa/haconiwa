@@ -142,6 +142,14 @@ module Haconiwa
       cg
     end
 
+    def resource(&blk)
+      if blk
+        @resource.defblock = blk
+        blk.call(@resource)
+      end
+      @resource
+    end
+
     def add_mount_point(point, options)
       self.namespace.unshare "mount"
       self.filesystem.mount_points << MountPoint.new(point, options)
@@ -469,8 +477,9 @@ module Haconiwa
   class Resource
     def initialize
       @limits = []
+      @defblock = nil
     end
-    attr_reader :limits
+    attr_reader :limits, :defblock
 
     def set_limit(type, value)
       self.limits << [type, value]
