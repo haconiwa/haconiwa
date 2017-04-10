@@ -159,6 +159,7 @@ And `attach` is not concerned with capabilities which is granted to container. S
 * `config.mount_independent` - Mount the independent filesystems: `"procfs", "sysfs", "devtmpfs", "devpts" and "shm"` in the newborn container. Useful if `"pid"` or `"net"` are unshared
 * `config.chroot_to` - The new chroot root
 * `config.uid=/config.gid=` - The new container's running uid/gid. `groups=` is also respected
+* `config.support_reload` - Specify reloadable parameters when invoked `haconiwa reload` command. Only `:cgroup` is available for now and it is active only when the config block is followed
 
 You can pick your own parameters for your use case of container.
 e.g. just using `mount` namespace unshared, container with common filesystem, limit the cgroups for big resource job and so on.
@@ -172,6 +173,7 @@ e.g. just using `mount` namespace unshared, container with common filesystem, li
   * `:after_chroot` - Hooked just after the chroot is successful, in forked process. This is the last timing before doing `exec()` and becoming a new program
   * `:before_start_wait` - Hooked before starting to `wait()` the container process. Hook itself is invoked in the parent process
   * `:teardown` - Hooked after the container process has quitted, in the parent process
+  * `:after_reload` - Hooked just after `haconiwa reload` is invoked and successful
   * Every hook can accept one argument `base`, which is Haconiwa::Base object.
 * `config.add_async_hook(option, &block)` - Define timer handler. Supported options:
   * `:msec/:sec/:min/:hour` - First timeout to invoke hook.

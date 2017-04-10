@@ -107,6 +107,31 @@ module Haconiwa
       base.attach(*exe)
     end
 
+    def self.reload(args)
+      opt = parse_opts(args, '[HACO_FILE]', ignore_catchall: lambda {|o| o['t'].exist? } ) do |o|
+        o.integer('t', 'target', 'PPID', "Container's supervisor PID to invoke reload")
+        o.string('n', 'name', 'CONTAINER_NAME', "Container's name to be reloaded, default to all the children")
+      end
+
+      barn = nil
+      if opt.catchall.exist?
+        barn = get_base(opt.catchall.values)
+      end
+
+      if opt['n'].exist?
+        base = barn.find_child_by_name(opt['n'].value)
+        raise("Invalid name: #{opt['n'].value}") unless base
+        ::Process.kill :SIGHUP, base.ppid
+      elsif !barn && opt['t'].exist?
+        ::Process.kill :SIGHUP, opt['t'].value.to_i
+      else
+        barn.containers_real_run.each do |c|
+          ::Process.kill :SIGHUP, c.ppid
+        end
+      end
+      STDERR.puts "Reload success"
+    end
+
     def self.kill(args)
       load_global_config
 
@@ -116,11 +141,11 @@ module Haconiwa
         o.string('s', 'signal', 'SIGFOO', "Signal name. default to TERM")
       end
 
-      base, _  = get_script_and_eval(opt.catchall.values)
-      base.pid = opt['t'].value if opt['t'].exist?
+      barn, _  = get_script_and_eval(opt.catchall.values)
+      barn.pid = opt['t'].value if opt['t'].exist?
       signame  = opt['s'].exist? ? opt['s'].value : "TERM"
       timeout  = opt['T'].exist? ? opt['T'].value : 10
-      base.kill(signame, timeout)
+      barn.kill(signame, timeout)
     end
 
     def self.revisions
@@ -177,7 +202,9 @@ module Haconiwa
 
     def self.get_base(args)
       script = File.read(args[0])
-      return Kernel.eval(script)
+      obj = Kernel.eval(script)
+      obj.hacofile = (args[0][0] == '/') ? args[0] : File.expand_path(args[0], Dir.pwd)
+      return obj
     end
 
     def self.get_script_and_eval(args)
@@ -186,8 +213,10 @@ module Haconiwa
       if exe.first == "--"
         exe.shift
       end
+      obj = Kernel.eval(script)
+      obj.hacofile = (args[0][0] == '/') ? args[0] : File.expand_path(args[0], Dir.pwd)
 
-      return [Kernel.eval(script), exe]
+      return [obj, exe]
     end
   end
 end

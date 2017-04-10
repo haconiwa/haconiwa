@@ -23,6 +23,8 @@ module Haconiwa
                   :created_at,
                   :network_mountpoint,
                   :cleaned,
+                  :hacofile,
+                  :reloadable_attr,
                   :exit_status
 
     delegate     [:uid,
@@ -45,6 +47,9 @@ module Haconiwa
     def define(&b)
       base = Base.new(self)
       b.call(base)
+      if find_child_by_name(base.name)
+        raise "Duplicated container name: #{base.name}"
+      end
       self.containers << base
     end
 
@@ -68,6 +73,7 @@ module Haconiwa
       @pid = nil
       @daemon = false
       @network_mountpoint = []
+      @reloadable_attr = []
       @cleaned = false
       @bootstrap = @provision = nil
 
@@ -83,6 +89,10 @@ module Haconiwa
       else
         containers
       end
+    end
+
+    def find_child_by_name(name)
+      containers_real_run.find{|bs| bs.name == name }
     end
 
     def supervisor_all_pid_file
@@ -112,6 +122,13 @@ module Haconiwa
       filesystem.rootfs
     end
 
+    def support_reload(name)
+      unless [:cgroup].include?(name)
+        raise ArgumentError, "Unsupported reload attribute: #{name}"
+      end
+      @reloadable_attr << name
+    end
+
     def cgroup(v=nil, &blk)
       cg = if v.to_s == "v2"
              @cgroupv2
@@ -119,6 +136,7 @@ module Haconiwa
              @cgroup
            end
       if blk
+        cg.defblock = blk
         blk.call(cg)
       end
       cg
@@ -248,7 +266,7 @@ module Haconiwa
       else
         puts "Please choose container:"
         target.each_with_index {|c, i| puts "#{i + 1}) #{c.name}" }
-        print "Selest[1-#{target.size}]: "
+        print "Select[1-#{target.size}]: "
         ans = gets
         raise("Invalid input") if ans.to_i < 1
         c = target[ans.to_i - 1]
@@ -261,6 +279,9 @@ module Haconiwa
       containers_real_run.each do |c|
         c.kill(signame, timeout)
       end
+
+      # timeout < 0 means "do not wait"
+      return true if timeout < 0
 
       (timeout * 10).times do
         unless File.exist? supervisor_all_pid_file
@@ -298,6 +319,7 @@ module Haconiwa
         :@network_mountpoint,
         :@bootstrap,
         :@provision,
+        :@reloadable_attr,
       ].each do |varname|
         value = barn.instance_variable_get(varname)
         case value
@@ -332,11 +354,30 @@ module Haconiwa
       parent.daemon?
     end
 
+    def hacofile
+      parent.hacofile
+    end
+
     def skip_bootstrap
       @bootstrap.skip = true
       @provision.skip = true
     end
     alias skip_provision skip_bootstrap
+
+    def pid!
+      self.container_pid_file ||= default_container_pid_file
+      @pid ||= ::File.read(container_pid_file).to_i
+    end
+
+    def ppid
+      ::File.read("/proc/#{pid!}/status").split("\n").each do |l|
+        next unless l.start_with?("PPid")
+        return l.split[1].to_i
+      end
+    rescue => e
+      STDERR.puts e
+      nil
+    end
 
     def create(no_provision)
       validate_non_nil(@bootstrap, "`config.bootstrap' block must be defined to create rootfs")
@@ -384,6 +425,10 @@ module Haconiwa
     def attach(*run_command)
       self.container_pid_file ||= default_container_pid_file
       LinuxRunner.new(self).attach(run_command)
+    end
+
+    def reload(newcg, newcg2)
+      LinuxRunner.new(self).reload(self.name, newcg, newcg2, self.reloadable_attr)
     end
 
     def kill(signame, timeout)
@@ -436,8 +481,10 @@ module Haconiwa
     def initialize
       @groups = {}
       @groups_by_controller = {}
+      @defblock = nil
     end
     attr_reader :groups, :groups_by_controller
+    attr_accessor :defblock
 
     def [](key)
       @groups[key]
@@ -447,7 +494,7 @@ module Haconiwa
       @groups[key] = value
       c, *attr = key.split('.')
       raise("Invalid cgroup name #{key}") if attr.empty?
-      @groups_by_controller[c] ||= Array.new
+      @groups_by_controller[c] ||= []
       @groups_by_controller[c] << [key, attr.join('_')]
       return value
     end

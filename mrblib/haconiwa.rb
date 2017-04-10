@@ -17,6 +17,8 @@ def __main__(argv)
     Haconiwa::Cli.run(argv)
   when "attach"
     Haconiwa::Cli.attach(argv)
+  when "reload"
+    Haconiwa::Cli.reload(argv)
   when "kill"
     Haconiwa::Cli.kill(argv)
   else
@@ -29,6 +31,7 @@ commands:
     archive   - create, provision, then archive rootfs to image
     start     - run the container
     attach    - attach to existing container
+    reload    - reload running container parameters, following its current config
     kill      - kill the running container
     version   - show version
     revisions - show mgem/mruby revisions which haconiwa bin uses
