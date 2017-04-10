@@ -29,14 +29,35 @@ module Haconiwa
     end
 
     def register_sighandlers(base, runner)
-      [:SIGTERM, :SIGINT, :SIGHUP, :SIGPIPE].each do |sig|
-        @sig_threads << SignalThread.trap(sig) do
+      # Registers cleanup handler when unintended death
+      [:SIGTERM, :SIGINT, :SIGPIPE].each do |sig|
+        @sig_threads << SignalThread.trap_once(sig) do
           unless base.cleaned
             Logger.warning "Supervisor received unintended kill. Cleanup..."
             runner.cleanup_supervisor(base)
           end
           Process.kill :TERM, base.pid
           exit 127
+        end
+      end
+
+      if base.daemon? # Terminal uses SIGHUP
+        # Registers reload handler
+        b1 = base.cgroup(:v1).defblock
+        b2 = base.cgroup(:v2).defblock
+
+        @sig_threads << SignalThread.trap(:SIGHUP) do
+          begin
+            newcg = Haconiwa::CGroup.new
+            Haconiwa::Logger.info "Accepted reload: PID=#{base.pid}"
+            b1.call(newcg) if b1
+            newcg2 = Haconiwa::CGroupV2.new
+            b2.call(newcg2) if b2
+            base.reload(newcg, newcg2)
+          rescue Exception => e
+            Haconiwa::Logger.warning "Reload failed: #{e.class}, #{e.message}"
+            e.backtrace.each{|l| Haconiwa::Logger.warning "    #{l}" }
+          end
         end
       end
     end

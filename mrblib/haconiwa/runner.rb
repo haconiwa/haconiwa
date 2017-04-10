@@ -14,6 +14,7 @@ module Haconiwa
       :after_chroot,
       :before_start_wait,
       :teardown,
+      :after_reload,
     ]
 
     def waitall(&how_you_run)
@@ -199,6 +200,15 @@ module Haconiwa
       end
     end
 
+    def reload(name, new_cg, new_cg2, targets)
+      if targets.include?(:cgroup)
+        Haconiwa::Logger.info "Reloading... :cgroup"
+        reapply_cgroup(name, new_cg, new_cg2)
+      end
+
+      invoke_general_hook(:after_reload, @base)
+    end
+
     def kill(sigtype, timeout)
       if !@base.pid
         if File.exist? @base.container_pid_file
@@ -208,22 +218,19 @@ module Haconiwa
         end
       end
 
-      case sigtype.to_s
-      when "INT"
-        Process.kill :INT, @base.pid
-      when "TERM"
-        Process.kill :TERM, @base.pid
-      when "KILL"
-        Process.kill :KILL, @base.pid
-      else
-        raise "Invalid or unsupported signal type: #{sigtype}"
+      ::Process.kill sigtype.to_sym, @base.pid
+
+      # timeout < 0 means "do not wait"
+      if timeout < 0
+        Logger.puts "Send signal success"
+        return
       end
 
       (timeout * 10).times do
         usleep 1000
         unless File.exist?(@base.container_pid_file)
           Logger.puts "Kill success"
-          Process.exit 0
+          return
         end
       end
 
@@ -290,7 +297,7 @@ module Haconiwa
     def invoke_general_hook(hookpoint, base)
       hook = base.general_hooks[hookpoint]
       hook.call(base) if hook
-    rescue => e
+    rescue Exception => e
       Logger.warning("General container hook at #{hookpoint.inspect} failed. Skip")
       Logger.warning("#{e.class} - #{e.message}")
     end
@@ -395,6 +402,34 @@ module Haconiwa
         cg.commit
         cg.attach
       end
+    end
+
+    def reapply_cgroup(name, cgroup, cgroupv2)
+      if cgroup
+        cgroup.controllers.each do |controller|
+          Logger.debug "Modifying cgroup controller #{controller}"
+          Logger.exception("Invalid or unsupported controller name: #{controller}") unless CG_MAPPING.has_key?(controller)
+          cls = CG_MAPPING[controller]
+          c = cls.new(name)
+          cgroup.groups_by_controller[controller].each do |pair|
+            key, attr = pair
+            value = cgroup[key]
+            c.send "#{attr}=", value
+          end
+          c.modify
+        end
+      end
+
+      if cgroupv2 && !cgroupv2.groups.empty?
+        cg = ::CgroupV2.new_group(name)
+        cgroupv2.groups.each do |key, value|
+          cg[key.to_s] = value.to_s
+        end
+        cg.commit
+      end
+    rescue Exception => e
+      Haconiwa::Logger.warning "Reapply failed: #{e.class}, #{e.message}"
+      e.backtrace.each{|l| Haconiwa::Logger.warning "    #{l}" }
     end
 
     def cleanup_cgroup(base)
