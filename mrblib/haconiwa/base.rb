@@ -364,6 +364,21 @@ module Haconiwa
     end
     alias skip_provision skip_bootstrap
 
+    def pid!
+      self.container_pid_file ||= default_container_pid_file
+      @pid ||= ::File.read(container_pid_file).to_i
+    end
+
+    def ppid
+      ::File.read("/proc/#{pid!}/status").split("\n").each do |l|
+        next unless l.start_with?("PPid")
+        return l.split[1].to_i
+      end
+    rescue => e
+      STDERR.puts e
+      nil
+    end
+
     def create(no_provision)
       validate_non_nil(@bootstrap, "`config.bootstrap' block must be defined to create rootfs")
       if @bootstrap.skip

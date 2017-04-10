@@ -109,7 +109,7 @@ module Haconiwa
 
     def self.reload(args)
       opt = parse_opts(args, '[HACO_FILE]', ignore_catchall: lambda {|o| o['t'].exist? } ) do |o|
-        o.integer('t', 'target', 'PID', "Container's PID to reload one")
+        o.integer('t', 'target', 'PPID', "Container's supervisor PID to invoke reload")
         o.string('n', 'name', 'CONTAINER_NAME', "Container's name to be reloaded, default to all the children")
       end
 
@@ -120,11 +120,14 @@ module Haconiwa
 
       if opt['n'].exist?
         base = barn.find_child_by_name(opt['n'].value)
-        base.kill(:SIGHUP, -1)
+        raise("Invalid name: #{opt['n'].value}") unless base
+        ::Process.kill :SIGHUP, base.ppid
       elsif !barn && opt['t'].exist?
         ::Process.kill :SIGHUP, opt['t'].value.to_i
       else
-        barn.kill(:SIGHUP, -1)
+        barn.containers_real_run.each do |c|
+          ::Process.kill :SIGHUP, c.ppid
+        end
       end
       STDERR.puts "Reload success"
     end
