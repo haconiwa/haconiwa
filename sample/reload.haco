@@ -1,5 +1,5 @@
 # -*- mode: ruby -*-
-haconiwa = Haconiwa.define do |config|
+Haconiwa.define do |config|
   config.name = "cgroup-reload-test" # to be hostname
   config.init_command = ["/usr/bin/ruby", "-e", "def fib(n);n<2?1:fib(n-2)+fib(n-1);end;loop{fib(rand(256));sleep 0.5}"]
   config.daemonize!

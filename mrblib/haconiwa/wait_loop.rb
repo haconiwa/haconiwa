@@ -43,12 +43,20 @@ module Haconiwa
 
       if base.daemon? # Terminal uses SIGHUP
         # Registers reload handler
+        b1 = base.cgroup(:v1).defblock
+        b2 = base.cgroup(:v2).defblock
+
         @sig_threads << SignalThread.trap(:SIGHUP) do
           begin
+            newcg = Haconiwa::CGroup.new
             Haconiwa::Logger.info "Accepted reload: PID=#{base.pid}"
-            base.reload
-          rescue => e
+            b1.call(newcg) if b1
+            newcg2 = Haconiwa::CGroupV2.new
+            b2.call(newcg2) if b2
+            base.reload(newcg, newcg2)
+          rescue Exception => e
             Haconiwa::Logger.warning "Reload failed: #{e.class}, #{e.message}"
+            e.backtrace.each{|l| Haconiwa::Logger.warning "    #{l}" }
           end
         end
       end

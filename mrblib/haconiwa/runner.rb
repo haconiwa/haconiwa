@@ -199,10 +199,10 @@ module Haconiwa
       end
     end
 
-    def reload(new_cg, new_cg2, targets)
+    def reload(name, new_cg, new_cg2, targets)
       if targets.include?(:cgroup)
-        Haconiwa::Logger.info "Reload: :cgroup"
-        reapply_cgroup(new_cg, new_cg2)
+        Haconiwa::Logger.info "Reloading... :cgroup"
+        reapply_cgroup(name, new_cg, new_cg2)
       end
     end
 
@@ -401,16 +401,16 @@ module Haconiwa
       end
     end
 
-    def reapply_cgroup(cgroup, cgroupv2)
+    def reapply_cgroup(name, cgroup, cgroupv2)
       if cgroup
         cgroup.controllers.each do |controller|
           Logger.debug "Modifying cgroup controller #{controller}"
           Logger.exception("Invalid or unsupported controller name: #{controller}") unless CG_MAPPING.has_key?(controller)
-
-          c = CG_MAPPING[controller].new(base.name)
-          base.cgroup.groups_by_controller[controller].each do |pair|
+          cls = CG_MAPPING[controller]
+          c = cls.new(name)
+          cgroup.groups_by_controller[controller].each do |pair|
             key, attr = pair
-            value = base.cgroup[key]
+            value = cgroup[key]
             c.send "#{attr}=", value
           end
           c.modify
@@ -418,12 +418,15 @@ module Haconiwa
       end
 
       if cgroupv2 && !cgroupv2.groups.empty?
-        cg = ::CgroupV2.new_group(base.name)
-        base.cgroupv2.groups.each do |key, value|
+        cg = ::CgroupV2.new_group(name)
+        cgroupv2.groups.each do |key, value|
           cg[key.to_s] = value.to_s
         end
         cg.commit
       end
+    rescue Exception => e
+      Haconiwa::Logger.warning "Reapply failed: #{e.class}, #{e.message}"
+      e.backtrace.each{|l| Haconiwa::Logger.warning "    #{l}" }
     end
 
     def cleanup_cgroup(base)
