@@ -412,19 +412,8 @@ module Haconiwa
       LinuxRunner.new(self).attach(run_command)
     end
 
-    def reload
-      newcg = CGroup.new
-      if b = self.cgroup(:v1).defblock
-        b.call(newcg)
-      end
-      newcg2 = CGroupV2.new
-      if b = self.cgroup(:v2).defblock
-        b.call(newcg2)
-      end
-
-      LinuxRunner.new(self).reload(newcg, newcg2, self.reloadable_attr)
-    rescue => e
-      Logger.warning "Reload failed: #{e}. Skipping for now"
+    def reload(newcg, newcg2)
+      LinuxRunner.new(self).reload(self.name, newcg, newcg2, self.reloadable_attr)
     end
 
     def kill(signame, timeout)
@@ -490,7 +479,7 @@ module Haconiwa
       @groups[key] = value
       c, *attr = key.split('.')
       raise("Invalid cgroup name #{key}") if attr.empty?
-      @groups_by_controller[c] ||= Array.new
+      @groups_by_controller[c] ||= []
       @groups_by_controller[c] << [key, attr.join('_')]
       return value
     end
