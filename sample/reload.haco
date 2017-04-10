@@ -24,4 +24,8 @@ Haconiwa.define do |config|
   end
 
   config.support_reload :cgroup
+
+  config.add_general_hook :after_reload do |base|
+    Haconiwa::Logger.info "Reloading is successful: #{base.name}[#{base.pid}]"
+  end
 end

@@ -14,6 +14,7 @@ module Haconiwa
       :after_chroot,
       :before_start_wait,
       :teardown,
+      :after_reload,
     ]
 
     def waitall(&how_you_run)
@@ -204,6 +205,8 @@ module Haconiwa
         Haconiwa::Logger.info "Reloading... :cgroup"
         reapply_cgroup(name, new_cg, new_cg2)
       end
+
+      invoke_general_hook(:after_reload, @base)
     end
 
     def kill(sigtype, timeout)
@@ -294,7 +297,7 @@ module Haconiwa
     def invoke_general_hook(hookpoint, base)
       hook = base.general_hooks[hookpoint]
       hook.call(base) if hook
-    rescue => e
+    rescue Exception => e
       Logger.warning("General container hook at #{hookpoint.inspect} failed. Skip")
       Logger.warning("#{e.class} - #{e.message}")
     end
