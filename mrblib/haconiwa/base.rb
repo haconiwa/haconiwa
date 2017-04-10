@@ -266,7 +266,7 @@ module Haconiwa
       else
         puts "Please choose container:"
         target.each_with_index {|c, i| puts "#{i + 1}) #{c.name}" }
-        print "Selest[1-#{target.size}]: "
+        print "Select[1-#{target.size}]: "
         ans = gets
         raise("Invalid input") if ans.to_i < 1
         c = target[ans.to_i - 1]
