@@ -9,7 +9,6 @@ Haconiwa.define do |config|
   config.bootstrap do |b|
     b.strategy = "git"
     b.git_url  = "https://github.com/haconiwa/haconiwa-image-alpine"
-    b.postprocess :shell, "rm -rf /tmp/save-*" # BUG: Block called on bootstrap...
   end
 
   config.provision do |p|
@@ -32,27 +31,20 @@ apk add ruby
   config.namespace.unshare "pid"
 
   config.cgroup do |cgroup|
-    savefile = "/tmp/save-quota-<%= @hash %>"
-    quota = if ::File.exist?(savefile)
-              ::File.read(savefile).to_i
-            else
-              30000
-            end
+    cache = Cache.new filename: "/var/save-mem-<%= @hash %>.data"
+    quota = (cache['quota'] || 30000).to_i
     cgroup["cpu.cfs_period_us"] = 100000
     cgroup["cpu.cfs_quota_us"]  = quota
 
-    ::File.open(savefile, 'w') {|f| f.write (quota + 10000).to_s }
+    cache['quota'] = (quota + 10000).to_s
   end
 
   config.resource do |res|
-    savefile = "/tmp/save-resource-<%= @hash %>"
-    resource = if ::File.exist?(savefile)
-                 ::File.read(savefile).to_i
-               else
-                 2048
-               end
+    cache = Cache.new filename: "/var/save-mem-<%= @hash %>.data"
+    resource = (cache['resource'] || 1024).to_i
     res.set_limit :NOFILE, resource, 65536
-    ::File.open(savefile, 'w') {|f| f.write (resource + 2048).to_s }
+
+    cache['resource'] = (resource + 1024).to_s
   end
 
   config.support_reload :cgroup, :resource
