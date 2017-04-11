@@ -200,10 +200,15 @@ module Haconiwa
       end
     end
 
-    def reload(name, new_cg, new_cg2, targets)
+    def reload(name, new_cg, new_cg2, new_resource, targets)
       if targets.include?(:cgroup)
         Haconiwa::Logger.info "Reloading... :cgroup"
         reapply_cgroup(name, new_cg, new_cg2)
+      end
+
+      if targets.include?(:resource)
+        Haconiwa::Logger.info "Reloading... :resource"
+        reapply_rlimit(@base.pid, new_resource)
       end
 
       invoke_general_hook(:after_reload, @base)
@@ -468,6 +473,14 @@ module Haconiwa
         type = ::Resource.const_get("RLIMIT_#{limit[0]}")
         value = [:unlimited, :infinity].include?(limit[1]) ? ::Resource::RLIM_INFINITY : limit[1]
         ::Resource.setrlimit(type, value)
+      end
+    end
+
+    def reapply_rlimit(pid, rlimit)
+      rlimit.limits.each do |limit|
+        type = ::Resource.const_get("RLIMIT_#{limit[0]}")
+        value = [:unlimited, :infinity].include?(limit[1]) ? ::Resource::RLIM_INFINITY : limit[1]
+        ::Resource.setprlimit(pid, type, value)
       end
     end
 
