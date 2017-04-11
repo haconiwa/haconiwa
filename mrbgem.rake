@@ -40,6 +40,7 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.add_dependency 'mruby-signal-thread', :github => 'pyama86/mruby-signal-thread'
 
   spec.add_test_dependency 'mruby-tempfile', :github => 'iij/mruby-tempfile'
+  spec.add_test_dependency 'mruby-cache', :github => 'matsumotory/mruby-localmemcache'
 
   # The good luck charm for avoiding dependency hell
   spec.add_dependency 'mruby-sprintf'   , :core => 'mruby-sprintf'

@@ -13,7 +13,6 @@ FileUtils.rm_rf   HACONIWA_TMP_ROOT2
 FileUtils.mkdir_p File.dirname(HACONIWA_TMP_ROOT2)
 
 at_exit do
-  FileUtils.rm_rf "/tmp/save-*"
   FileUtils.rm_rf File.dirname(HACONIWA_TMP_ROOT2)
 end
 
@@ -71,12 +70,35 @@ assert('haconiwa container is reloadable') do
 
     pid = File.read("/var/run/haconiwa-#{container_name}.pid").chomp
     quota = File.read("/sys/fs/cgroup/cpu/#{container_name}/cpu.cfs_quota_us").chomp
-    assert_equal "30000", quota
+    # FIXME: Quota counter is created then bumped in first invocation at `create'...
+    # So start with here
+    assert_equal "40000", quota
     nofile = `prlimit -o SOFT --noheadings -n -p #{pid}`.chomp
     assert_equal "2048", nofile
 
+    ppid = `grep PPid /proc/#{pid}/status | awk '{print $2}'`.chomp
+    Process.kill :HUP, ppid.to_i
+
+    begin
+      Timeout.timeout 3 do
+        until `prlimit -o SOFT --noheadings -n -p #{pid}`.chomp == "3072"
+          sleep 0.1
+        end
+      end
+    rescue Timeout::Error => e
+      warn "reload may be failed... skipping: #{e.class}, #{e.message}"
+    end
+
+    quota2 = File.read("/sys/fs/cgroup/cpu/#{container_name}/cpu.cfs_quota_us").chomp
+    assert_equal "50000", quota2
+    nofile2 = `prlimit -o SOFT --noheadings -n -p #{pid}`.chomp
+    assert_equal "3072", nofile2
+
     output, status = run_haconiwa "kill", haconame
     assert_true status.success?, "Process did not exit cleanly: kill"
+
+    system "rm -rf /var/*.data"
+    FileUtils.rm_rf @rootfs
   end
 end
 
