@@ -23,7 +23,11 @@ Haconiwa.define do |config|
     cgroup["cpu.cfs_quota_us"]  = UUID.secure_random(1..8) * 10000
   end
 
-  config.support_reload :cgroup
+  config.resource do |res|
+    res.set_limit :NOFILE, UUID.secure_random(1..4) * 1024
+  end
+
+  config.support_reload :cgroup, :resource
 
   config.add_general_hook :after_reload do |base|
     Haconiwa::Logger.info "Reloading is successful: #{base.name}[#{base.pid}]"
