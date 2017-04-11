@@ -1,0 +1,59 @@
+# -*- mode: ruby -*-
+Haconiwa.define do |config|
+  config.name = "cgroup-reload-test-<%= @hash %>" # to be hostname
+  config.init_command = ["/bin/sh", "-c", "trap exit 15; while true; do : ; done"]
+  config.daemonize!
+
+  root = Pathname.new("<%= @rootfs %>")
+
+  config.bootstrap do |b|
+    b.strategy = "git"
+    b.git_url  = "https://github.com/haconiwa/haconiwa-image-alpine"
+    b.postprocess :shell, "rm -rf /tmp/save-*" # BUG: Block called on bootstrap...
+  end
+
+  config.provision do |p|
+    p.run_shell <<-SHELL
+apk update
+apk upgrade
+apk add ruby
+    SHELL
+  end
+
+  config.mount_independent "procfs"
+  config.mount_independent "sysfs"
+  config.mount_independent "devtmpfs"
+  config.mount_independent "devpts"
+  config.chroot_to root
+
+  config.namespace.unshare "mount"
+  config.namespace.unshare "ipc"
+  config.namespace.unshare "uts"
+  config.namespace.unshare "pid"
+
+  config.cgroup do |cgroup|
+    savefile = "/tmp/save-quota-<%= @hash %>"
+    quota = if ::File.exist?(savefile)
+              ::File.read(savefile).to_i
+            else
+              30000
+            end
+    cgroup["cpu.cfs_period_us"] = 100000
+    cgroup["cpu.cfs_quota_us"]  = quota
+
+    ::File.open(savefile, 'w') {|f| f.write (quota + 10000).to_s }
+  end
+
+  config.resource do |res|
+    savefile = "/tmp/save-resource-<%= @hash %>"
+    resource = if ::File.exist?(savefile)
+                 ::File.read(savefile).to_i
+               else
+                 2048
+               end
+    res.set_limit :NOFILE, resource, 65536
+    ::File.open(savefile, 'w') {|f| f.write (resource + 2048).to_s }
+  end
+
+  config.support_reload :cgroup, :resource
+end
