@@ -123,7 +123,7 @@ module Haconiwa
     end
 
     def support_reload(name)
-      unless [:cgroup].include?(name)
+      unless [:cgroup, :resource].include?(name)
         raise ArgumentError, "Unsupported reload attribute: #{name}"
       end
       @reloadable_attr << name
@@ -435,8 +435,8 @@ module Haconiwa
       LinuxRunner.new(self).attach(run_command)
     end
 
-    def reload(newcg, newcg2)
-      LinuxRunner.new(self).reload(self.name, newcg, newcg2, self.reloadable_attr)
+    def reload(newcg, newcg2, newres)
+      LinuxRunner.new(self).reload(self.name, newcg, newcg2, newres, self.reloadable_attr)
     end
 
     def kill(signame, timeout)
