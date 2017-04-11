@@ -122,11 +122,13 @@ module Haconiwa
       filesystem.rootfs
     end
 
-    def support_reload(name)
-      unless [:cgroup, :resource].include?(name)
-        raise ArgumentError, "Unsupported reload attribute: #{name}"
+    def support_reload(*names)
+      names.each do |name|
+        unless [:cgroup, :resource].include?(name)
+          raise ArgumentError, "Unsupported reload attribute: #{name}"
+        end
+        @reloadable_attr << name
       end
-      @reloadable_attr << name
     end
 
     def cgroup(v=nil, &blk)
