@@ -483,8 +483,9 @@ module Haconiwa
     end
     attr_reader :limits, :defblock
 
-    def set_limit(type, value)
-      self.limits << [type, value]
+    def set_limit(type, soft, hard=nil)
+      hard ||= soft
+      self.limits << [type, soft, hard]
     end
   end
 

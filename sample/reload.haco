@@ -24,7 +24,7 @@ Haconiwa.define do |config|
   end
 
   config.resource do |res|
-    res.set_limit :NOFILE, UUID.secure_random(1..4) * 1024
+    res.set_limit :NOFILE, UUID.secure_random(1..4) * 1024, 65536
   end
 
   config.support_reload :cgroup, :resource
