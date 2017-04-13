@@ -35,7 +35,6 @@ before_script:
   - sudo sed -e "s?/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin?${PATH}:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin?g" --in-place /etc/sudoers
 script:
   - rake consistent
-  - rake || true
   - rake compile
   - sudo /usr/bin/rake test:bintest
   - sudo /usr/bin/rake test:mtest
