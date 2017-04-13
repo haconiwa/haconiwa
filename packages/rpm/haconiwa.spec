@@ -1,6 +1,6 @@
 Name: haconiwa
 Epoch: 1
-Version: 0.8.1
+Version: 0.8.2
 Release: 1
 Summary: MRuby on Container
 License: GPLv3+
@@ -49,6 +49,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Thu Apr 13 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.8.2-1
+- Support haconiwa reload, implement thread watchdog
+
 * Mon Apr  3 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.8.1-1
 - Remove experimental features. This destroys some of (minor) backward compatibilities
 
@@ -63,6 +66,3 @@ fi
 
 * Fri Feb 10 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.7.20170210-1
 - Snapshot with fix cgroup creation
-
-* Fri Feb  3 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.7.20170203-1
-- Snapshot with forwardports from 0.6

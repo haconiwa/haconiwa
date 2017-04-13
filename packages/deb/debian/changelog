@@ -1,3 +1,9 @@
+haconiwa (0.8.2-1) unstable; urgency=medium
+
+  * Support haconiwa reload, implement thread watchdog
+
+ -- Uchio Kondo <udzura@udzura.jp>  Thu, 13 Apr 2017 16:55:17 +0900
+
 haconiwa (0.8.1-1) unstable; urgency=medium
 
   * Remove experimental features. This destroys some of (minor) backward compatibilities
@@ -27,9 +33,3 @@ haconiwa (0.7.20170210-1) unstable; urgency=medium
   * Snapshot with fix cgroup creation
 
  -- Uchio Kondo <udzura@udzura.jp>  Fri, 10 Feb 2017 16:41:43 +0900
-
-haconiwa (0.7.20170203-1) unstable; urgency=medium
-
-  * Snapshot with forwardports from 0.6
-
- -- Uchio Kondo <udzura@udzura.jp>  Fri,  3 Feb 2017 16:18:08 +0900
