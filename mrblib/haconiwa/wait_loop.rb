@@ -77,14 +77,16 @@ module Haconiwa
     def start_dogwatch_thread
       threads = (@hook_threads + @sig_threads).map{|t| t.thread_id }
       t = SignalThread.new(threads) do |targets|
-        while 1
+        ret = []
+        while ret.empty?
           targets.each do |th|
             if SignalThread.kill_by_thread_id(th, 0) != 0
-              return th
+              ret << th
             end
           end
           usleep 50 * 1000
         end
+        ret
       end
       Haconiwa::Logger.info "Start watchdog"
       t
@@ -111,10 +113,13 @@ module Haconiwa
           end
 
           failed = t.join
-          failed_thread = (@hook_threads + @sig_threads).find{|t| t.thread_id == failed }
-          if failed_thread
-            e = failed_thread.exception
-            raise "One of threads failed. #{e.class}: #{e.message} Please check"
+          failed_threads = (@hook_threads + @sig_threads).select{|t| failed.include? t.thread_id }
+          if !failed_threads.empty?
+            failed_threads.each do |t|
+              e = t.exception
+              Haconiwa::Logger.warning "One of threads failed. #{e.class}: #{e.message} Please check"
+            end
+            raise "Something is wrong on thread pool... #{failed_threads.size} thread(s) failed"
           else
             raise "Something is wrong on thread pool..."
           end
