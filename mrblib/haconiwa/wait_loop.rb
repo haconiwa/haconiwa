@@ -74,11 +74,59 @@ module Haconiwa
       end
     end
 
+    def start_dogwatch_thread
+      threads = (@hook_threads + @sig_threads).map{|t| t.thread_id }
+      t = SignalThread.new(threads) do |targets|
+        ret = []
+        while ret.empty?
+          targets.each do |th|
+            if SignalThread.kill_by_thread_id(th, 0) != 0
+              ret << th
+            end
+          end
+          usleep 50 * 1000
+        end
+        ret
+      end
+      Haconiwa::Logger.info "Start watchdog"
+      t
+    end
+
     def run_and_wait(pid)
+      t = start_dogwatch_thread
       @registered_hooks.each do |hook|
         hook.start
       end
-      p, s = Process.waitpid2(pid)
+
+      ret = nil
+      loop {
+        ret = Process.waitpid2(pid, Process::WNOHANG)
+        if ret
+          break
+        end
+
+        if !t.alive?
+          ::Process.kill :TERM, pid # cleanup
+          if t.failed?
+            e = t.exception
+            raise "Watchdog threads failed. #{e.class}: #{e.message} Please check"
+          end
+
+          failed = t.join
+          failed_threads = (@hook_threads + @sig_threads).select{|t| failed.include? t.thread_id }
+          if !failed_threads.empty?
+            failed_threads.each do |t|
+              e = t.exception
+              Haconiwa::Logger.warning "One of threads failed. #{e.class}: #{e.message} Please check"
+            end
+            raise "Something is wrong on thread pool... #{failed_threads.size} thread(s) failed"
+          else
+            raise "Something is wrong on thread pool..."
+          end
+        end
+        usleep 1000
+      }
+      p, s = *ret
       Logger.puts "Container(#{p}) finish detected: #{s.inspect}"
       return [p, s]
     end
