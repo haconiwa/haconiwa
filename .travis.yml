@@ -6,6 +6,7 @@ language: c
 addons:
   apt:
     packages:
+      - util-linux
       - rake
       - psmisc
       - bison

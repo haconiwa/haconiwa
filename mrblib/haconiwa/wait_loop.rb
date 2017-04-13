@@ -45,6 +45,7 @@ module Haconiwa
         # Registers reload handler
         b1 = base.cgroup(:v1).defblock
         b2 = base.cgroup(:v2).defblock
+        r1 = base.resource.defblock
 
         @sig_threads << SignalThread.trap(:SIGHUP) do
           begin
@@ -53,7 +54,10 @@ module Haconiwa
             b1.call(newcg) if b1
             newcg2 = Haconiwa::CGroupV2.new
             b2.call(newcg2) if b2
-            base.reload(newcg, newcg2)
+            newres = Haconiwa::Resource.new
+            r1.call(newres) if r1
+
+            base.reload(newcg, newcg2, newres)
           rescue Exception => e
             Haconiwa::Logger.warning "Reload failed: #{e.class}, #{e.message}"
             e.backtrace.each{|l| Haconiwa::Logger.warning "    #{l}" }
