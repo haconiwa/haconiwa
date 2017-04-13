@@ -109,7 +109,7 @@ module Haconiwa
           ::Process.kill :TERM, pid # cleanup
           if t.failed?
             e = t.exception
-            raise "Watchdog threads failed. #{e.class}: #{e.message} Please check"
+            raise "Watchdog thread failed itself. #{e.class}: #{e.message} Please check!"
           end
 
           failed = t.join
@@ -117,7 +117,7 @@ module Haconiwa
           if !failed_threads.empty?
             failed_threads.each do |t|
               e = t.exception
-              Haconiwa::Logger.warning "One of threads failed. #{e.class}: #{e.message} Please check"
+              Haconiwa::Logger.warning "One of threads failed. #{e.class}: #{e.message} Please check!"
             end
             raise "Something is wrong on thread pool... #{failed_threads.size} thread(s) failed"
           else
