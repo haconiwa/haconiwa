@@ -122,11 +122,13 @@ module Haconiwa
       filesystem.rootfs
     end
 
-    def support_reload(name)
-      unless [:cgroup].include?(name)
-        raise ArgumentError, "Unsupported reload attribute: #{name}"
+    def support_reload(*names)
+      names.each do |name|
+        unless [:cgroup, :resource].include?(name)
+          raise ArgumentError, "Unsupported reload attribute: #{name}"
+        end
+        @reloadable_attr << name
       end
-      @reloadable_attr << name
     end
 
     def cgroup(v=nil, &blk)
@@ -140,6 +142,14 @@ module Haconiwa
         blk.call(cg)
       end
       cg
+    end
+
+    def resource(&blk)
+      if blk
+        @resource.defblock = blk
+        blk.call(@resource)
+      end
+      @resource
     end
 
     def add_mount_point(point, options)
@@ -427,8 +437,8 @@ module Haconiwa
       LinuxRunner.new(self).attach(run_command)
     end
 
-    def reload(newcg, newcg2)
-      LinuxRunner.new(self).reload(self.name, newcg, newcg2, self.reloadable_attr)
+    def reload(newcg, newcg2, newres)
+      LinuxRunner.new(self).reload(self.name, newcg, newcg2, newres, self.reloadable_attr)
     end
 
     def kill(signame, timeout)
@@ -469,11 +479,14 @@ module Haconiwa
   class Resource
     def initialize
       @limits = []
+      @defblock = nil
     end
     attr_reader :limits
+    attr_accessor :defblock
 
-    def set_limit(type, value)
-      self.limits << [type, value]
+    def set_limit(type, soft, hard=nil)
+      hard ||= soft
+      self.limits << [type, soft, hard]
     end
   end
 

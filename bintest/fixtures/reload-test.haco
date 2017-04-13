@@ -1,0 +1,51 @@
+# -*- mode: ruby -*-
+Haconiwa.define do |config|
+  config.name = "cgroup-reload-test-<%= @hash %>" # to be hostname
+  config.init_command = ["/bin/sh", "-c", "trap exit 15; while true; do : ; done"]
+  config.daemonize!
+
+  root = Pathname.new("<%= @rootfs %>")
+
+  config.bootstrap do |b|
+    b.strategy = "git"
+    b.git_url  = "https://github.com/haconiwa/haconiwa-image-alpine"
+  end
+
+  config.provision do |p|
+    p.run_shell <<-SHELL
+apk update
+apk upgrade
+apk add ruby
+    SHELL
+  end
+
+  config.mount_independent "procfs"
+  config.mount_independent "sysfs"
+  config.mount_independent "devtmpfs"
+  config.mount_independent "devpts"
+  config.chroot_to root
+
+  config.namespace.unshare "mount"
+  config.namespace.unshare "ipc"
+  config.namespace.unshare "uts"
+  config.namespace.unshare "pid"
+
+  config.cgroup do |cgroup|
+    cache = Cache.new filename: "/var/save-mem-<%= @hash %>.data"
+    quota = (cache['quota'] || 30000).to_i
+    cgroup["cpu.cfs_period_us"] = 100000
+    cgroup["cpu.cfs_quota_us"]  = quota
+
+    cache['quota'] = (quota + 10000).to_s
+  end
+
+  config.resource do |res|
+    cache = Cache.new filename: "/var/save-mem-<%= @hash %>.data"
+    resource = (cache['resource'] || 1024).to_i
+    res.set_limit :NOFILE, resource, 65536
+
+    cache['resource'] = (resource + 1024).to_s
+  end
+
+  config.support_reload :cgroup, :resource
+end

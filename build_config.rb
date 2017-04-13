@@ -11,6 +11,7 @@ MRuby::Build.new do |conf|
   conf.enable_test
 
   gem_config(conf)
+  conf.gem github: 'matsumotory/mruby-localmemcache'
 end
 
 # Just build for Linux...
