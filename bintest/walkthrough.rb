@@ -81,7 +81,7 @@ assert('walkthrough') do
         until ready
           subprocess = `pstree -Al $(pgrep haconiwa | sort | head -1)`.chomp
           tree = subprocess.split(/(-[-+]-|\s+)/)
-          ready = (tree.size >= 7 && tree.last == "`-4*[{haconiwa}]")
+          ready = (tree.size >= 7 && tree.last == "`-5*[{haconiwa}]")
           sleep 0.1
         end
       end
@@ -96,7 +96,7 @@ assert('walkthrough') do
     assert_equal "-+-", tree[3]
     assert_equal "sh", tree[4]
     # Assert sub threads
-    assert_equal "`-4*[{haconiwa}]", tree[6]
+    assert_equal "`-5*[{haconiwa}]", tree[6]
 
     output, status = run_haconiwa "kill", haconame
     assert_true status.success?, "Process did not exit cleanly: kill"
