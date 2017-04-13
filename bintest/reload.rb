@@ -73,7 +73,7 @@ assert('haconiwa container is reloadable') do
     # FIXME: Quota counter is created then bumped in first invocation at `create'...
     # So start with here
     assert_equal "40000", quota
-    nofile = `prlimit -o SOFT --noheadings -n -p #{pid}`.chomp
+    nofile = `cat /proc/#{pid}/limits | grep 'Max open files' | awk '{print $4}'`.chomp
     assert_equal "2048", nofile
 
     ppid = `grep PPid /proc/#{pid}/status | awk '{print $2}'`.chomp
@@ -81,7 +81,7 @@ assert('haconiwa container is reloadable') do
 
     begin
       Timeout.timeout 3 do
-        until `prlimit -o SOFT --noheadings -n -p #{pid}`.chomp == "3072"
+        until `cat /proc/#{pid}/limits | grep 'Max open files' | awk '{print $4}'`.chomp == "3072"
           sleep 0.1
         end
       end
@@ -91,7 +91,7 @@ assert('haconiwa container is reloadable') do
 
     quota2 = File.read("/sys/fs/cgroup/cpu/#{container_name}/cpu.cfs_quota_us").chomp
     assert_equal "50000", quota2
-    nofile2 = `prlimit -o SOFT --noheadings -n -p #{pid}`.chomp
+    nofile2 = `cat /proc/#{pid}/limits | grep 'Max open files' | awk '{print $4}'`.chomp
     assert_equal "3072", nofile2
 
     output, status = run_haconiwa "kill", haconame
