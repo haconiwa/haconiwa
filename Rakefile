@@ -161,10 +161,6 @@ namespace :release do
     Dir.chdir(pwd) { sh "docker-compose build rpm && docker-compose run rpm" }
   end
 
-  task :rpm6 do
-    Dir.chdir(pwd) { sh "docker-compose build rpm6 && docker-compose run rpm6" }
-  end
-
   desc "release packages to packagecloud"
   task :packagecloud do
     Dir.chdir pwd do
@@ -172,7 +168,6 @@ namespace :release do
       sh "package_cloud push udzura/haconiwa/ubuntu/xenial pkg/haconiwa_#{Haconiwa::VERSION}-1_amd64.deb"
       sh "package_cloud push udzura/haconiwa/debian/jessie pkg/haconiwa_#{Haconiwa::VERSION}-1_amd64.deb"
       sh "package_cloud push udzura/haconiwa/el/7 pkg/haconiwa-#{Haconiwa::VERSION}-1.el7.x86_64.rpm"
-      sh "package_cloud push udzura/haconiwa/el/6 pkg/haconiwa-#{Haconiwa::VERSION}-1.el6.x86_64.rpm"
       sh "package_cloud push udzura/haconiwa/fedora/23 pkg/haconiwa-#{Haconiwa::VERSION}-1.el7.x86_64.rpm"
       sh "package_cloud push udzura/haconiwa/fedora/24 pkg/haconiwa-#{Haconiwa::VERSION}-1.el7.x86_64.rpm"
     end
@@ -200,9 +195,6 @@ task :package_regen do
 
     docker_rpm = ERB.new(File.read("packages/templates/Dockerfile.centos.erb")).result(binding)
     File.write("packages/dockerfiles/Dockerfile.centos", docker_rpm)
-
-    docker_rpm = ERB.new(File.read("packages/templates/Dockerfile.centos6.erb")).result(binding)
-    File.write("packages/dockerfiles/Dockerfile.centos6", docker_rpm)
 
     version = ERB.new(File.read("packages/templates/version.rb.erb")).result(binding)
     File.write("mrblib/haconiwa/version.rb", version)
