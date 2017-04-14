@@ -9,9 +9,3 @@ rpm:
   build: .
   volumes:
     - .:/out:rw
-
-rpm6:
-  dockerfile: packages/dockerfiles/Dockerfile.centos6
-  build: .
-  volumes:
-    - .:/out:rw
