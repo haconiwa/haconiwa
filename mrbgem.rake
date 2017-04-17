@@ -13,7 +13,6 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.add_dependency 'mruby-eval'      , :core => 'mruby-eval'
   spec.add_dependency 'mruby-random'    , :core => 'mruby-random'
   spec.add_dependency 'mruby-string-ext', :core => 'mruby-string-ext'
-  spec.add_dependency 'mruby-time'      , :core => 'mruby-time'
 
   spec.add_dependency 'mruby-forwardable', :mgem => 'mruby-forwardable'
   spec.add_dependency 'mruby-shellwords', :mgem => 'mruby-shellwords'
@@ -40,10 +39,10 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.add_dependency 'mruby-signal-thread', :github => 'pyama86/mruby-signal-thread'
   spec.add_dependency 'mruby-thread', :mgem => 'mruby-thread'
 
-  spec.add_test_dependency 'mruby-tempfile', :github => 'iij/mruby-tempfile'
   spec.add_test_dependency 'mruby-cache', :github => 'matsumotory/mruby-localmemcache'
 
   # The good luck charm for avoiding dependency hell
+  spec.add_dependency 'mruby-time'      , :core => 'mruby-time'
   spec.add_dependency 'mruby-sprintf'   , :core => 'mruby-sprintf'
   spec.add_dependency 'mruby-print'     , :core => 'mruby-print'
 
