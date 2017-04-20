@@ -1,8 +1,8 @@
 # Haconiwa
 
-[![Build Status](https://travis-ci.org/haconiwa/haconiwa.svg?branch=master)](https://travis-ci.org/haconiwa/haconiwa)
+![The logo](images/haconiwa-logo.png)
 
-mRuby on Container / helper tools with DSL for your handmade linux containers.
+mRuby on Container / helper tools with DSL for your handmade linux containers. [![Build Status](https://travis-ci.org/haconiwa/haconiwa.svg?branch=master)](https://travis-ci.org/haconiwa/haconiwa)
 
 Haconiwa (`箱庭` - a miniature garden) is a container builder DSL, by which you can choose any container-related technologies as you like:
 
@@ -236,6 +236,8 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/haconi
 ## License
 
 Haconiwa core is under the GPL v3 License: See [LICENSE](./LICENSE) file.
+
+Haconinwa's logo is originally created by [@takeshige](https://github.com/takeshige), and is under [Creative Commons License **BY-NC-ND** 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/). ![CC BY-NC-ND](https://licensebuttons.net/l/by-nc-nd/4.0/88x31.png)
 
 Bundled libraries (libcap, libcgroup, libargtable and mruby) are licensed by each authors. See `LICENSE_*` file.
 
