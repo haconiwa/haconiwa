@@ -1,6 +1,6 @@
 # Haconiwa
 
-![The logo](images/haconiwa-logo.png)
+![The logo](images/haconiwa-logo-small.png)
 
 mRuby on Container / helper tools with DSL for your handmade linux containers. [![Build Status](https://travis-ci.org/haconiwa/haconiwa.svg?branch=master)](https://travis-ci.org/haconiwa/haconiwa)
 
