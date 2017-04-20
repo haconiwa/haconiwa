@@ -1,6 +1,6 @@
 # Haconiwa
 
-<img src="images/haconiwa-logo.png" alt="The logo" style="width: 500px;" />
+<img src="images/haconiwa-logo.png" alt="The logo" width="500" />
 
 mRuby on Container / helper tools with DSL for your handmade linux containers. [![Build Status](https://travis-ci.org/haconiwa/haconiwa.svg?branch=master)](https://travis-ci.org/haconiwa/haconiwa)
 
