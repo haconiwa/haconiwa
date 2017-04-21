@@ -43,6 +43,7 @@ module Haconiwa
       Logger.info("Base setting DSL is evaluated")
       barn
     end
+    attr_accessor :system_exception
 
     def define(&b)
       base = Base.new(self)
@@ -260,10 +261,6 @@ module Haconiwa
           pid
         end
       end
-    rescue HacoFatalError => e
-      raise e
-    rescue => e
-      Logger.exception(e)
     end
     alias run start
 

@@ -41,6 +41,23 @@ Haconiwa.define do |config|
     Kernel.slack("Container is going to be done!! #{base.name}, current hostname: #{hostname}")
   end
 
+  config.add_general_hook :after_failure do |base|
+    Haconiwa::Logger.warning("Message = Container is failed: #{base.exit_status.inspect}")
+    Kernel.slack("Container is failed: #{base.exit_status.inspect}")
+  end
+
+  config.add_general_hook :system_failure do |barn|
+    if barn.exit_status
+      Haconiwa::Logger.warning("Message = System is failed: #{barn.exit_status.inspect}")
+      Kernel.slack("System is failed: #{barn.exit_status.inspect}")
+    elsif barn.system_exception
+      Haconiwa::Logger.warning("Message = System is failed: #{barn.system_exception.inspect}")
+      Kernel.slack("System is failed: #{barn.system_exception.inspect}")
+    else
+      Haconiwa::Logger.warning("????: #{barn.inspect}")
+    end
+  end
+
   config.add_async_hook(sec: 5, interval_msec: 10 * 1000) do |base|
     Haconiwa::Logger.info("This is a hook!!!1: [#{base.pid}]")
     hostname = `hostname`.chomp

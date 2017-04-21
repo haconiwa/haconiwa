@@ -172,9 +172,16 @@ e.g. just using `mount` namespace unshared, container with common filesystem, li
   * `:before_chroot` - Hooked just after container settins are applied (e.g. namespace, cgroup, caps, fs mounting) and just before do chroot in forked process
   * `:after_chroot` - Hooked just after the chroot is successful, in forked process. This is the last timing before doing `exec()` and becoming a new program
   * `:before_start_wait` - Hooked before starting to `wait()` the container process. Hook itself is invoked in the parent process
-  * `:teardown` - Hooked after the container process has quitted, in the parent process
+  * `:teardown_container` - Hooked after the container process has quitted, in the parent process. `base.exit_status` is set
   * `:after_reload` - Hooked just after `haconiwa reload` is invoked and successful
+  * `:after_failure` - Hooked just after tha container process is exited with failure. `base.exit_status` is set
   * Every hook can accept one argument `base`, which is Haconiwa::Base object.
+* hooks below are system hooks, which are invoked in across-supervisor layer.
+  * `:setup` - Hooked just before the supervisor processes are going to be forked
+  * `:teardown` - Hooked after the supervisor processes have quitted all
+  * `:system_failure` - Hooked just after tha container process is exited with failure
+    * Either `barn.exit_status` or `barn.system_exception` will be available
+  * Every hook can accept one argument `barn`, which is Haconiwa::Barn object.
 * `config.add_async_hook(option, &block)` - Define timer handler. Supported options:
   * `:msec/:sec/:min/:hour` - First timeout to invoke hook.
   * `:interval_msec` - Define the interval timeout hooks, if this paramete exists.
