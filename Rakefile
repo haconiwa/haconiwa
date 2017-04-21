@@ -151,7 +151,7 @@ namespace :release do
   task :shipit => [:tarball, :run_ghr]
 
   desc "Build all of packages in parallel"
-  multitask :packages => [:deb, :rpm, :rpm6]
+  multitask :packages => [:deb, :rpm]
 
   task :deb do
     Dir.chdir(pwd) { sh "docker-compose build deb && docker-compose run deb" }
