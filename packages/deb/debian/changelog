@@ -1,3 +1,9 @@
+haconiwa (0.8.3-1) unstable; urgency=medium
+
+  * Support haconiwa new hooks, including system hooks
+
+ -- Uchio Kondo <udzura@udzura.jp>  Fri, 21 Apr 2017 17:20:31 +0900
+
 haconiwa (0.8.2-1) unstable; urgency=medium
 
   * Support haconiwa reload, implement thread watchdog
@@ -27,9 +33,3 @@ haconiwa (0.7.20170216-1) unstable; urgency=medium
   * Snapshot with pid check
 
  -- Uchio Kondo <udzura@udzura.jp>  Thu, 16 Feb 2017 17:10:47 +0900
-
-haconiwa (0.7.20170210-1) unstable; urgency=medium
-
-  * Snapshot with fix cgroup creation
-
- -- Uchio Kondo <udzura@udzura.jp>  Fri, 10 Feb 2017 16:41:43 +0900
