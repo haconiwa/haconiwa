@@ -1,4 +1,14 @@
 # -*- mode: ruby -*-
+IKACHAN_HOST = ENV['IKACHAN_HOST'] || "ikachan.local:4979"
+CHANNEL_NAME = ENV['CHANNEL_NAME'] || "#test"
+LIFETIME     = ENV['LIFETIME'] || 60
+module Kernel
+  def self.slack(msg)
+    Haconiwa::Logger.info "msg is: #{msg}"
+    system "curl -dchannel='#{CHANNEL_NAME}' -dmessage='#{msg}' #{IKACHAN_HOST}/notice"
+  end
+end
+
 Haconiwa.define do |config|
   # The first process when invoking haconiwa run:
   # If your first process is a daemon, please explicitly daemonize by:
@@ -10,6 +20,14 @@ Haconiwa.define do |config|
   config.bootstrap do |b|
     b.strategy = "git"
     b.git_url = "https://github.com/haconiwa/haconiwa-image-php-tester"
+  end
+
+  config.add_general_hook :teardown do |base|
+    Kernel.slack("Container is dead at all. #{base.name}")
+  end
+
+  config.add_general_hook :setup do |base|
+    Kernel.slack("new supervisor! #{base.name}")
   end
 
   config.provision do |p|

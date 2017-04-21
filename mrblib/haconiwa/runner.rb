@@ -22,6 +22,7 @@ module Haconiwa
 
     def waitall(&how_you_run)
       wrap_daemonize do |base, n|
+        invoke_general_hook(:setup, base)
         pids = how_you_run.call(n)
 
         if n
@@ -35,6 +36,8 @@ module Haconiwa
           Logger.puts "A container finished: #{pid}, #{status.inspect}"
           break if pids.empty?
         end
+
+        invoke_general_hook(:teardown, base)
       end
     end
 
