@@ -119,6 +119,7 @@ module Haconiwa
             reopen_fds(base.command) if base.daemon?
 
             apply_capability(base.capabilities)
+            apply_seccomp(base.seccomp)
             switch_guid(base.guid)
             kick_ok.puts "done"
             kick_ok.close
@@ -490,6 +491,14 @@ module Haconiwa
     rescue => e
       showid = capabilities.acts_as_whitelist? ? capabilities.whitelist_ids : capabilities.blacklist_ids
       Logger.exception "Maybe there are unsupported caps in #{showid.inspect}: #{e.class} - #{e.message}"
+    end
+
+    def apply_seccomp(seccomp)
+      if seccomp.def_action
+        ctx = ::Seccomp.new(default: seccomp.def_action)
+        seccomp.defblock.call(ctx)
+        ctx.load
+      end
     end
 
     def apply_rlimit(rlimit)
