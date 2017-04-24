@@ -1,3 +1,9 @@
+haconiwa (0.8.4-1) unstable; urgency=medium
+
+  * Support seccomp-bpf filter
+
+ -- Uchio Kondo <udzura@udzura.jp>  Mon, 24 Apr 2017 18:19:01 +0900
+
 haconiwa (0.8.3-1) unstable; urgency=medium
 
   * Support haconiwa new hooks, including system hooks
@@ -27,9 +33,3 @@ haconiwa (0.7.20170302-1) unstable; urgency=medium
   * Snapshot with cgroup warning fix
 
  -- Uchio Kondo <udzura@udzura.jp>  Thu,  2 Mar 2017 17:28:47 +0900
-
-haconiwa (0.7.20170216-1) unstable; urgency=medium
-
-  * Snapshot with pid check
-
- -- Uchio Kondo <udzura@udzura.jp>  Thu, 16 Feb 2017 17:10:47 +0900

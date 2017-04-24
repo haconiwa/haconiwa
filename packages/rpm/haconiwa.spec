@@ -1,6 +1,6 @@
 Name: haconiwa
 Epoch: 1
-Version: 0.8.3
+Version: 0.8.4
 Release: 1
 Summary: MRuby on Container
 License: GPLv3+
@@ -49,6 +49,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Mon Apr 24 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.8.4-1
+- Support seccomp-bpf filter
+
 * Fri Apr 21 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.8.3-1
 - Support haconiwa new hooks, including system hooks
 
@@ -63,6 +66,3 @@ fi
 
 * Thu Mar  2 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.7.20170302-1
 - Snapshot with cgroup warning fix
-
-* Thu Feb 16 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.7.20170216-1
-- Snapshot with pid check
