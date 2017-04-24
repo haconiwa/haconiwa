@@ -1,0 +1,27 @@
+# -*- mode: ruby -*-
+Haconiwa.define do |config|
+  config.name = "haconiwa-seccomp-test"
+  # invoke shell that cannot call mkdir(1) or chown(1)
+  config.init_command = ["/bin/sh"]
+
+  root = Pathname.new("/var/lib/haconiwa/8cfccb3d")
+  config.chroot_to root
+
+  config.add_mount_point "tmpfs", to: root.join("tmp"), fs: "tmpfs"
+  config.mount_independent "procfs"
+  config.mount_independent "sysfs"
+  config.mount_independent "devtmpfs"
+  config.mount_independent "devpts"
+  config.mount_independent "shm"
+
+  # The namespaces to unshare:
+  config.namespace.unshare "mount"
+  config.namespace.unshare "ipc"
+  config.namespace.unshare "uts"
+  config.namespace.unshare "pid"
+
+  config.seccomp.filter(default: :allow) do |rule|
+    rule.kill :mkdir
+    rule.kill :fchownat
+  end
+end

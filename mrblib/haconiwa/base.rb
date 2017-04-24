@@ -13,6 +13,7 @@ module Haconiwa
                   :namespace,
                   :capabilities,
                   :guid,
+                  :seccomp,
                   :general_hooks,
                   :async_hooks,
                   :environ,
@@ -64,6 +65,7 @@ module Haconiwa
       @namespace = Namespace.new
       @capabilities = Capabilities.new
       @guid = Guid.new
+      @seccomp = Seccomp.new
       @general_hooks = {}
       @async_hooks = []
       @environ = {}
@@ -316,6 +318,7 @@ module Haconiwa
         :@namespace,
         :@capabilities,
         :@guid,
+        :@seccomp,
         :@general_hooks,
         :@async_hooks,
         :@environ,
@@ -726,6 +729,20 @@ module Haconiwa
         end
       end
       @groups
+    end
+  end
+
+  class Seccomp
+    def initialize
+      @def_action = nil
+      @defblock = nil
+    end
+    attr_accessor :def_action, :defblock
+
+    def filter(options={}, &blk)
+      @def_action = options[:default]
+      raise("default: must be specified to filter") unless @def_action
+      @defblock = blk
     end
   end
 
