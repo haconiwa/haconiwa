@@ -17,6 +17,11 @@ module Haconiwa
         e.backtrace[1..-1].each{|l| Syslog.err "=> #{l}" } if e.backtrace
         Syslog.err("...Shutting down haconiwa")
         raise(e)
+      elsif args.first.is_a? Exception
+        e = args.first
+        Syslog.err("#{e.inspect}")
+        Syslog.err("=> #{e.backtrace.first}") if e.backtrace
+        raise(HacoFatalError, e.inspect)
       else
         Syslog.err(*args)
         raise(HacoFatalError, *args)

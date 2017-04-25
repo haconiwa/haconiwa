@@ -5,6 +5,7 @@ module Haconiwa
   class LinuxRunner < Runner
     def initialize(base)
       @base = base
+      validate_ruid(base)
     end
 
     VALID_HOOKS = [
@@ -31,6 +32,7 @@ module Haconiwa
           n.close
         end
 
+        drop_suid_bit
         while res = ::Process.waitpid2(-1)
           pid, status = res[0], res[1]
           pids.delete(pid)
@@ -47,12 +49,12 @@ module Haconiwa
         invoke_general_hook(:teardown, barn)
       end
     rescue HacoFatalError => ex
-      barn.system_exception = ex
-      invoke_general_hook(:system_failure, barn)
+      @base.system_exception = ex
+      invoke_general_hook(:system_failure, @base)
       raise ex
     rescue => e
-      barn.system_exception = e
-      invoke_general_hook(:system_failure, barn)
+      @base.system_exception = e
+      invoke_general_hook(:system_failure, @base)
       Logger.exception(e)
     end
 
@@ -156,6 +158,7 @@ module Haconiwa
         base.pid = pid.to_i
         base.supervisor_pid = ::Process.pid
 
+        drop_suid_bit
         Logger.puts "Container fork success and going to wait: pid=#{pid}"
         base.waitloop.register_hooks(base)
         base.waitloop.register_sighandlers(base, self)
@@ -269,9 +272,19 @@ module Haconiwa
     end
 
     def cleanup_supervisor(base)
-      cleanup_cgroup(base)
-      File.unlink base.container_pid_file
+      recover_suid_bit do
+        cleanup_cgroup(base)
+        File.unlink base.container_pid_file
+      end
       base.cleaned = true
+    end
+
+    def validate_ruid(base)
+      if base.rid_validator
+        unless base.rid_validator.call(::Process::Sys.getuid, ::Process::Sys.getgid)
+          raise "Invalid user/group to invoke suid-haconiwa: #{::Process::Sys.getuid}:#{::Process::Sys.getgid}"
+        end
+      end
     end
 
     private
@@ -292,7 +305,7 @@ module Haconiwa
           rescue => e
             Logger.exception(e)
           ensure
-            File.unlink @base.supervisor_all_pid_file
+            recover_suid_bit { File.unlink @base.supervisor_all_pid_file }
           end
         end
         w.close
@@ -551,14 +564,28 @@ module Haconiwa
     end
 
     def switch_guid(guid)
-      if guid.gid
-        ::Process::Sys.setgid(guid.gid)
-        ::Process::Sys.__setgroups(guid.groups + [guid.gid])
-      else
-        # Assume gid is same as uid
-        ::Process::Sys.setgid(guid.uid) if guid.uid
+      uid = guid.uid || ::Process::Sys.getuid
+      gid = guid.gid || ::Process::Sys.getgid
+      ::Process::Sys.setgid(gid)
+      ::Process::Sys.__setgroups(guid.groups + [gid])
+      ::Process::Sys.setuid(uid)
+    end
+
+    def drop_suid_bit
+      if ::Process::Sys.getuid != ::Process::Sys.geteuid
+        ::Process::Sys.seteuid(::Process::Sys.getuid)
       end
-      ::Process::Sys.setuid(guid.uid) if guid.uid
+
+      if ::Process::Sys.getgid != ::Process::Sys.getegid
+        ::Process::Sys.setegid(::Process::Sys.getgid)
+      end
+    end
+
+    def recover_suid_bit(&b)
+      ::Process::Sys.seteuid(0)
+      b.call
+    ensure
+      ::Process::Sys.seteuid(::Process::Sys.getuid)
     end
 
     def persist_namespace(pid, namespace)
