@@ -271,8 +271,10 @@ module Haconiwa
     end
 
     def cleanup_supervisor(base)
-      cleanup_cgroup(base)
-      File.unlink base.container_pid_file
+      recover_suid_bit do
+        cleanup_cgroup(base)
+        File.unlink base.container_pid_file
+      end
       base.cleaned = true
     end
 
@@ -294,7 +296,7 @@ module Haconiwa
           rescue => e
             Logger.exception(e)
           ensure
-            File.unlink @base.supervisor_all_pid_file
+            recover_suid_bit { File.unlink @base.supervisor_all_pid_file }
           end
         end
         w.close
@@ -568,6 +570,13 @@ module Haconiwa
       if ::Process::Sys.getgid != ::Process::Sys.getegid
         ::Process::Sys.setegid(::Process::Sys.getgid)
       end
+    end
+
+    def recover_suid_bit(&b)
+      ::Process::Sys.seteuid(0)
+      b.call
+    ensure
+      ::Process::Sys.seteuid(::Process::Sys.getuid)
     end
 
     def persist_namespace(pid, namespace)
