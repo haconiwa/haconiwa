@@ -187,6 +187,7 @@ e.g. just using `mount` namespace unshared, container with common filesystem, li
   * `:interval_msec` - Define the interval timeout hooks, if this paramete exists.
   * NOTE: Async hook uses POSIX timer and real-time signals internally. Please do not queue real-time signals directly.
 * `config.add_signal_handler(signame, &block)` - Define signal handler at supervisor process(not container itself). Available signals are `SIGTTIN/SIGTTOU/SIGUSR1/SIGUSR2`. See [handler example](./sample/cpu.haco).
+* `config.validate_real_id(&block{|ruid, rgid| ... })` - Validates the Real UID/GID who invoked haconiwa command. return true if OK, false/nil to mark invalid. This is useful when haconiwa command is set-user-ID root
 
 Please check out [`sample`](./sample) directory.
 
