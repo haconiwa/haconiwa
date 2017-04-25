@@ -551,14 +551,11 @@ module Haconiwa
     end
 
     def switch_guid(guid)
-      if guid.gid
-        ::Process::Sys.setgid(guid.gid)
-        ::Process::Sys.__setgroups(guid.groups + [guid.gid])
-      else
-        # Assume gid is same as uid
-        ::Process::Sys.setgid(guid.uid) if guid.uid
-      end
-      ::Process::Sys.setuid(guid.uid) if guid.uid
+      uid = guid.uid || ::Process::Sys.getuid
+      gid = guid.gid || ::Process::Sys.getgid
+      ::Process::Sys.setgid(guid.gid)
+      ::Process::Sys.__setgroups(guid.groups + [guid.gid])
+      ::Process::Sys.setuid(uid)
     end
 
     def persist_namespace(pid, namespace)
