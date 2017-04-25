@@ -31,6 +31,7 @@ module Haconiwa
           n.close
         end
 
+        drop_suid_bit
         while res = ::Process.waitpid2(-1)
           pid, status = res[0], res[1]
           pids.delete(pid)
@@ -156,6 +157,7 @@ module Haconiwa
         base.pid = pid.to_i
         base.supervisor_pid = ::Process.pid
 
+        drop_suid_bit
         Logger.puts "Container fork success and going to wait: pid=#{pid}"
         base.waitloop.register_hooks(base)
         base.waitloop.register_sighandlers(base, self)
@@ -556,6 +558,16 @@ module Haconiwa
       ::Process::Sys.setgid(guid.gid)
       ::Process::Sys.__setgroups(guid.groups + [guid.gid])
       ::Process::Sys.setuid(uid)
+    end
+
+    def drop_suid_bit
+      if ::Process::Sys.getuid != ::Process::Sys.geteuid
+        ::Process::Sys.seteuid(::Process::Sys.getuid)
+      end
+
+      if ::Process::Sys.getgid != ::Process::Sys.getegid
+        ::Process::Sys.setegid(::Process::Sys.getgid)
+      end
     end
 
     def persist_namespace(pid, namespace)
