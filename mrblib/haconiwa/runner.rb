@@ -5,6 +5,7 @@ module Haconiwa
   class LinuxRunner < Runner
     def initialize(base)
       @base = base
+      validate_ruid(base)
     end
 
     VALID_HOOKS = [
@@ -276,6 +277,14 @@ module Haconiwa
         File.unlink base.container_pid_file
       end
       base.cleaned = true
+    end
+
+    def validate_ruid(base)
+      if base.rid_validator
+        unless base.rid_validator.call(::Process::Sys.getuid, ::Process::Sys.getgid)
+          raise "Invalid user/group to invoke suid-haconiwa: #{::Process::Sys.getuid}:#{::Process::Sys.getgid}"
+        end
+      end
     end
 
     private

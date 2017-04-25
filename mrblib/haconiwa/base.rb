@@ -44,7 +44,6 @@ module Haconiwa
       Logger.info("Base setting DSL is evaluated")
       barn
     end
-    attr_accessor :system_exception
 
     def define(&b)
       base = Base.new(self)
@@ -84,7 +83,12 @@ module Haconiwa
 
       @containers = []
     end
+    attr_accessor :system_exception, :rid_validator
     attr_reader :containers, :waitloop
+
+    def validate_real_id(&validator)
+      @rid_validator = validator
+    end
 
     def containers_real_run
       if containers.empty?
