@@ -555,8 +555,8 @@ module Haconiwa
     def switch_guid(guid)
       uid = guid.uid || ::Process::Sys.getuid
       gid = guid.gid || ::Process::Sys.getgid
-      ::Process::Sys.setgid(guid.gid)
-      ::Process::Sys.__setgroups(guid.groups + [guid.gid])
+      ::Process::Sys.setgid(gid)
+      ::Process::Sys.__setgroups(guid.groups + [gid])
       ::Process::Sys.setuid(uid)
     end
 

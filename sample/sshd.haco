@@ -12,8 +12,8 @@ Haconiwa.define do |config|
   config.add_mount_point "/var/haconiwa/user_homes", to: root + "/home/haconiwa"
   config.chroot_to root
 
-  config.uid = 'vagrant'
-  config.gid = 'vagrant'
+  #config.uid = 'vagrant'
+  #config.gid = 'vagrant'
 
   config.mount_independent "procfs"
   config.mount_independent "sysfs"
