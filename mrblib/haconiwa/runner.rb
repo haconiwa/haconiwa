@@ -47,12 +47,12 @@ module Haconiwa
         invoke_general_hook(:teardown, barn)
       end
     rescue HacoFatalError => ex
-      barn.system_exception = ex
-      invoke_general_hook(:system_failure, barn)
+      @base.system_exception = ex
+      invoke_general_hook(:system_failure, @base)
       raise ex
     rescue => e
-      barn.system_exception = e
-      invoke_general_hook(:system_failure, barn)
+      @base.system_exception = e
+      invoke_general_hook(:system_failure, @base)
       Logger.exception(e)
     end
 
