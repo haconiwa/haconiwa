@@ -4,17 +4,24 @@ Haconiwa.define do |config|
   config.init_command = ["/usr/sbin/sshd", '-D'] # to be first process
   config.daemonize!
 
-  root = "/var/haconiwa/root/"
-  config.add_mount_point "/var/lib/haconiwa", to: root, readonly: true
-  config.add_mount_point "/lib64", to: root + "lib64", readonly: true
-  config.add_mount_point "/usr/bin", to: root + "usr/bin", readonly: true
-  config.add_mount_point "/usr/sbin", to: root + "usr/sbin", readonly: true
-  config.add_mount_point "tmpfs",  to: root + "tmp", fs: "tmpfs"
-  config.add_mount_point "devpts", to: root + "dev/pts", fs: "devpts"
-  config.add_mount_point "/var/haconiwa/user_homes", to: root + "home/haconiwa"
-  config.mount_independent_procfs
+  root = "/var/lib/haconiwa/8cfccb3d"
+  # config.add_mount_point "/lib64", to: root + "/lib64", readonly: true
+  # config.add_mount_point "/usr/bin", to: root + "/usr/bin", readonly: true
+  # config.add_mount_point "/usr/sbin", to: root + "/usr/sbin", readonly: true
+  config.add_mount_point "tmpfs",  to: root + "/tmp", fs: "tmpfs"
+  config.add_mount_point "/var/haconiwa/user_homes", to: root + "/home/haconiwa"
   config.chroot_to root
 
+  config.uid = 'vagrant'
+  config.gid = 'vagrant'
+
+  config.mount_independent "procfs"
+  config.mount_independent "sysfs"
+  config.mount_independent "devtmpfs"
+  config.mount_independent "devpts"
+  config.mount_independent "shm"
+
+  # The namespaces to unshare:
   config.namespace.unshare "mount"
   config.namespace.unshare "ipc"
   config.namespace.unshare "uts"
@@ -23,5 +30,6 @@ Haconiwa.define do |config|
   config.cgroup["cpu.cfs_quota_us"] = 30000
   config.cgroup["cpuset.cpus"] = "0"
 
-  config.capabilities.drop 'cap_sys_time'
+  config.capabilities.allow 'cap_sys_chroot'
+  config.capabilities.allow 'cap_kill'
 end
