@@ -1,5 +1,5 @@
 DEFS_FILE = File.expand_path('../src/REVISIONS.defs', __FILE__) unless defined?(DEFS_FILE)
-system "rm -rf #{DEFS_FILE}"
+DEPENDENT_GEMS = Dir.glob(File.expand_path('../mruby/build/mrbgems/mruby-*', __FILE__)) unless defined?(DEPENDENT_GEMS)
 
 MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.license = 'GPL v3'
@@ -48,7 +48,7 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.add_dependency 'mruby-print'     , :core => 'mruby-print'
 
   def spec.save_dependent_mgem_revisions
-    file DEFS_FILE do
+    file DEFS_FILE => DEPENDENT_GEMS do
       f = open(DEFS_FILE, 'w')
       corerev = `git rev-parse HEAD`.chomp
       f.puts %Q<{"MRUBY_CORE_REVISION", "#{corerev}"},>
