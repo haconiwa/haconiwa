@@ -45,11 +45,9 @@ apk add ruby
     cache['after_fork'] = 'OK'
   end
 
-  # FIXME: Passes on my xenial environment, but it failes on travis trusty
-  # config.add_general_hook :after_chroot do |base|
-  #   cache = Cache.new filename: "/var/save-hook-<%= @hash %>.data"
-  #   cache['after_chroot'] = 'OK'
-  # end
+  config.add_general_hook :after_chroot do |base|
+    File.open("/after_chroot.txt", 'w+') {|f| f.puts "OK, this file is from after_chroot hook\n" }
+  end
 
   config.add_general_hook :teardown_container do |base|
     cache = Cache.new filename: "#{root.to_s}/var/save-hook-<%= @hash %>.data"

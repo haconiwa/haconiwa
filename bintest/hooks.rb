@@ -68,6 +68,7 @@ assert('haconiwa container is reloadable') do
       sleep 0.1
     end
 
+    system "cat #{@rootfs}/after_chroot.txt"
     result = JSON.parse(File.read "#{@rootfs}/log.json")
     %w(before_fork before_start_wait after_fork teardown_container).each do |hook|
       assert_equal "OK", result[hook]
