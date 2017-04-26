@@ -26,7 +26,6 @@ apk add ruby
   config.chroot_to root
 
   config.namespace.unshare "mount"
-  config.namespace.unshare "ipc"
   config.namespace.unshare "uts"
   config.namespace.unshare "pid"
 
