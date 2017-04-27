@@ -1,0 +1,68 @@
+# -*- mode: ruby -*-
+Haconiwa.define do |config|
+  config.name = "hooks-test-<%= @hash %>" # to be hostname
+  config.init_command = ["/bin/sh", "-c", "trap exit 15; while true; do : ; done"]
+  config.daemonize!
+
+  root = Pathname.new("<%= @rootfs %>")
+
+  config.bootstrap do |b|
+    b.strategy = "git"
+    b.git_url  = "https://github.com/haconiwa/haconiwa-image-alpine"
+  end
+
+  config.provision do |p|
+    p.run_shell <<-SHELL
+apk update
+apk upgrade
+apk add ruby
+    SHELL
+  end
+
+  config.mount_independent "procfs"
+  config.mount_independent "sysfs"
+  config.mount_independent "devtmpfs"
+  config.mount_independent "devpts"
+  config.chroot_to root
+
+  config.namespace.unshare "mount"
+  config.namespace.unshare "ipc"
+  config.namespace.unshare "uts"
+  config.namespace.unshare "pid"
+
+  config.add_general_hook :before_fork do |base|
+    cache = Cache.new filename: "#{root.to_s}/var/save-hook-<%= @hash %>.data"
+    cache['before_fork'] = 'OK'
+  end
+
+  config.add_general_hook :before_start_wait do |base|
+    cache = Cache.new filename: "#{root.to_s}/var/save-hook-<%= @hash %>.data"
+    cache['before_start_wait'] = 'OK'
+  end
+
+  config.add_general_hook :after_fork do |base|
+    cache = Cache.new filename: "#{root.to_s}/var/save-hook-<%= @hash %>.data"
+    cache['after_fork'] = 'OK'
+  end
+
+  config.add_general_hook :after_chroot do |base|
+    File.open("/after_chroot.txt", 'w+') {|f| f.puts "OK, this file is from after_chroot hook" }
+  end
+
+  config.add_general_hook :teardown_container do |base|
+    cache = Cache.new filename: "#{root.to_s}/var/save-hook-<%= @hash %>.data"
+    cache['teardown_container'] = 'OK'
+  end
+
+  config.add_general_hook :teardown do |base|
+    cache = Cache.new filename: "#{root.to_s}/var/save-hook-<%= @hash %>.data"
+    data = "{\n"
+    %w(before_fork before_start_wait after_fork after_chroot teardown_container).each do |hook|
+      data << "\"#{hook}\": \"#{cache[hook]}\",\n"
+    end
+    data << '"dummy": 0 }'
+    File.open("#{root.to_s}/log.json", 'w') do |f|
+      f.puts data
+    end
+  end
+end
