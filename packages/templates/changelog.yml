@@ -1,5 +1,10 @@
-latest: 0.8.4
+latest: 0.8.5
 changelog:
+  - version: 0.8.5
+    messages:
+      - Add some supports when haconiwa bin is set-user-id-rooted, bump mruby version
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Thu, 27 Apr 2017 13:44:16 +0900
   - version: 0.8.4
     messages:
       - Support seccomp-bpf filter

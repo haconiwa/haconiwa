@@ -1,6 +1,6 @@
 Name: haconiwa
 Epoch: 1
-Version: 0.8.4
+Version: 0.8.5
 Release: 1
 Summary: MRuby on Container
 License: GPLv3+
@@ -49,6 +49,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Thu Apr 27 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.8.5-1
+- Add some supports when haconiwa bin is set-user-id-rooted, bump mruby version
+
 * Mon Apr 24 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.8.4-1
 - Support seccomp-bpf filter
 
@@ -63,6 +66,3 @@ fi
 
 * Tue Mar 28 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.8.0-1
 - Bump mruby\'s version
-
-* Thu Mar  2 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.7.20170302-1
-- Snapshot with cgroup warning fix
