@@ -231,10 +231,6 @@ See dependent gem's READMEs.
 * We create branches as `0.6.x-dev` for release
 * PRs can be proposed to `master` branch. Maintainers will pick these to stable/unstable dev branches
 
-## Contributing
-
-Bug reports and pull requests are welcome on GitHub at https://github.com/haconiwa/haconiwa. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
-
 ## TODOs
 
 * [ ] Haconiwa DSL compiler
