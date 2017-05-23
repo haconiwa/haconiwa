@@ -394,22 +394,21 @@ module Haconiwa
 
     def apply_filesystem(base)
       cwd = Dir.pwd
-      m = Mount.new
-      m.make_private "/"
+      Mount.make_private "/"
       owner_options = base.rootfs.to_owner_options
       base.filesystem.mount_points.each do |mp|
         case
         when mp.fs
-          m.mount mp.normalized_src(cwd), mp.dest, owner_options.merge(mp.options).merge(type: mp.fs)
+          Mount.mount mp.normalized_src(cwd), mp.dest, owner_options.merge(mp.options).merge(type: mp.fs)
         else
-          m.bind_mount mp.normalized_src(cwd), mp.dest, owner_options.merge(mp.options)
+          Mount.bind_mount mp.normalized_src(cwd), mp.dest, owner_options.merge(mp.options)
         end
       end
       base.network_mountpoint.each do |mp|
         unless File.exist? mp.dest
           File.open(mp.dest, "w+") {|f| f.print "" }
         end
-        m.bind_mount mp.normalized_src(cwd), mp.dest, {readonly: true}.merge(owner_options)
+        Mount.bind_mount mp.normalized_src(cwd), mp.dest, {readonly: true}.merge(owner_options)
       end
     end
 
@@ -533,11 +532,10 @@ module Haconiwa
     end
 
     def apply_remount(base)
-      m = Mount.new
       owner_options = base.rootfs.to_owner_options
       base.filesystem.independent_mount_points.each do |mp|
         opts = ["tmpfs", "devpts"].include?(mp.fs) ? {type: mp.fs}.merge(owner_options) : {type: mp.fs}
-        m.mount mp.src, "#{base.filesystem.chroot}#{mp.dest}",opts
+        Mount.mount mp.src, "#{base.filesystem.chroot}#{mp.dest}",opts
       end
     end
 

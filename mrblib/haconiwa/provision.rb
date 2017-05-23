@@ -66,23 +66,22 @@ module Haconiwa
     end
 
     def chroot_into(root)
-      m = ::Mount.new
       ::Namespace.unshare ::Namespace::CLONE_NEWNS
 
-      m.make_private "/"
+      ::Mount.make_private "/"
 
       # network etc files should be shared
       ["/etc/hosts", "/etc/resolv.conf"].each do |etc|
         File.open("#{root}#{etc}", "a+") {|f| f.print "" }
-        m.bind_mount etc, "#{root}#{etc}", readonly: true
+        ::Mount.bind_mount etc, "#{root}#{etc}", readonly: true
       end
 
       Dir.chdir root
       Dir.chroot root
-      m.mount "proc",     "/proc", type: "proc"
-      m.mount "devtmpfs", "/dev",  type: "devtmpfs"
-      m.mount "sysfs",    "/sys",  type: "sysfs"
-      m.mount "tmpfs",    "/tmp",  type: "tmpfs"
+      ::Mount.mount "proc",     "/proc", type: "proc"
+      ::Mount.mount "devtmpfs", "/dev",  type: "devtmpfs"
+      ::Mount.mount "sysfs",    "/sys",  type: "sysfs"
+      ::Mount.mount "tmpfs",    "/tmp",  type: "tmpfs"
     end
 
     private
