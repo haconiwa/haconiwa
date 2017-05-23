@@ -73,7 +73,7 @@ module Haconiwa
       # network etc files should be shared
       ["/etc/hosts", "/etc/resolv.conf"].each do |etc|
         File.open("#{root}#{etc}", "a+") {|f| f.print "" }
-        m.bind_mount etc, "#{root}#{etc}", readonly: true
+        ::Mount.bind_mount etc, "#{root}#{etc}", readonly: true
       end
 
       Dir.chdir root
