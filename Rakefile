@@ -59,16 +59,6 @@ task :compile => exes do
   MRuby.targets['host'].print_build_summary
 end
 
-desc "compile all binary"
-task :compile_all => [:all] do
-  bins = ["mruby", "mirb", APP_NAME]
-  bins.each do |binname|
-    %W(#{mruby_root}/build/x86_64-pc-linux-gnu/bin/#{binname} #{mruby_root}/build/x86_64-pc-linux-gnu_mirb/bin/#{binname}).each do |bin|
-      sh "strip --strip-unneeded #{bin}" if File.exist?(bin)
-    end
-  end
-end
-
 namespace :test do
   desc "run mruby & unit tests"
   # only build mtest for host
@@ -131,7 +121,7 @@ namespace :release do
     sh "rm -rf #{pwd}/tmp/* #{pwd}/pkg/*"
   end
 
-  task :copy => ["release:clean", :compile_all] do
+  task :copy => ["release:clean", :all] do
     sh "cp #{mruby_root}/build/x86_64-pc-linux-gnu/bin/mruby     #{pwd}/tmp/hacorb"
     sh "cp #{mruby_root}/build/x86_64-pc-linux-gnu_mirb/bin/mirb #{pwd}/tmp/hacoirb"
     sh "cp #{mruby_root}/build/x86_64-pc-linux-gnu/bin/haconiwa  #{pwd}/tmp/haconiwa"
