@@ -203,7 +203,7 @@ module Haconiwa
     def self.get_base(args)
       script = File.read(args[0])
       obj = Kernel.eval(script)
-      obj.hacofile = (args[0][0] == '/') ? args[0] : File.expand_path(args[0], Dir.pwd)
+      obj.hacofile = (args[0][0] == '/') ? args[0] : ExpandPath.expand(args[0], Dir.pwd)
       return obj
     end
 
@@ -214,7 +214,7 @@ module Haconiwa
         exe.shift
       end
       obj = Kernel.eval(script)
-      obj.hacofile = (args[0][0] == '/') ? args[0] : File.expand_path(args[0], Dir.pwd)
+      obj.hacofile = (args[0][0] == '/') ? args[0] : ExpandPath.expand(args[0], Dir.pwd)
 
       return [obj, exe]
     end

@@ -96,10 +96,15 @@ module Haconiwa
             ::Procutil.setsid if base.daemon?
 
             apply_namespace(base.namespace)
+            Logger.debug("OK: apply_namespace")
             apply_filesystem(base)
+            Logger.debug("OK: apply_filesystem")
             apply_rlimit(base.resource)
+            Logger.debug("OK: apply_rlimit")
             apply_cgroup(base)
+            Logger.debug("OK: apply_cgroup")
             apply_remount(base)
+            Logger.debug("OK: apply_remount")
             ::Procutil.sethostname(base.name) if base.namespace.flag?(::Namespace::CLONE_NEWUTS)
 
             apply_user_namespace(base.namespace)
@@ -112,19 +117,25 @@ module Haconiwa
               r2.close
               switch_current_namespace_root
             end
+            Logger.debug("OK: apply_user_namespace")
 
             invoke_general_hook(:before_chroot, base)
 
             do_chroot(base)
+            Logger.debug("OK: do_chroot")
             invoke_general_hook(:after_chroot, base)
 
             reopen_fds(base.command) if base.daemon?
 
             apply_capability(base.capabilities)
+            Logger.debug("OK: apply_capability")
             apply_seccomp(base.seccomp)
+            Logger.debug("OK: apply_seccomp")
             switch_guid(base.guid)
+            Logger.debug("OK: switch_guid")
             kick_ok.puts "done"
             kick_ok.close
+            Logger.debug("OK: kick parent process to resume")
 
             Logger.info "Container is going to exec: #{base.init_command.inspect}"
             Exec.execve(base.environ, *base.init_command)
@@ -230,12 +241,12 @@ module Haconiwa
 
     def reload(name, new_cg, new_cg2, new_resource, targets)
       if targets.include?(:cgroup)
-        Haconiwa::Logger.info "Reloading... :cgroup"
+        Logger.info "Reloading... :cgroup"
         reapply_cgroup(name, new_cg, new_cg2)
       end
 
       if targets.include?(:resource)
-        Haconiwa::Logger.info "Reloading... :resource"
+        Logger.info "Reloading... :resource"
         reapply_rlimit(@base.pid, new_resource)
       end
 
@@ -397,6 +408,7 @@ module Haconiwa
       Mount.make_private "/"
       owner_options = base.rootfs.to_owner_options
       base.filesystem.mount_points.each do |mp|
+        Logger.debug("Mounting: #{mp.inspect}")
         case
         when mp.fs
           Mount.mount mp.normalized_src(cwd), mp.dest, owner_options.merge(mp.options).merge(type: mp.fs)
@@ -405,6 +417,7 @@ module Haconiwa
         end
       end
       base.network_mountpoint.each do |mp|
+        Logger.debug("Mounting: #{mp.inspect}")
         unless File.exist? mp.dest
           File.open(mp.dest, "w+") {|f| f.print "" }
         end
@@ -470,8 +483,8 @@ module Haconiwa
         cg.commit
       end
     rescue Exception => e
-      Haconiwa::Logger.warning "Reapply failed: #{e.class}, #{e.message}"
-      e.backtrace.each{|l| Haconiwa::Logger.warning "    #{l}" }
+      Logger.warning "Reapply failed: #{e.class}, #{e.message}"
+      e.backtrace.each{|l| Logger.warning "    #{l}" }
     end
 
     def cleanup_cgroup(base)
@@ -491,12 +504,10 @@ module Haconiwa
         (0..38).each do |cap|
           break unless ::Capability.supported? cap
           next if ids.include?(cap)
-          Logger.debug "Dropping cap of #{cap}"
           ::Capability.drop_bound cap
         end
       else
         capabilities.blacklist_ids.each do |cap|
-          Logger.debug "Dropping cap of #{cap}"
           ::Capability.drop_bound cap
         end
       end
@@ -549,7 +560,7 @@ module Haconiwa
 
     def do_chroot(base)
       if base.filesystem.chroot
-        Dir.chdir File.expand_path([base.filesystem.chroot, base.workdir].join('/'))
+        Dir.chdir ExpandPath.expand([base.filesystem.chroot, base.workdir].join('/'))
         Dir.chroot base.filesystem.chroot
       else
         Dir.chdir base.workdir
@@ -608,7 +619,7 @@ module Haconiwa
         else
           begin
             File.unlink(pid_file)
-            Haconiwa::Logger.debug("Since the process does not exist, delete the PID file #{pid_file}")
+            Logger.debug("Since the process does not exist, delete the PID file #{pid_file}")
           rescue
             raise "Failed to delete PID file #{pid_file}."
           end
