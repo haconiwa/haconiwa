@@ -1,6 +1,6 @@
 Name: haconiwa
 Epoch: 1
-Version: 0.8.5
+Version: 0.8.6
 Release: 1
 Summary: MRuby on Container
 License: GPLv3+
@@ -49,6 +49,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Wed May 24 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.8.6-1
+- May fix some segfaults on GC, stopped binary spritting
+
 * Thu Apr 27 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.8.5-1
 - Add some supports when haconiwa bin is set-user-id-rooted, bump mruby version
 
@@ -63,6 +66,3 @@ fi
 
 * Mon Apr  3 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.8.1-1
 - Remove experimental features. This destroys some of (minor) backward compatibilities
-
-* Tue Mar 28 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.8.0-1
-- Bump mruby\'s version

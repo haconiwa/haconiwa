@@ -1,5 +1,10 @@
-latest: 0.8.5
+latest: 0.8.6
 changelog:
+  - version: 0.8.6
+    messages:
+      - May fix some segfaults on GC, stopped binary spritting
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Wed, 24 May 2017 15:26:53 +0900
   - version: 0.8.5
     messages:
       - Add some supports when haconiwa bin is set-user-id-rooted, bump mruby version
