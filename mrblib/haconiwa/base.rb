@@ -813,6 +813,9 @@ module Haconiwa
     def normalized_src(cwd="/")
       if @src.start_with?('/')
         @src
+      # These filesystems do not need a real src directory
+      elsif %w(tmpfs devtmpfs proc sysfs devpts).include?(@fs.to_s)
+        @src
       else
         fullpath = File.expand_path [cwd, @src].join("/")
         File.exist?(fullpath) ? fullpath : @src
