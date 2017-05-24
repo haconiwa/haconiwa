@@ -560,7 +560,7 @@ module Haconiwa
 
     def do_chroot(base)
       if base.filesystem.chroot
-        Dir.chdir File.expand_path([base.filesystem.chroot, base.workdir].join('/'))
+        Dir.chdir ExpandPath.expand([base.filesystem.chroot, base.workdir].join('/'))
         Dir.chroot base.filesystem.chroot
       else
         Dir.chdir base.workdir

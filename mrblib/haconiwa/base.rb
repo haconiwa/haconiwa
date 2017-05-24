@@ -817,7 +817,7 @@ module Haconiwa
       elsif %w(tmpfs devtmpfs proc sysfs devpts).include?(@fs.to_s)
         @src
       else
-        fullpath = File.expand_path [cwd, @src].join("/")
+        fullpath = ExpandPath.expand [cwd, @src].join("/")
         File.exist?(fullpath) ? fullpath : @src
       end
     end
