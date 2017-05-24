@@ -54,7 +54,7 @@ module ExpandPath
     elsif path[0] == "~"
       if (path[1] == "/" || path[1] == nil)
         dir = path[1, path.size]
-        home_dir = _gethome
+        home_dir = File._gethome
 
         unless home_dir
           raise ArgumentError, "couldn't find HOME environment -- expanding '~'"
@@ -68,7 +68,7 @@ module ExpandPath
         user = splitted_path[0][1, splitted_path[0].size]
         dir = "/" + splitted_path[1, splitted_path.size].join("/")
 
-        home_dir = _gethome(user)
+        home_dir = File._gethome(user)
 
         unless home_dir
           raise ArgumentError, "user \#{user} doesn't exist"
@@ -79,7 +79,7 @@ module ExpandPath
         expanded_path += "/"
       end
     else
-      expanded_path = concat_path(base_path, _getwd)
+      expanded_path = concat_path(base_path, File._getwd)
       expanded_path += "/" + path
     end
 
