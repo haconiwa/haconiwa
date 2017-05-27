@@ -16,6 +16,7 @@ module Haconiwa
                   :seccomp,
                   :general_hooks,
                   :async_hooks,
+                  :wait_interval,
                   :environ,
                   :attached_capabilities,
                   :signal_handler,
@@ -67,6 +68,7 @@ module Haconiwa
       @seccomp = Seccomp.new
       @general_hooks = {}
       @async_hooks = []
+      @wait_interval = 50
       @environ = {}
       @signal_handler = SignalHandler.new
       @attached_capabilities = nil
@@ -325,6 +327,7 @@ module Haconiwa
         :@seccomp,
         :@general_hooks,
         :@async_hooks,
+        :@wait_interval,
         :@environ,
         :@signal_handler,
         :@attached_capabilities,
