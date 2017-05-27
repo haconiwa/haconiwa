@@ -1,10 +1,12 @@
 module Haconiwa
   class WaitLoop
-    def initialize
+    def initialize(wait_interval=50)
       @sig_threads = []
       @hook_threads = []
       @registered_hooks = []
+      @wait_interval = wait_interval
     end
+    attr_accessor :wait_interval
 
     def register_hooks(base)
       base.async_hooks.each do |hook|
@@ -76,6 +78,7 @@ module Haconiwa
 
     def start_dogwatch_thread
       threads = (@hook_threads + @sig_threads).map{|t| t.thread_id }
+      wait_interval = @wait_interval
       t = SignalThread.new(threads) do |targets|
         ret = []
         while ret.empty?
@@ -84,7 +87,7 @@ module Haconiwa
               ret << th
             end
           end
-          usleep 50 * 1000
+          usleep wait_interval * 1000
         end
         ret
       end
@@ -124,7 +127,7 @@ module Haconiwa
             raise "Something is wrong on thread pool..."
           end
         end
-        usleep 1000
+        usleep @wait_interval * 1000
       }
       p, s = *ret
       Logger.puts "Container(#{p}) finish detected: #{s.inspect}"
