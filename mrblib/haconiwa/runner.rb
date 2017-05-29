@@ -171,6 +171,7 @@ module Haconiwa
 
         drop_suid_bit
         Logger.puts "Container fork success and going to wait: pid=#{pid}"
+        base.waitloop.wait_interval = base.wait_interval
         base.waitloop.register_hooks(base)
         base.waitloop.register_sighandlers(base, self)
         base.waitloop.register_custom_sighandlers(base, base.signal_handler)
