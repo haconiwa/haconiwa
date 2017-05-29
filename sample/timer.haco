@@ -20,7 +20,7 @@ apk add --update ruby
     SHELL
   end
 
-  config.after_spawn(msec: 30 * 1000) do |base|
+  config.add_async_hook(msec: 30 * 1000) do |base|
     Haconiwa::Logger.info("Process killed: #{base.pid}")
     ::Process.kill :TERM, base.pid
   end
