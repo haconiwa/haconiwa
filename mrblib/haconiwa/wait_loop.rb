@@ -136,7 +136,7 @@ module Haconiwa
 
     class TimerHook
       def self.signal_pool
-        @__signal_pool = []
+        @__signal_pool ||= []
       end
 
       def initialize(timing={}, &b)
