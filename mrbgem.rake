@@ -34,6 +34,7 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.add_dependency 'mruby-procutil'  , :github => 'haconiwa/mruby-procutil'
   spec.add_dependency 'mruby-resource'  , :github => 'harasou/mruby-resource'
   spec.add_dependency 'mruby-cgroupv2'  , :github => 'haconiwa/mruby-cgroupv2'
+  spec.add_dependency 'mruby-lockfile', :github => 'udzura/mruby-lockfile'
 
   spec.add_dependency 'mruby-syslog'    , :github => 'udzura/mruby-syslog'
   spec.add_dependency 'mruby-timer-thread' , :github => 'matsumotory/mruby-timer-thread'
