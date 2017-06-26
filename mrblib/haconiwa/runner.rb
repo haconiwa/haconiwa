@@ -354,8 +354,10 @@ module Haconiwa
           Logger.puts "Create lock: #{l.inspect}"
           b.call(@base, nil)
         ensure
-          l.unlock
-          system "rm -f #{l.path}"
+          if l
+            l.unlock
+            system "rm -f #{l.path}"
+          end
         end
       end
     end
