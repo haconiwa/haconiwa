@@ -26,6 +26,7 @@ module Haconiwa
                   :network_mountpoint,
                   :cleaned,
                   :hacofile,
+                  :metadata,
                   :reloadable_attr,
                   :exit_status
 
@@ -81,6 +82,7 @@ module Haconiwa
       @cleaned = false
       @bootstrap = @provision = nil
       @project_name = nil
+      @metadata = {}
 
       @waitloop = WaitLoop.new
 
@@ -346,6 +348,7 @@ module Haconiwa
         :@network_mountpoint,
         :@bootstrap,
         :@provision,
+        :@metadata,
         :@reloadable_attr,
       ].each do |varname|
         value = barn.instance_variable_get(varname)
