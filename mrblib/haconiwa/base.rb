@@ -391,16 +391,9 @@ module Haconiwa
     end
     alias skip_provision skip_bootstrap
 
-    def pid!
-      self.container_pid_file ||= default_container_pid_file
-      @pid ||= ::File.read(container_pid_file).to_i
-    end
-
     def ppid
-      ::File.read("/proc/#{pid!}/status").split("\n").each do |l|
-        next unless l.start_with?("PPid")
-        return l.split[1].to_i
-      end
+      self.container_pid_file ||= default_container_pid_file
+      ::File.read(container_pid_file).to_i
     rescue => e
       STDERR.puts e
       nil
