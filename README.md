@@ -161,6 +161,7 @@ And `attach` is not concerned with capabilities which is granted to container. S
 * `config.uid=/config.gid=` - The new container's running uid/gid. `groups=` is also respected
 * `config.support_reload` - Specify reloadable parameters when invoked `haconiwa reload` command. Only `:cgroup` and `:resource` are available for now and it is active only when they are defined following configuration blocks. See test cases and examples
 * `config.wait_interval` - Specify the sleep interval in `wait` and `watchdog` loops by milli seconds
+* `config.metadata` - Add container's metadata(tagging) by ruby Hash
 
 You can pick your own parameters for your use case of container.
 e.g. just using `mount` namespace unshared, container with common filesystem, limit the cgroups for big resource job and so on.
