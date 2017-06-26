@@ -17,6 +17,7 @@ addons:
       - autotools-dev
       - libcap-dev
       - libargtable2-dev
+      - parallel
 compiler:
   - gcc
   - clang
