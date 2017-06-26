@@ -1,0 +1,26 @@
+# -*- mode: ruby -*-
+Haconiwa.define do |config|
+  config.name = "parallel-test-<%= @hash %>" # to be hostname
+  config.init_command = ["/bin/sleep", "156"]
+  config.daemonize!
+
+  root = Pathname.new("<%= @rootfs %>")
+
+  config.bootstrap do |b|
+    b.strategy = "git"
+    b.git_url  = "https://github.com/haconiwa/haconiwa-image-alpine"
+  end
+
+  config.chroot_to root
+
+  config.mount_independent "procfs"
+  config.mount_independent "sysfs"
+  config.mount_independent "devtmpfs"
+  config.mount_independent "devpts"
+  config.mount_independent "shm"
+
+  config.namespace.unshare "mount"
+  config.namespace.unshare "ipc"
+  config.namespace.unshare "uts"
+  config.namespace.unshare "pid"
+end
