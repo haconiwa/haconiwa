@@ -22,7 +22,11 @@ module Haconiwa
       :system_failure,
     ]
 
+    LOCKFILE_DIR = "/var/run"
+
     def waitall(&how_you_run)
+      l = ::Lockfile.lock(LOCKFILE_DIR + "/." + @base.project_name.to_s)
+
       wrap_daemonize do |barn, n|
         invoke_general_hook(:setup, barn)
         pids = how_you_run.call(n)
@@ -56,6 +60,9 @@ module Haconiwa
       @base.system_exception = e
       invoke_general_hook(:system_failure, @base)
       Logger.exception(e)
+    ensure
+      l.unlock
+      system "rm -f #{l.path}"
     end
 
     def run(options, init_command)
