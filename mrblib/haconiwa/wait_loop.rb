@@ -35,7 +35,7 @@ module Haconiwa
       [:SIGTERM, :SIGINT, :SIGPIPE].each do |sig|
         @sig_threads << SignalThread.trap_once(sig) do
           unless base.cleaned
-            Logger.warning "Supervisor received unintended kill. Cleanup..."
+            ::Haconiwa::Logger.warning "Supervisor received unintended kill. Cleanup..."
             runner.cleanup_supervisor(base)
           end
           Process.kill :TERM, base.pid
@@ -130,7 +130,7 @@ module Haconiwa
         usleep @wait_interval * 1000
       }
       p, s = *ret
-      Logger.puts "Container(#{p}) finish detected: #{s.inspect}"
+      Haconiwa::Logger.puts "Container(#{p}) finish detected: #{s.inspect}"
       return [p, s]
     end
 
@@ -180,7 +180,7 @@ module Haconiwa
           else
             t.run(@timing)
           end
-          Logger.info("Timer registered: #{t.inspect}")
+          Haconiwa::Logger.info("Timer registered: #{t.inspect}")
           @active_timer = t
         end
       end

@@ -80,13 +80,23 @@ module Haconiwa
       @reloadable_attr = []
       @cleaned = false
       @bootstrap = @provision = nil
+      @project_name = nil
 
       @waitloop = WaitLoop.new
 
       @containers = []
     end
-    attr_accessor :system_exception, :rid_validator
+    attr_accessor :system_exception, :rid_validator, :project_name
     attr_reader :containers, :waitloop
+
+    def update_project_name!
+      if containers_real_run.size == 1
+        @project_name ||= containers_real_run.first.name
+      else
+        names = containers_real_run.map{|b| b.name }.sort.join(':')
+        @project_name ||= "haconiwa-" + ::SHA1.sha1_hex(names)
+      end
+    end
 
     def validate_real_id(&validator)
       @rid_validator = validator
@@ -381,16 +391,9 @@ module Haconiwa
     end
     alias skip_provision skip_bootstrap
 
-    def pid!
-      self.container_pid_file ||= default_container_pid_file
-      @pid ||= ::File.read(container_pid_file).to_i
-    end
-
     def ppid
-      ::File.read("/proc/#{pid!}/status").split("\n").each do |l|
-        next unless l.start_with?("PPid")
-        return l.split[1].to_i
-      end
+      self.container_pid_file ||= default_container_pid_file
+      ::File.read(container_pid_file).to_i
     rescue => e
       STDERR.puts e
       nil
@@ -827,6 +830,8 @@ module Haconiwa
   end
 
   def self.define(&b)
-    Barn.define(&b)
+    b = Barn.define(&b)
+    b.update_project_name!
+    b
   end
 end

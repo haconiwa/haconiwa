@@ -22,6 +22,8 @@ module Haconiwa
       :system_failure,
     ]
 
+    LOCKFILE_DIR = "/var/lock"
+
     def waitall(&how_you_run)
       wrap_daemonize do |barn, n|
         invoke_general_hook(:setup, barn)
@@ -60,7 +62,7 @@ module Haconiwa
 
     def run(options, init_command)
       begin
-        confirm_existence_pid_file(@base.container_pid_file)
+        Pidfile.create(@base.container_pid_file)
       rescue => e
         Logger.exception e
       end
@@ -148,7 +150,6 @@ module Haconiwa
         base.pid = pid
         kick_ok.close
 
-        File.open(base.container_pid_file, 'w') {|f| f.write pid }
         if base.namespace.use_guid_mapping?
           Logger.info "Using gid/uid mapping in this container..."
           [w, r2].each {|io| io.close }
@@ -166,7 +167,6 @@ module Haconiwa
         persist_namespace(pid, base.namespace)
 
         base.created_at = Time.now
-        base.pid = pid.to_i
         base.supervisor_pid = ::Process.pid
 
         drop_suid_bit
@@ -198,10 +198,11 @@ module Haconiwa
     def attach(exe)
       base = @base
       if !base.pid
-        if File.exist? base.container_pid_file
-          base.pid = File.read(base.container_pid_file).to_i
-        else
-          Logger.exception "PID file #{base.container_pid_file} doesn't exist. You may be specifying container PID by -t option"
+        begin
+          ppid = ::Pidfile.pidof(base.container_pid_file)
+          base.pid = ppid_to_pid(ppid)
+        rescue => e
+          Logger.exception "PID detecting failed: #{e.class}, #{e.message}. It seems you should specify container PID by -t option"
         end
       end
 
@@ -256,10 +257,11 @@ module Haconiwa
 
     def kill(sigtype, timeout)
       if !@base.pid
-        if File.exist? @base.container_pid_file
-          @base.pid = File.read(@base.container_pid_file).to_i
-        else
-          raise "PID file #{@base.container_pid_file} doesn't exist. You may be specifying container PID by -t option - or the container is already killed."
+        begin
+          ppid = ::Pidfile.pidof(@base.container_pid_file)
+          @base.pid = ppid_to_pid(ppid)
+        rescue => e
+          Logger.exception "PID detecting failed: #{e.class}, #{e.message}. It seems you should specify container PID by -t option"
         end
       end
 
@@ -273,7 +275,7 @@ module Haconiwa
 
       (timeout * 10).times do
         usleep 1000
-        unless File.exist?(@base.container_pid_file)
+        unless ::Pidfile.locked?(@base.container_pid_file)
           Logger.puts "Kill success"
           return
         end
@@ -286,7 +288,7 @@ module Haconiwa
     def cleanup_supervisor(base)
       recover_suid_bit do
         cleanup_cgroup(base)
-        File.unlink base.container_pid_file
+        ::Pidfile.new(base.container_pid_file).unlock
       end
       base.cleaned = true
     end
@@ -301,6 +303,14 @@ module Haconiwa
 
     private
 
+    def ppid_to_pid(ppid)
+      status = `find /proc -maxdepth 2 -regextype posix-basic -regex '/proc/[0-9]\\+/status'`.
+               split.
+               find {|f| File.read(f).include? "PPid:\t#{ppid}\n" rescue false }
+      raise(HacoFatalError, "Container PID not found by find") unless status
+      status.split('/')[2].to_i
+    end
+
     def raise_container(&b)
       b.call(@base)
     end
@@ -309,27 +319,46 @@ module Haconiwa
       if @base.daemon?
         r, w = IO.pipe
         ppid = Process.fork do
+          l = nil
           begin
-            # TODO: logging
+            l = ::Lockfile.lock(LOCKFILE_DIR + "/." + @base.project_name.to_s + ".hacolock")
+
             r.close
             ::Procutil.daemon_fd_reopen
+            Logger.info "Daemonized..."
+            Logger.info "Create lock: #{l.inspect}"
             b.call(@base, w)
           rescue => e
             Logger.exception(e)
           ensure
-            recover_suid_bit { File.unlink @base.supervisor_all_pid_file }
+            if l
+              l.unlock
+              system "rm -f #{l.path}"
+            end
           end
         end
         w.close
-        File.open(@base.supervisor_all_pid_file, 'w') {|f| f.write ppid }
         _pids = r.read
-        Logger.puts "pids: #{_pids}"
-        pids = _pids.split(',').map{|v| v.to_i }
-        r.close
+        if _pids.empty?
+          Logger.puts "Container cluster cannot be booted. Please check syslog"
+        else
+          Logger.puts "pids: #{_pids}"
+          pids = _pids.split(',').map{|v| v.to_i }
+          r.close
 
-        Logger.puts "Container cluster successfully up. PID={supervisors: #{pids.inspect}, root: #{ppid}}"
+          Logger.puts "Container cluster successfully up. PID={supervisors: #{pids.inspect}, root: #{ppid}}"
+        end
       else
-        b.call(@base, nil)
+        begin
+          l = ::Lockfile.lock(LOCKFILE_DIR + "/." + @base.project_name.to_s + ".hacolock")
+          Logger.puts "Create lock: #{l.inspect}"
+          b.call(@base, nil)
+        ensure
+          if l
+            l.unlock
+            system "rm -f #{l.path}"
+          end
+        end
       end
     end
 
