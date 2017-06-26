@@ -22,11 +22,9 @@ module Haconiwa
       :system_failure,
     ]
 
-    LOCKFILE_DIR = "/var/run"
+    LOCKFILE_DIR = "/var/lock"
 
     def waitall(&how_you_run)
-      l = ::Lockfile.lock(LOCKFILE_DIR + "/." + @base.project_name.to_s)
-
       wrap_daemonize do |barn, n|
         invoke_general_hook(:setup, barn)
         pids = how_you_run.call(n)
@@ -60,9 +58,6 @@ module Haconiwa
       @base.system_exception = e
       invoke_general_hook(:system_failure, @base)
       Logger.exception(e)
-    ensure
-      l.unlock
-      system "rm -f #{l.path}"
     end
 
     def run(options, init_command)
@@ -316,27 +311,44 @@ module Haconiwa
       if @base.daemon?
         r, w = IO.pipe
         ppid = Process.fork do
+          l = nil
           begin
-            # TODO: logging
+            l = ::Lockfile.lock(LOCKFILE_DIR + "/." + @base.project_name.to_s + ".hacolock")
+
             r.close
             ::Procutil.daemon_fd_reopen
+            Logger.info "Daemonized..."
+            Logger.info "Create lock: #{l.inspect}"
             b.call(@base, w)
           rescue => e
             Logger.exception(e)
           ensure
-            recover_suid_bit { File.unlink @base.supervisor_all_pid_file }
+            if l
+              l.unlock
+              system "rm -f #{l.path}"
+            end
           end
         end
         w.close
-        File.open(@base.supervisor_all_pid_file, 'w') {|f| f.write ppid }
         _pids = r.read
-        Logger.puts "pids: #{_pids}"
-        pids = _pids.split(',').map{|v| v.to_i }
-        r.close
+        if _pids.empty?
+          Logger.puts "Container cluster cannot be booted. Please check syslog"
+        else
+          Logger.puts "pids: #{_pids}"
+          pids = _pids.split(',').map{|v| v.to_i }
+          r.close
 
-        Logger.puts "Container cluster successfully up. PID={supervisors: #{pids.inspect}, root: #{ppid}}"
+          Logger.puts "Container cluster successfully up. PID={supervisors: #{pids.inspect}, root: #{ppid}}"
+        end
       else
-        b.call(@base, nil)
+        begin
+          l = ::Lockfile.lock(LOCKFILE_DIR + "/." + @base.project_name.to_s + ".hacolock")
+          Logger.puts "Create lock: #{l.inspect}"
+          b.call(@base, nil)
+        ensure
+          l.unlock
+          system "rm -f #{l.path}"
+        end
       end
     end
 
