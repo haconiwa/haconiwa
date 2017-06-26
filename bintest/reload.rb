@@ -27,13 +27,14 @@ def run_haconiwa(subcommand, *args)
 end
 
 def wait_haconiwa(container_name)
+  ppid = pid = nil
   begin
     Timeout.timeout 3 do
       ready = false
       until ready
         subprocess = `pstree -Al $(pgrep haconiwa | sort | head -1)`.chomp
         tree = subprocess.split(/(-[-+]-|\s+)/)
-        ready = (tree.size >= 7 && tree.last == "`-4*[{haconiwa}]")
+        ready = (tree.size >= 7 && tree.last == "`-5*[{haconiwa}]")
         sleep 0.1
       end
 
@@ -44,11 +45,26 @@ def wait_haconiwa(container_name)
       until File.exist?("/sys/fs/cgroup/cpu/#{container_name}/cpu.cfs_quota_us")
         sleep 0.1
       end
+
+      ppid = File.read("/var/run/haconiwa-#{container_name}.pid").chomp.to_i
+      until pid
+        pid = ppid_to_pid(ppid)
+      end
     end
+    return [ppid, pid]
   rescue Timeout::Error => e
     warn "container creation may be failed... skipping: #{e.class}, #{e.message}"
   end
 end
+
+def ppid_to_pid(ppid)
+  status = `find /proc -maxdepth 2 -regextype posix-basic -regex '/proc/[0-9]\\+/status'`.
+           split.
+           find {|f| File.read(f).include? "PPid:\t#{ppid}\n" rescue false }
+  return nil unless status
+  status.split('/')[2].to_i
+end
+
 
 assert('haconiwa container is reloadable') do
   haconame = "reload-#{rand(65535)}-#{$$}.haco"
@@ -66,9 +82,8 @@ assert('haconiwa container is reloadable') do
 
     output, status = run_haconiwa "run", haconame
     assert_true status.success?, "Process did not exit cleanly: run"
-    wait_haconiwa(container_name)
+    ppid, pid = wait_haconiwa(container_name)
 
-    pid = File.read("/var/run/haconiwa-#{container_name}.pid").chomp
     quota = File.read("/sys/fs/cgroup/cpu/#{container_name}/cpu.cfs_quota_us").chomp
     # FIXME: Quota counter is created then bumped in first invocation at `create'...
     # So start with here
@@ -76,8 +91,7 @@ assert('haconiwa container is reloadable') do
     nofile = `cat /proc/#{pid}/limits | grep 'Max open files' | awk '{print $4}'`.chomp
     assert_equal "2048", nofile
 
-    ppid = `grep PPid /proc/#{pid}/status | awk '{print $2}'`.chomp
-    Process.kill :HUP, ppid.to_i
+    Process.kill :HUP, ppid
 
     begin
       Timeout.timeout 3 do

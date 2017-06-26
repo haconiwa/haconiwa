@@ -101,7 +101,15 @@ assert('walkthrough') do
     output, status = run_haconiwa "kill", haconame
     assert_true status.success?, "Process did not exit cleanly: kill"
 
-    processes = `ps axf`
+    begin
+      Timeout.timeout 1 do
+        while (processes = `ps axf`).include?("haconiwa run #{haconame}")
+          sleep 0.1
+        end
+      end
+    rescue Timeout::Error => e
+      warn "container cannot be killed... skipping: #{e.class}, #{e.message}"
+    end
     assert_not_include processes, "haconiwa run #{haconame}"
   end
 end
