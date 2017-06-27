@@ -1,5 +1,10 @@
-latest: 0.8.6
+latest: 0.8.7
 changelog:
+  - version: 0.8.7
+    messages:
+      - Support metadata / Prevent doubel startup - and now pid file contains supervisor pid
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Tue, 27 Jun 2017 13:02:21 +0900
   - version: 0.8.6
     messages:
       - May fix some segfaults on GC, stopped binary spritting

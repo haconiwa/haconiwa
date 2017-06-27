@@ -1,3 +1,9 @@
+haconiwa (0.8.7-1) unstable; urgency=medium
+
+  * Support metadata / Prevent doubel startup - and now pid file contains supervisor pid
+
+ -- Uchio Kondo <udzura@udzura.jp>  Tue, 27 Jun 2017 13:02:21 +0900
+
 haconiwa (0.8.6-1) unstable; urgency=medium
 
   * May fix some segfaults on GC, stopped binary spritting
@@ -27,9 +33,3 @@ haconiwa (0.8.2-1) unstable; urgency=medium
   * Support haconiwa reload, implement thread watchdog
 
  -- Uchio Kondo <udzura@udzura.jp>  Thu, 13 Apr 2017 16:55:17 +0900
-
-haconiwa (0.8.1-1) unstable; urgency=medium
-
-  * Remove experimental features. This destroys some of (minor) backward compatibilities
-
- -- Uchio Kondo <udzura@udzura.jp>  Mon,  3 Apr 2017 12:45:35 +0900
