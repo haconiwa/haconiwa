@@ -157,6 +157,7 @@ namespace :release do
       sh "package_cloud push udzura/haconiwa/ubuntu/trusty pkg/haconiwa_#{Haconiwa::VERSION}-1_amd64.deb"
       sh "package_cloud push udzura/haconiwa/ubuntu/xenial pkg/haconiwa_#{Haconiwa::VERSION}-1_amd64.deb"
       sh "package_cloud push udzura/haconiwa/debian/jessie pkg/haconiwa_#{Haconiwa::VERSION}-1_amd64.deb"
+      sh "package_cloud push udzura/haconiwa/debian/stretch pkg/haconiwa_#{Haconiwa::VERSION}-1_amd64.deb"
       sh "package_cloud push udzura/haconiwa/el/7 pkg/haconiwa-#{Haconiwa::VERSION}-1.el7.x86_64.rpm"
       sh "package_cloud push udzura/haconiwa/fedora/23 pkg/haconiwa-#{Haconiwa::VERSION}-1.el7.x86_64.rpm"
       sh "package_cloud push udzura/haconiwa/fedora/24 pkg/haconiwa-#{Haconiwa::VERSION}-1.el7.x86_64.rpm"
