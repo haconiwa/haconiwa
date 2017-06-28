@@ -13,12 +13,12 @@ end
 
 BIN_PATH = File.join(File.dirname(__FILE__), "../mruby/bin/haconiwa") unless defined?(BIN_PATH)
 
-HACONIWA_TMP_ROOT3 = ENV['HACONIWA_TMP_ROOT2'] || "/tmp/haconiwa/work-#{rand(65535)}-#{$$}"
-FileUtils.rm_rf   HACONIWA_TMP_ROOT3
-FileUtils.mkdir_p File.dirname(HACONIWA_TMP_ROOT3)
+HACONIWA_TMP_ROOT4 = ENV['HACONIWA_TMP_ROOT2'] || "/tmp/haconiwa/work-#{rand(65535)}-#{$$}"
+FileUtils.rm_rf   HACONIWA_TMP_ROOT4
+FileUtils.mkdir_p File.dirname(HACONIWA_TMP_ROOT4)
 
 at_exit do
-  FileUtils.rm_rf File.dirname(HACONIWA_TMP_ROOT3)
+  FileUtils.rm_rf File.dirname(HACONIWA_TMP_ROOT4)
 end
 
 def run_haconiwa(subcommand, *args)
@@ -43,7 +43,7 @@ end
 
 assert('haconiwa container cannot be invoked when same process is up') do
   haconame = "parallel-#{rand(65535)}-#{$$}.haco"
-  Dir.chdir File.dirname(HACONIWA_TMP_ROOT3) do
+  Dir.chdir File.dirname(HACONIWA_TMP_ROOT4) do
     @hash = SecureRandom.hex(4)
     @rootfs = "/var/lib/haconiwa/__test__#{@hash}"
     container_name = "parallel-test-#{@hash}"
