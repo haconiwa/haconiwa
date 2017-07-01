@@ -1,5 +1,5 @@
 # -*- mode: dockerfile -*-
-FROM ubuntu:trusty
+FROM debian:9
 MAINTAINER Uchio Kondo <udzura@udzura.jp>
 
 ENV DEBIAN_FRONTEND noninteractive
@@ -9,7 +9,7 @@ RUN apt-get -qq -y install \
     debhelper devscripts bison flex \
     automake autoconf libtool git libreadline6-dev \
     zlib1g-dev libncurses5-dev libssl-dev libpam0g-dev \
-    rake autotools-dev cgroup-lite build-essential \
+    rake autotools-dev cgroup-tools build-essential \
     dh-make xz-utils
 
 ENV VERSION <%= @latest %>
