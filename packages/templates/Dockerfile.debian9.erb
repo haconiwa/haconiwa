@@ -14,6 +14,8 @@ RUN apt-get -qq -y install \
 
 ENV VERSION <%= @latest %>
 ENV USER root
+ENV SRC_PKG_NAME haconiwa_<%= @latest %>-1_amd64.deb
+ENV DST_PKG_NAME haconiwa_<%= @latest %>-1+debian9_amd64.deb
 VOLUME /out
 
 RUN mkdir -p /libexec
@@ -29,7 +31,7 @@ RUN echo 'cp -f debian/control.9 debian/control' >> /libexec/builddeb.sh
 RUN echo 'rm -rf debian/*.ex debian/*.EX'      >> /libexec/builddeb.sh
 RUN echo 'debuild -uc -us'                     >> /libexec/builddeb.sh
 RUN echo 'cd ../'                              >> /libexec/builddeb.sh
-RUN echo 'cp *.deb /out/pkg'                   >> /libexec/builddeb.sh
+RUN echo 'cp $SRC_PKG_NAME /out/pkg/$DST_PKG_NAME' >> /libexec/builddeb.sh
 RUN chmod a+x /libexec/builddeb.sh
 
 CMD ["/libexec/builddeb.sh"]
