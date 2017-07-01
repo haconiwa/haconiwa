@@ -147,6 +147,10 @@ namespace :release do
     Dir.chdir(pwd) { sh "docker-compose build deb && docker-compose run deb" }
   end
 
+  task :deb9 do
+    Dir.chdir(pwd) { sh "docker-compose build deb9 && docker-compose run deb9" }
+  end
+
   task :rpm do
     Dir.chdir(pwd) { sh "docker-compose build rpm && docker-compose run rpm" }
   end
@@ -183,6 +187,9 @@ task :package_regen do
 
     docker_deb = ERB.new(File.read("packages/templates/Dockerfile.debian.erb")).result(binding)
     File.write("packages/dockerfiles/Dockerfile.debian", docker_deb)
+
+    docker_deb = ERB.new(File.read("packages/templates/Dockerfile.debian9.erb")).result(binding)
+    File.write("packages/dockerfiles/Dockerfile.debian9", docker_deb)
 
     docker_rpm = ERB.new(File.read("packages/templates/Dockerfile.centos.erb")).result(binding)
     File.write("packages/dockerfiles/Dockerfile.centos", docker_rpm)

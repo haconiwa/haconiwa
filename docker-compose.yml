@@ -4,6 +4,12 @@ deb:
   volumes:
     - .:/out:rw
 
+deb9:
+  dockerfile: packages/dockerfiles/Dockerfile.debian9
+  build: .
+  volumes:
+    - .:/out:rw
+
 rpm:
   dockerfile: packages/dockerfiles/Dockerfile.centos
   build: .
