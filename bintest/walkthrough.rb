@@ -55,7 +55,7 @@ assert('walkthrough') do
     # change to git strategy
     system %Q(sed -i 's!b.strategy.*!b.strategy = "git"!' #{haconame})
     system %Q(sed -i 's!b.os_type.*!b.git_url = "https://github.com/haconiwa/haconiwa-image-alpine"!' #{haconame})
-    system %Q(sed -i 's!apk add.*!apk update\\napk upgrade\\napk add ruby!' #{haconame})
+    system %Q(sed -i 's!apk add.*!apk update\\napk upgrade\\napk --no-cache add ruby!' #{haconame})
 
     output, status = run_haconiwa "create", haconame
     assert_true status.success?, "Process did not exit cleanly: create"

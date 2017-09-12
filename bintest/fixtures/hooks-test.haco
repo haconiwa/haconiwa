@@ -15,7 +15,7 @@ Haconiwa.define do |config|
     p.run_shell <<-SHELL
 apk update
 apk upgrade
-apk add ruby
+apk --no-cache add ruby
     SHELL
   end
 
