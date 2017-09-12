@@ -1,6 +1,8 @@
 require 'open3'
 require 'fileutils'
 require 'timeout'
+require 'erb'
+require 'securerandom'
 
 if `whoami` =~ /root/
 ### start sudo test
