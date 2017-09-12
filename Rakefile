@@ -11,7 +11,7 @@ file :mruby do
   case MRUBY_VERSION
   when /\A[a-fA-F0-9]+\z/
     cmd << " && cd mruby"
-    cmd << " && git fetch --depth=100 && git checkout #{MRUBY_VERSION}"
+    cmd << " && git fetch --depth=500 && git checkout #{MRUBY_VERSION}"
   when /\A\d\.\d\.\d\z/
     cmd << " && cd mruby"
     cmd << " && git fetch --tags && git checkout $(git rev-parse #{MRUBY_VERSION})"
