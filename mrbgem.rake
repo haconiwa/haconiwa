@@ -39,8 +39,7 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.add_dependency 'mruby-syslog'    , :github => 'udzura/mruby-syslog'
   spec.add_dependency 'mruby-timer-thread' , :github => 'matsumotory/mruby-timer-thread'
   spec.add_dependency 'mruby-signal-thread', :github => 'pyama86/mruby-signal-thread'
-  spec.add_dependency 'mruby-thread', :mgem => 'mruby-thread',
-                      :checksum_hash => '2c51fe9dc06bd1c82479a982beab586cea29eadb'
+  spec.add_dependency 'mruby-thread', :github => 'chikuwait/mruby-thread'
   spec.add_dependency 'mruby-sha1', :github => 'mattn/mruby-sha1'
 
   spec.add_test_dependency 'mruby-cache', :github => 'matsumotory/mruby-localmemcache'
