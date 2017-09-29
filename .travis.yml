@@ -38,7 +38,7 @@ script:
   - rake consistent
   - rake compile
   - sudo /usr/bin/rake test:bintest
-  - sudo /usr/bin/rake test:mtest
+  - sudo env MTEST_VERBOSE=1 /usr/bin/rake test:mtest
 
 notifications:
   slack:
