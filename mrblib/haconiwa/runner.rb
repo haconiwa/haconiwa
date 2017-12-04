@@ -578,6 +578,19 @@ module Haconiwa
         opts = ["tmpfs", "devpts"].include?(mp.fs) ? {type: mp.fs}.merge(owner_options) : {type: mp.fs}
         Mount.mount mp.src, "#{base.filesystem.chroot}#{mp.dest}",opts
       end
+
+      if base.lxcfs_root
+        %w(
+          /proc/cpuinfo
+          /proc/diskstats
+          /proc/meminfo
+          /proc/stat
+          /proc/swaps
+          /proc/uptime
+        ).each do |procfile|
+          Mount.bind_mount "#{base.lxcfs_root}#{procfile}", "#{base.filesystem.chroot}#{procfile}", readonly: true
+        end
+      end
     end
 
     def reopen_fds(command)
