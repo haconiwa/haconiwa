@@ -813,6 +813,11 @@ module Haconiwa
       params = FS_TO_MOUNT[fs]
       raise("Unsupported: #{fs}") unless params
 
+      if self.independent_mount_points.map{|mp| mp.to }.include?(params[2])
+        # Skip duplicated mount declaration
+        return
+      end
+
       self.independent_mount_points << MountPoint.new(params[1], to: params[2], fs: params[0])
     end
   end
