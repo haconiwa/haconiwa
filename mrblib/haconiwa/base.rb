@@ -18,6 +18,7 @@ module Haconiwa
                   :async_hooks,
                   :wait_interval,
                   :environ,
+                  :lxcfs_root,
                   :attached_capabilities,
                   :signal_handler,
                   :pid,
@@ -71,6 +72,7 @@ module Haconiwa
       @async_hooks = []
       @wait_interval = 50
       @environ = {}
+      @lxcfs_root = nil
       @signal_handler = SignalHandler.new
       @attached_capabilities = nil
       @name = "haconiwa-#{Time.now.to_i}"
@@ -192,6 +194,11 @@ module Haconiwa
       from = options[:host_root] || '/etc'
       self.network_mountpoint << MountPoint.new("#{from}/resolv.conf", to: "#{root}/etc/resolv.conf")
       self.network_mountpoint << MountPoint.new("#{from}/hosts",       to: "#{root}/etc/hosts")
+    end
+
+    def lxcfs_root=(lxcfs_root)
+      self.mount_independent "procfs" # implicit mount
+      @lxcfs_root = lxcfs_root
     end
 
     def add_general_hook(hookpoint, &b)
@@ -341,6 +348,7 @@ module Haconiwa
         :@async_hooks,
         :@wait_interval,
         :@environ,
+        :@lxcfs_root,
         :@signal_handler,
         :@attached_capabilities,
         :@name,
@@ -804,6 +812,11 @@ module Haconiwa
     def mount_independent(fs)
       params = FS_TO_MOUNT[fs]
       raise("Unsupported: #{fs}") unless params
+
+      if self.independent_mount_points.map{|mp| mp.dest }.include?(params[2])
+        # Skip duplicated mount declaration
+        return
+      end
 
       self.independent_mount_points << MountPoint.new(params[1], to: params[2], fs: params[0])
     end
