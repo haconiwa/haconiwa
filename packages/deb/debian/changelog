@@ -1,3 +1,9 @@
+haconiwa (0.8.8-1) unstable; urgency=medium
+
+  * Support lxcfs API endpoint
+
+ -- Uchio Kondo <udzura@udzura.jp>  Tue Dec  5 19:13:46 JST 2017
+
 haconiwa (0.8.7-1) unstable; urgency=medium
 
   * Support metadata / Prevent doubel startup - and now pid file contains supervisor pid
@@ -27,9 +33,3 @@ haconiwa (0.8.3-1) unstable; urgency=medium
   * Support haconiwa new hooks, including system hooks
 
  -- Uchio Kondo <udzura@udzura.jp>  Fri, 21 Apr 2017 17:20:31 +0900
-
-haconiwa (0.8.2-1) unstable; urgency=medium
-
-  * Support haconiwa reload, implement thread watchdog
-
- -- Uchio Kondo <udzura@udzura.jp>  Thu, 13 Apr 2017 16:55:17 +0900

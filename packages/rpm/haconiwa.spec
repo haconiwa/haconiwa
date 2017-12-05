@@ -1,6 +1,6 @@
 Name: haconiwa
 Epoch: 1
-Version: 0.8.7
+Version: 0.8.8
 Release: 1
 Summary: MRuby on Container
 License: GPLv3+
@@ -49,6 +49,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Tue Dec  5 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.8.8-1
+- Support lxcfs API endpoint
+
 * Tue Jun 27 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.8.7-1
 - Support metadata / Prevent doubel startup - and now pid file contains supervisor pid
 
@@ -63,6 +66,3 @@ fi
 
 * Fri Apr 21 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.8.3-1
 - Support haconiwa new hooks, including system hooks
-
-* Thu Apr 13 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.8.2-1
-- Support haconiwa reload, implement thread watchdog

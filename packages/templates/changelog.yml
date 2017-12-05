@@ -1,5 +1,10 @@
-latest: 0.8.7
+latest: 0.8.8
 changelog:
+  - version: 0.8.8
+    messages:
+      - Support lxcfs API endpoint
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Tue Dec  5 19:13:46 JST 2017
   - version: 0.8.7
     messages:
       - Support metadata / Prevent doubel startup - and now pid file contains supervisor pid

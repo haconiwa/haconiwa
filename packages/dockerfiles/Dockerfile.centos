@@ -13,7 +13,7 @@ RUN yum -q -y install \
 RUN mkdir -p /root/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 RUN sed -i "s;%_build_name_fmt.*;%_build_name_fmt\t%%{ARCH}/%%{NAME}-%%{VERSION}-%%{RELEASE}.el7.%%{ARCH}.rpm;" /usr/lib/rpm/macros
 
-ENV VERSION 0.8.7
+ENV VERSION 0.8.8
 ENV USER root
 ENV HOME /root
 VOLUME /out
