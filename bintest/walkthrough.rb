@@ -65,6 +65,7 @@ assert('walkthrough') do
 
     output, status = run_haconiwa "run", "-T", haconame, "--", "/usr/bin/uptime"
     assert_true status.success?, "Process did not exit cleanly: run"
+
     assert_include output, "load average"
 
     output, status = run_haconiwa "run", haconame
@@ -72,6 +73,7 @@ assert('walkthrough') do
 
     processes = `ps axf`
     assert_include processes, "haconiwa run #{haconame}"
+    assert_true File.exist?("/var/run/haconiwa-#{test_name}.pid"), "Haconiwa creates pid file"
 
     subprocess = nil
     tree = []
