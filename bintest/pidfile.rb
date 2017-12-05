@@ -23,6 +23,16 @@ at_exit do
   FileUtils.rm_rf File.dirname(HACONIWA_TMP_ROOT5)
 end
 
+def run_haconiwa(subcommand, *args)
+  STDERR.puts "[testcase]\thaconiwa #{[subcommand, *args].join(' ')}"
+  o, s = Open3.capture2(BIN_PATH, subcommand, *args)
+  if s.coredump?
+    raise "[BUG] haconiwa got SEGV. Abort testing"
+  end
+  puts(o) if ENV['DEBUGGING']
+  return [o, s]
+end
+
 def run_haconiwa_seq(seq, subcommand, *args)
   STDERR.puts "[testcase]\thaconiwa #{[subcommand, *args].join(' ')} ##{seq}"
   o, s = Open3.capture2({"SEQ" => seq.to_s}, BIN_PATH, subcommand, *args)
