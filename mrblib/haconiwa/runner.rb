@@ -188,11 +188,11 @@ module Haconiwa
 
         cleanup_supervisor(base)
         if status.success?
-          pid_file.remove
           Logger.puts "Container successfully exited: #{status.inspect}"
         else
           Logger.warning "Container failed: #{status.inspect}"
         end
+        pid_file.remove # in any case
       end
     end
 
