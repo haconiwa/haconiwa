@@ -1,7 +1,7 @@
 # -*- mode: ruby -*-
 Haconiwa.define do |config|
   config.name = "parallel-test-<%= @hash %>" # to be hostname
-  config.init_command = ["/bin/sleep", "156"]
+  config.init_command = ["/bin/sleep", "<%= @sleeptime || 156 %>"]
   config.daemonize!
 
   root = Pathname.new("<%= @rootfs %>")
