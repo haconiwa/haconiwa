@@ -24,8 +24,9 @@ compiler:
 env:
   - MRUBY_VERSION=""
   # - MRUBY_VERSION=master
-allow_failures:
-  - compiler: clang
+matrix:
+  allow_failures:
+    - compiler: clang
 branches:
   only:
     - master
