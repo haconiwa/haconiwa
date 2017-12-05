@@ -113,8 +113,6 @@ assert('walkthrough') do
       warn "container cannot be killed... skipping: #{e.class}, #{e.message}"
     end
     assert_not_include processes, "haconiwa run #{haconame}"
-
-    assert_true(!File.exist?("/var/run/haconiwa-#{test_name}.pid"), "Haconiwa removes pid file on exit")
   end
 end
 

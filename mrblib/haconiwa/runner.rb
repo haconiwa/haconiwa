@@ -192,7 +192,9 @@ module Haconiwa
         else
           Logger.warning "Container failed: #{status.inspect}"
         end
+        Logger.puts "Remoing pidfile: #{pid_file}"
         pid_file.remove # in any case
+        Logger.puts "Removed pidfile: #{pid_file}"
       end
     end
 
