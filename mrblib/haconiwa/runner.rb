@@ -62,7 +62,7 @@ module Haconiwa
 
     def run(options, init_command)
       begin
-        Pidfile.create(@base.container_pid_file)
+        pid_file = Pidfile.create(@base.container_pid_file)
       rescue => e
         Logger.exception e
       end
@@ -188,6 +188,7 @@ module Haconiwa
 
         cleanup_supervisor(base)
         if status.success?
+          pid_file.remove
           Logger.puts "Container successfully exited: #{status.inspect}"
         else
           Logger.warning "Container failed: #{status.inspect}"
