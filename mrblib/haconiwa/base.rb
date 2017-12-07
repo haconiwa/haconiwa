@@ -175,8 +175,11 @@ module Haconiwa
       @resource
     end
 
-    def add_mount_point(point, options)
+    def add_mount_point(point, options={})
       self.namespace.unshare "mount"
+      if data = options.delete(:data)
+        options[:options] = data
+      end
       self.filesystem.mount_points << MountPoint.new(point, options)
     end
 
