@@ -1,7 +1,7 @@
 module Haconiwa
   module Cli
     def self.init(args)
-      opt = parse_opts(args, 'HACO_FILE', ignore_catchall: lambda {|o| o['G'].exist? } ) do |o|
+      opt = parse_opts(args, 'HACO_FILE', ignore_catchall: lambda {|o| o['G'].exist? || o['N'].exist? } ) do |o|
         o.string('n', 'name', 'CONTAINER_NAME', "Specify the container name if you want")
         o.string('r', 'root', 'ROOTFS_LOC', "Specify the rootfs location to generate on host")
         o.literal('G', 'global', "Create global config /etc/haconiwa.conf.rb")
