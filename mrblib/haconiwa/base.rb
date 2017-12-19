@@ -829,12 +829,7 @@ module Haconiwa
   end
 
   class Network
-    def initialize
-      @bridge_name = 'haconiwa0'
-      @bridge_ip, @netmask = detect_bridge_ip_mask
-    end
     attr_accessor :container_ip,
-                  :bridge_name,
                   :bridge_ip,
                   :netmask,
                   :namespace
@@ -845,9 +840,17 @@ module Haconiwa
       !!(container_ip)
     end
 
+    def bridge_name
+      @bridge_name ||= begin
+                         @bridge_ip, @netmask = detect_bridge_ip_mask('haconiwa0')
+                         'haconiwa0'
+                       end
+    end
+
     def bridge_name=(newname)
       @bridge_name = newname
       @bridge_ip, @netmask = detect_bridge_ip_mask
+      @bridge_name
     end
 
     def veth_host
@@ -859,8 +862,8 @@ module Haconiwa
     end
 
     private
-    def detect_bridge_ip_mask
-      `ip -f inet -o addr show #{@bridge_name}`.split[3].split('/')
+    def detect_bridge_ip_mask(brname=@bridge_name)
+      `ip -f inet -o addr show #{brname}`.split[3].split('/')
     end
   end
 
