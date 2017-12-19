@@ -238,6 +238,10 @@ module Haconiwa
         ::Namespace.setns(::Namespace::CLONE_NEWPID, pid: base.pid)
       end
       pid = Process.fork do
+        if base.network.enabled?
+          nw_handler = NetworkHandler::Bridge.new(base.network)
+          base.namespace.enter "net", via: nw_handler.to_ns_file
+        end
         flag = base.namespace.to_flag_without_pid_and_user
         ::Namespace.setns(flag, pid: base.pid)
 
