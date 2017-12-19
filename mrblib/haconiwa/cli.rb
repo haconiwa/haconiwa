@@ -5,6 +5,9 @@ module Haconiwa
         o.string('n', 'name', 'CONTAINER_NAME', "Specify the container name if you want")
         o.string('r', 'root', 'ROOTFS_LOC', "Specify the rootfs location to generate on host")
         o.literal('G', 'global', "Create global config /etc/haconiwa.conf.rb")
+        o.literal('N', 'bridge', "Create haconiwa's network bridge")
+        o.string('B', 'bridge-name', 'HACONIWA0', "Specify the bridge's name. default to `haconiwa0'")
+        o.string('I', 'bridge-ip', '10.0.0.1/24', "Specify the bridge's IP and netmask")
       end
 
       haconame = opt['n'].exist? ? opt['n'].value : nil
@@ -12,6 +15,10 @@ module Haconiwa
 
       if opt['G'].exist?
         Haconiwa::Generator.generate_global_config
+      elsif opt['N'].exist?
+        brname = opt['B'].exist? ? opt['B'].value : 'haconiwa0'
+        brip   = opt['I'].exist? ? opt['I'].value : '10.0.0.1/24'
+        NetworkHandler::Bridge.generate_bridge(brname, brip)
       else
         Haconiwa::Generator.generate_hacofile(opt.catchall.value(0), haconame, root)
       end

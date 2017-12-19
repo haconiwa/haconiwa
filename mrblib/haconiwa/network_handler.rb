@@ -57,5 +57,22 @@ class NetworkHandler
         end
       end
     end
+
+    def self.generate_bridge(bridge_name, bridge_ip_netmask)
+      unless bridge_ip_netmask =~ /\/\d+$/
+        bridge_ip_netmask << '/24'
+      end
+      runner = RunCmd.new("init.network.bridge")
+      [
+        "ip link add #{bridge_name} type bridge",
+        "ip addr add #{bridge_ip_netmask} dev #{bridge_name}",
+        "ip link set dev #{bridge_name} up"
+      ].each do |cmd|
+        _, status = runner.run(cmd)
+        if !status.success?
+          raise "Creating container networks failed: #{cmd}"
+        end
+      end
+    end
   end
 end
