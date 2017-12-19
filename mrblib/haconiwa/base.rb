@@ -7,6 +7,7 @@ module Haconiwa
                   :workdir,
                   :command,
                   :filesystem,
+                  :network,
                   :resource,
                   :cgroup,
                   :cgroupv2,
@@ -61,6 +62,7 @@ module Haconiwa
       @workdir = "/"
       @command = Command.new
       @filesystem = Filesystem.new
+      @network = Network.new
       @resource = Resource.new
       @cgroup = CGroup.new
       @cgroupv2 = CGroupV2.new
@@ -340,6 +342,7 @@ module Haconiwa
         :@workdir,
         :@command,
         :@filesystem,
+        :@network,
         :@resource,
         :@cgroup,
         :@cgroupv2,
@@ -823,6 +826,17 @@ module Haconiwa
 
       self.independent_mount_points << MountPoint.new(params[1], to: params[2], fs: params[0])
     end
+  end
+
+  class Network
+    def initialize
+      @bridge_name = 'haconiwa0'
+      @bridge_ip, @netmask = `ip -f inet -o addr show #{@bridge_name}`.split[3].split('/')
+    end
+    attr_accessor :container_ip,
+                  :bridge_name,
+                  :bridge_ip,
+                  :netmask
   end
 
   class MountPoint
