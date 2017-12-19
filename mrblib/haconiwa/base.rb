@@ -836,7 +836,17 @@ module Haconiwa
     attr_accessor :container_ip,
                   :bridge_name,
                   :bridge_ip,
-                  :netmask
+                  :netmask,
+                  :namespace
+    attr_writer :veth_host, :veth_guest
+
+    def veth_host
+      @veth_host ||= ::SHA1.sha1_hex(self.namespace)[0, 8] + '_h'
+    end
+
+    def veth_guest
+      @veth_guest ||= ::SHA1.sha1_hex(self.namespace)[0, 8] + '_g'
+    end
   end
 
   class MountPoint
