@@ -36,7 +36,7 @@ class NetworkHandler
       [
         "ip link add #{network.veth_host} type veth peer name #{network.veth_guest}",
         "ip link set #{network.veth_host} up",
-        "ip link set dev #{network.veth_host} master #{netwotk.bridge_name}"
+        "ip link set dev #{network.veth_host} master #{network.bridge_name}"
       ].each do |cmd|
         unless system(cmd)
           raise "Creating veth failed: #{cmd}"

@@ -97,7 +97,17 @@ module Haconiwa
             done.close
             ::Procutil.setsid if base.daemon?
 
+            if base.network.enabled?
+              nw_handler = NetworkHandler::Bridge.new(base.network)
+              begin
+                nw_handler.generate
+                base.namespace.enter "net", via: nw_handler.to_ns_file
+              rescue => e
+                Logger.exception(e)
+              end
+            end
             apply_namespace(base.namespace)
+
             Logger.debug("OK: apply_namespace")
             apply_filesystem(base)
             Logger.debug("OK: apply_filesystem")
@@ -187,6 +197,15 @@ module Haconiwa
         end
 
         cleanup_supervisor(base)
+        if base.network.enabled?
+          nw_handler = NetworkHandler::Bridge.new(base.network)
+          begin
+            nw_handler.cleanup
+          rescue => e
+            Logger.warning "Network cleanup failed: #{e.message}. Skip on quit"
+          end
+        end
+
         if status.success?
           Logger.puts "Container successfully exited: #{status.inspect}"
         else

@@ -1,0 +1,26 @@
+# -*- mode: ruby -*-
+haconiwa = Haconiwa.define do |config|
+  config.name = "haconiwa-nw-test#{ENV['SUFFIX']}" # to be hostname
+  config.init_command = ["/usr/sbin/sshd", '-D']
+  config.daemonize!
+
+  root = Pathname.new("/var/lib/haconiwa/8cfccb3d")
+  config.mount_independent "procfs"
+  config.mount_independent "sysfs"
+  config.mount_independent "devtmpfs"
+  config.mount_independent "devpts"
+  config.chroot_to root
+
+  config.namespace.unshare "mount"
+  config.namespace.unshare "ipc"
+  config.namespace.unshare "uts"
+  config.namespace.unshare "pid"
+
+  config.network.namespace = config.name
+  config.network.container_ip = '10.254.254.10'
+  config.network.bridge_name = 'hogehoge0'
+
+  # sshd needs chroot!
+  config.capabilities.allow "cap_sys_chroot"
+  config.capabilities.allow "cap_kill"
+end
