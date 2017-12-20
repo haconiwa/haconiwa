@@ -152,6 +152,7 @@ And `attach` is not concerned with capabilities which is granted to container. S
 * `config.cgroup` - Assign cgroup parameters via `[]=`
 * `config.namespace.unshare` - Unshare the namespaces like `"mount"`, `"ipc"` or `"pid" ...`. `persist_in` option make the specified namespace persist in a bind-moounted-file
   * See: http://karelzak.blogspot.jp/2015/04/persistent-namespaces.html
+* `config.network` - Specify networking config. `Network#namespace` and `#container_ip` must be set. Other attributes are `#bridge_name`, `#bridge_ip`, `#veth_host`, `#veth_guest`
 * `config.capabilities.reset_to_privileged!` - Haconiwa has default capability whitelist to use. If you want to use customized black/whitelist, declare this first
 * `config.capabilities.allow` - Allow capabilities on container root. Setting parameters other than `:all` should make this acts as whitelist
 * `config.capabilities.drop` - Drop capabilities of container root. Default to act as blacklist
@@ -162,6 +163,7 @@ And `attach` is not concerned with capabilities which is granted to container. S
 * `config.support_reload` - Specify reloadable parameters when invoked `haconiwa reload` command. Only `:cgroup` and `:resource` are available for now and it is active only when they are defined following configuration blocks. See test cases and examples
 * `config.wait_interval` - Specify the sleep interval in `wait` and `watchdog` loops by milli seconds
 * `config.metadata` - Add container's metadata(tagging) by ruby Hash
+* `config.lxcfs_root` - Set your host's `lxcfs` mount point to cooperate with containers
 
 You can pick your own parameters for your use case of container.
 e.g. just using `mount` namespace unshared, container with common filesystem, limit the cgroups for big resource job and so on.

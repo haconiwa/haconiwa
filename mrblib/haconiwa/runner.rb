@@ -61,6 +61,8 @@ module Haconiwa
     end
 
     def run(options, init_command)
+      GC.disable # FIXME: temp, thread GC problem
+
       begin
         pid_file = Pidfile.create(@base.container_pid_file)
       rescue => e
@@ -97,7 +99,17 @@ module Haconiwa
             done.close
             ::Procutil.setsid if base.daemon?
 
+            if base.network.enabled?
+              nw_handler = NetworkHandler::Bridge.new(base.network)
+              begin
+                nw_handler.generate
+                base.namespace.enter "net", via: nw_handler.to_ns_file
+              rescue => e
+                Logger.exception(e)
+              end
+            end
             apply_namespace(base.namespace)
+
             Logger.debug("OK: apply_namespace")
             apply_filesystem(base)
             Logger.debug("OK: apply_filesystem")
@@ -187,6 +199,15 @@ module Haconiwa
         end
 
         cleanup_supervisor(base)
+        if base.network.enabled?
+          nw_handler = NetworkHandler::Bridge.new(base.network)
+          begin
+            nw_handler.cleanup
+          rescue => e
+            Logger.warning "Network cleanup failed: #{e.message}. Skip on quit"
+          end
+        end
+
         if status.success?
           Logger.puts "Container successfully exited: #{status.inspect}"
         else
@@ -217,6 +238,10 @@ module Haconiwa
         ::Namespace.setns(::Namespace::CLONE_NEWPID, pid: base.pid)
       end
       pid = Process.fork do
+        if base.network.enabled?
+          nw_handler = NetworkHandler::Bridge.new(base.network)
+          base.namespace.enter "net", via: nw_handler.to_ns_file
+        end
         flag = base.namespace.to_flag_without_pid_and_user
         ::Namespace.setns(flag, pid: base.pid)
 

@@ -7,6 +7,7 @@ module Haconiwa
                   :workdir,
                   :command,
                   :filesystem,
+                  :network,
                   :resource,
                   :cgroup,
                   :cgroupv2,
@@ -61,6 +62,7 @@ module Haconiwa
       @workdir = "/"
       @command = Command.new
       @filesystem = Filesystem.new
+      @network = Network.new
       @resource = Resource.new
       @cgroup = CGroup.new
       @cgroupv2 = CGroupV2.new
@@ -340,6 +342,7 @@ module Haconiwa
         :@workdir,
         :@command,
         :@filesystem,
+        :@network,
         :@resource,
         :@cgroup,
         :@cgroupv2,
@@ -822,6 +825,45 @@ module Haconiwa
       end
 
       self.independent_mount_points << MountPoint.new(params[1], to: params[2], fs: params[0])
+    end
+  end
+
+  class Network
+    attr_accessor :container_ip,
+                  :bridge_ip,
+                  :netmask,
+                  :namespace
+    attr_writer   :veth_host,
+                  :veth_guest
+
+    def enabled?
+      !!(container_ip)
+    end
+
+    def bridge_name
+      @bridge_name ||= begin
+                         @bridge_ip, @netmask = detect_bridge_ip_mask('haconiwa0')
+                         'haconiwa0'
+                       end
+    end
+
+    def bridge_name=(newname)
+      @bridge_name = newname
+      @bridge_ip, @netmask = detect_bridge_ip_mask
+      @bridge_name
+    end
+
+    def veth_host
+      @veth_host ||= ::SHA1.sha1_hex(self.namespace)[0, 8] + '_h'
+    end
+
+    def veth_guest
+      @veth_guest ||= ::SHA1.sha1_hex(self.namespace)[0, 8] + '_g'
+    end
+
+    private
+    def detect_bridge_ip_mask(brname=@bridge_name)
+      `ip -f inet -o addr show #{brname}`.split[3].split('/')
     end
   end
 
