@@ -1,10 +1,15 @@
-latest: 0.8.8
+latest: 0.8.9
 changelog:
+  - version: 0.8.9
+    messages:
+      - Support network configuration DSL
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Wed, 20 Dec 2017 16:33:53 +0900
   - version: 0.8.8
     messages:
       - Support lxcfs API endpoint
     author: Uchio Kondo <udzura@udzura.jp>
-    date: Tue Dec  5 19:13:46 JST 2017
+    date: Tue,  5 Dec 2017 19:13:46 +0900
   - version: 0.8.7
     messages:
       - Support metadata / Prevent doubel startup - and now pid file contains supervisor pid

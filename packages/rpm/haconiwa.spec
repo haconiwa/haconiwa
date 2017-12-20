@@ -1,6 +1,6 @@
 Name: haconiwa
 Epoch: 1
-Version: 0.8.8
+Version: 0.8.9
 Release: 1
 Summary: MRuby on Container
 License: GPLv3+
@@ -49,6 +49,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Wed Dec 20 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.8.9-1
+- Support network configuration DSL
+
 * Tue Dec  5 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.8.8-1
 - Support lxcfs API endpoint
 
@@ -63,6 +66,3 @@ fi
 
 * Mon Apr 24 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.8.4-1
 - Support seccomp-bpf filter
-
-* Fri Apr 21 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.8.3-1
-- Support haconiwa new hooks, including system hooks
