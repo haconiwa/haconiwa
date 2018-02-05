@@ -15,7 +15,7 @@ end
 
 BIN_PATH = File.join(File.dirname(__FILE__), "../mruby/bin/haconiwa") unless defined?(BIN_PATH)
 
-HACONIWA_TMP_ROOT4 = ENV['HACONIWA_TMP_ROOT2'] || "/tmp/haconiwa/work-#{rand(65535)}-#{$$}"
+HACONIWA_TMP_ROOT4 = ENV['HACONIWA_TMP_ROOT4'] || "/tmp/haconiwa/work-#{rand(65535)}-#{$$}"
 FileUtils.rm_rf   HACONIWA_TMP_ROOT4
 FileUtils.mkdir_p File.dirname(HACONIWA_TMP_ROOT4)
 
@@ -51,13 +51,14 @@ assert('haconiwa container cannot be invoked when same process is up') do
     container_name = "parallel-test-#{@hash}"
     hacosrc = File.expand_path('fixtures/just-sleep.haco.erb', File.dirname(__FILE__))
     File.open(haconame, 'w') do |haco|
-      haco.puts ERB.new(File.read(hacosrc)).result(binding)
+      haco.write ERB.new(File.read(hacosrc)).result(binding)
+      haco.write "\n"
     end
 
     output, status = run_haconiwa "create", haconame
     assert_true status.success?, "Process did not exit cleanly: create"
 
-    _, err, _ =run_parallel "-j", "10", BIN_PATH, "run", haconame, "--", "/bin/sleep", ":::", *((10..19).to_a.map(&:to_s))
+    _, err, _ = run_parallel "-j", "10", BIN_PATH, "run", haconame, "--", "/bin/sleep", ":::", *((10..19).to_a.map(&:to_s))
     Timeout.timeout 2 do
       until File.exist?("/var/run/haconiwa-#{container_name}.pid")
         sleep 0.1
