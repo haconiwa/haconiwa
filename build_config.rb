@@ -7,7 +7,7 @@ end
 MRuby::Build.new do |conf|
   toolchain :gcc
 
-  conf.cc.defines << %w(MRB_GC_STRESS)
+  # conf.cc.defines << %w(MRB_GC_STRESS)
   conf.enable_bintest
   conf.enable_debug
   conf.enable_test
