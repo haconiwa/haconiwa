@@ -15,7 +15,7 @@ static int check_match_owner(int argc, char *argv[]) {
   if (argc <= 2) {
     return 0;
   }
-  if (!strcmp(argv[1], "run")) {
+  if (!strcmp(argv[1], "run") && !strcmp(argv[1], "start")) {
     return 0;
   }
 
@@ -36,6 +36,14 @@ int main(int argc, char *argv[])
   mrb_value ARGV = mrb_ary_new_capa(mrb, argc);
   int i;
   int return_value;
+
+#ifdef HACONIWA_SECURE_RUN
+  if(check_match_owner(argc, argv) < 0) {
+    mrb_raise(mrb, E_RUNTIME_ERROR,
+              "haconiwa runner and hacofile's owner would not be matched: This run prohibited on secure-run build");
+    exit(2);
+  }
+#endif
 
   for (i = 0; i < argc; i++) {
     mrb_ary_push(mrb, ARGV, mrb_str_new_cstr(mrb, argv[i]));
