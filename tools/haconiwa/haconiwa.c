@@ -8,6 +8,7 @@
 /* Include the mruby header */
 #include <mruby.h>
 #include <mruby/array.h>
+#include <mruby/error.h>
 
 static int check_match_owner(int argc, char *argv[]) {
   struct stat buf;
@@ -42,6 +43,14 @@ int main(int argc, char *argv[])
     exit(2);
   }
 #endif
+  if(setuid(geteuid()) < 0) {
+    mrb_sys_fail(mrb, "setuid");
+    exit(2);
+  }
+  if(setgid(getegid()) < 0) {
+    mrb_sys_fail(mrb, "setgid");
+    exit(2);
+  }
 
   for (i = 0; i < argc; i++) {
     mrb_ary_push(mrb, ARGV, mrb_str_new_cstr(mrb, argv[i]));
