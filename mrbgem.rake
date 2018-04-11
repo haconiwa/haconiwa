@@ -35,11 +35,9 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.add_dependency 'mruby-resource'  , :github => 'harasou/mruby-resource'
   spec.add_dependency 'mruby-cgroupv2'  , :github => 'haconiwa/mruby-cgroupv2'
   spec.add_dependency 'mruby-lockfile', :github => 'udzura/mruby-lockfile'
+  spec.add_dependency 'mruby-fibered_worker' , :github => 'udzura/mruby-fibered_worker'
 
   spec.add_dependency 'mruby-syslog'    , :github => 'udzura/mruby-syslog'
-  spec.add_dependency 'mruby-timer-thread' , :github => 'matsumotory/mruby-timer-thread', :branch => 'fix-testcases'
-  spec.add_dependency 'mruby-signal-thread', :github => 'udzura/mruby-signal-thread', :branch => 'class-to-hash'
-  spec.add_dependency 'mruby-thread', :github => 'udzura/mruby-thread', :branch => 'after-1.3'
   spec.add_dependency 'mruby-sha1', :github => 'mattn/mruby-sha1'
 
   spec.add_test_dependency 'mruby-cache', :github => 'matsumotory/mruby-localmemcache'
