@@ -1,7 +1,7 @@
 module Haconiwa
   class WaitLoop
-    def initialize(wait_interval=50)
-      @mainloop = FiberedWorker::MainLoop.new
+    def initialize(wait_interval=5)
+      @mainloop = FiberedWorker::MainLoop.new(interval: wait_interval)
       @wait_interval = wait_interval
     end
     attr_accessor :mainloop, :wait_interval
@@ -34,7 +34,8 @@ module Haconiwa
         end
       end
 
-      if base.daemon? # Terminal uses SIGHUP
+      # Terminal uses SIGHUP; reload is enabled only in daemon mode
+      if base.daemon? && !base.reloadable_attr.empty?
         # Registers reload handler
         b1 = base.cgroup(:v1).defblock
         b2 = base.cgroup(:v2).defblock

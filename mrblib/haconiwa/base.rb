@@ -72,7 +72,7 @@ module Haconiwa
       @seccomp = Seccomp.new
       @general_hooks = {}
       @async_hooks = []
-      @wait_interval = 50
+      @wait_interval = 5
       @environ = {}
       @lxcfs_root = nil
       @signal_handler = SignalHandler.new

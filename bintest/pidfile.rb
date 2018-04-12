@@ -54,7 +54,7 @@ assert('haconiwa containers create pidfile and leap it on exit') do
     hacosrc = File.expand_path('fixtures/just-sleep.haco.erb', File.dirname(__FILE__))
     File.open(haconame, 'w') do |haco|
       data = ERB.new(File.read(hacosrc)).result(binding)
-      puts data
+      puts data if ENV['DEBUGGING']
       haco.puts data
     end
 
