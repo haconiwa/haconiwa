@@ -40,7 +40,7 @@ module Haconiwa
         b2 = base.cgroup(:v2).defblock
         r1 = base.resource.defblock
 
-        @mainloop.register_handler(sig, false) do
+        @mainloop.register_handler(:SIGHUP, false) do
           begin
             newcg = Haconiwa::CGroup.new
             Haconiwa::Logger.info "Accepted reload: PID=#{base.pid}"
