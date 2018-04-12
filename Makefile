@@ -2,7 +2,7 @@ package = haconiwa
 CFLAGS = -std=gnu99
 
 build:
-	rake all
+	rake compile_all
 
 clean:
 	rake clean

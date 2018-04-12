@@ -61,8 +61,6 @@ module Haconiwa
     end
 
     def run(options, init_command)
-      GC.disable # FIXME: temp, thread GC problem
-
       begin
         pid_file = Pidfile.create(@base.container_pid_file)
       rescue => e
