@@ -1,5 +1,10 @@
-latest: 0.8.9
+latest: 0.9.0
 changelog:
+  - version: 0.9.0
+    messages:
+      - Change mruby version to current master, drop dependencies to mruby-thread
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Thu, 12 Apr 2018 19:23:18 +0900
   - version: 0.8.9
     messages:
       - Support network configuration DSL
