@@ -83,7 +83,7 @@ assert('walkthrough') do
         until ready
           subprocess = `pstree -Al $(pgrep haconiwa | sort | head -1)`.chomp
           tree = subprocess.split(/(-[-+]-|\s+)/)
-          ready = (tree.size >= 3)
+          ready = (tree.size >= 5)
           sleep 0.1
         end
       end
