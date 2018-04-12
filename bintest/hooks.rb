@@ -34,7 +34,7 @@ def wait_haconiwa(container_name)
       until ready
         subprocess = `pstree -Al $(pgrep haconiwa | sort | head -1)`.chomp
         tree = subprocess.split(/(-[-+]-|\s+)/)
-        ready = (tree.size >= 7 && tree.last == "`-4*[{haconiwa}]")
+        ready = (tree.size >= 5)
         sleep 0.1
       end
     end
