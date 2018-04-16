@@ -1,3 +1,9 @@
+haconiwa (0.9.1-1) unstable; urgency=medium
+
+  * Apply some enhancements to reduce memory consumption
+
+ -- Uchio Kondo <udzura@udzura.jp>  Mon, 16 Apr 2018 19:19:52 +0900
+
 haconiwa (0.9.0-1) unstable; urgency=medium
 
   * Change mruby version to current master, drop dependencies to mruby-thread
@@ -27,9 +33,3 @@ haconiwa (0.8.6-1) unstable; urgency=medium
   * May fix some segfaults on GC, stopped binary spritting
 
  -- Uchio Kondo <udzura@udzura.jp>  Wed, 24 May 2017 15:26:53 +0900
-
-haconiwa (0.8.5-1) unstable; urgency=medium
-
-  * Add some supports when haconiwa bin is set-user-id-rooted, bump mruby version
-
- -- Uchio Kondo <udzura@udzura.jp>  Thu, 27 Apr 2017 13:44:16 +0900

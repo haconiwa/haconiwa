@@ -1,6 +1,6 @@
 Name: haconiwa
 Epoch: 1
-Version: 0.9.0
+Version: 0.9.1
 Release: 1
 Summary: MRuby on Container
 License: GPLv3+
@@ -49,6 +49,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Mon Apr 16 2018 Uchio Kondo <udzura@udzura.jp> - 1:0.9.1-1
+- Apply some enhancements to reduce memory consumption
+
 * Thu Apr 12 2018 Uchio Kondo <udzura@udzura.jp> - 1:0.9.0-1
 - Change mruby version to current master, drop dependencies to mruby-thread
 
@@ -63,6 +66,3 @@ fi
 
 * Wed May 24 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.8.6-1
 - May fix some segfaults on GC, stopped binary spritting
-
-* Thu Apr 27 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.8.5-1
-- Add some supports when haconiwa bin is set-user-id-rooted, bump mruby version

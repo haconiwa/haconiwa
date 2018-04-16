@@ -1,5 +1,10 @@
-latest: 0.9.0
+latest: 0.9.1
 changelog:
+  - version: 0.9.1
+    messages:
+      - Apply some enhancements to reduce memory consumption
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Mon, 16 Apr 2018 19:19:52 +0900
   - version: 0.9.0
     messages:
       - Change mruby version to current master, drop dependencies to mruby-thread

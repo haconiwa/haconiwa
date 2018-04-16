@@ -12,7 +12,7 @@ RUN apt-get -qq -y install \
     rake autotools-dev cgroup-lite build-essential \
     dh-make xz-utils
 
-ENV VERSION 0.9.0
+ENV VERSION 0.9.1
 ENV USER root
 VOLUME /out
 
