@@ -56,7 +56,7 @@ $ mkdir -p /var/another/root/home
 Create the file `example.haco`:
 
 ```ruby
-Haconiwa::Base do |config|
+Haconiwa.define do |config|
   config.name = "new-haconiwa001" # to be hostname
 
   config.bootstrap do |b|
