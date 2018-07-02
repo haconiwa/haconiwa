@@ -27,7 +27,7 @@ Available for: `CentOS >= 7 / CentOS ~> 6(Experimental, maybe kernel update requ
 Other linuxes users can just download binaries from [latest](https://github.com/haconiwa/haconiwa/releases):
 
 ```bash
-VERSION=0.8.0
+VERSION=<specify version>
 wget https://github.com/haconiwa/haconiwa/releases/download/v${VERSION}/haconiwa-v${VERSION}.x86_64-pc-linux-gnu.tgz
 tar xzf haconiwa-v${VERSION}.x86_64-pc-linux-gnu.tgz
 sudo install hacorb hacoirb haconiwa /usr/local/bin
@@ -46,15 +46,22 @@ If you would not, these installation are not required.
 
 ### Bootstraping container filesystem
 
+Create mount points:
+
+```sh
+$ mkdir -p /var/another/root/etc
+$ mkdir -p /var/another/root/home
+```
+
 Create the file `example.haco`:
 
 ```ruby
-Haconiwa::Base.define do |config|
+Haconiwa::Base do |config|
   config.name = "new-haconiwa001" # to be hostname
 
   config.bootstrap do |b|
     b.strategy = "lxc"
-    b.os_type = centos
+    b.os_type = "centos"
   end
 
   config.provision do |p|
