@@ -15,6 +15,7 @@ module Haconiwa
                   :capabilities,
                   :guid,
                   :seccomp,
+                  :checkpoint,
                   :general_hooks,
                   :async_hooks,
                   :wait_interval,
@@ -70,6 +71,7 @@ module Haconiwa
       @capabilities = Capabilities.new
       @guid = Guid.new
       @seccomp = Seccomp.new
+      @checkpoint = Checkpoint.new
       @general_hooks = {}
       @async_hooks = []
       @wait_interval = 5
@@ -175,6 +177,13 @@ module Haconiwa
         blk.call(@resource)
       end
       @resource
+    end
+
+    def checkpoint(&blk)
+      if blk
+        blk.call(@checkpoint)
+      end
+      @checkpoint
     end
 
     def add_mount_point(point, options={})
@@ -350,6 +359,7 @@ module Haconiwa
         :@capabilities,
         :@guid,
         :@seccomp,
+        :@checkpoint,
         :@general_hooks,
         :@async_hooks,
         :@wait_interval,
@@ -894,5 +904,14 @@ module Haconiwa
     b = Barn.define(&b)
     b.update_project_name!
     b
+  end
+
+  class Checkpoint
+    def initialize
+      @target_syscall = nil
+      @image_dir = "/var/run/haconiwa/checkpoint"
+      @criu_log_file = "/var/log/haconiwa-criu.log"
+    end
+    attr_accessor :target_syscall, :image_dir, :criu_log_file
   end
 end
