@@ -114,6 +114,23 @@ module Haconiwa
       base.attach(*exe)
     end
 
+    def self.checkpoint(args)
+      opt = parse_opts(args, 'HACO_FILE') do |o|
+      end
+      get_base(opt.catchall.values).do_checkpoint
+    end
+
+    def self.restore(args)
+      opt = parse_opts(args, 'HACO_FILE') do |o|
+        o.literal('D', 'daemon', "Force the container to be daemon")
+        o.literal('T', 'no-daemon', "Force the container not to be daemon, stuck in tty")
+      end
+      base = get_base(opt.catchall.values)
+      base.daemonize! if opt['D'].exist?
+      base.cancel_daemonize! if opt['T'].exist?
+      base.restore
+    end
+
     def self.reload(args)
       opt = parse_opts(args, '[HACO_FILE]', ignore_catchall: lambda {|o| o['t'].exist? } ) do |o|
         o.integer('t', 'target', 'PPID', "Container's supervisor PID to invoke reload")

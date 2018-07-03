@@ -339,6 +339,24 @@ module Haconiwa
       end
       raise "Kill does not seem to be completed. Check process of PID=#{::File.read supervisor_all_pid_file}"
     end
+
+    def do_checkpoint(*cmd)
+      target = containers_real_run
+      if target.size != 1
+        raise "Checkpoint now does not support multiple containers"
+      end
+
+      # Haconiwa::CRIUService.new(target.first).create_checkpoint
+    end
+
+    def do_checkpoint(*cmd)
+      target = containers_real_run
+      if target.size != 1
+        raise "Checkpoint now does not support multiple containers"
+      end
+
+      # Haconiwa::CRIUService.new(target.first).restore
+    end
   end
 
   class Base < Barn
