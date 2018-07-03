@@ -1,8 +1,5 @@
 module Haconiwa
   class Runner
-  end
-
-  class LinuxRunner < Runner
     def initialize(base)
       @base = base
       validate_ruid(base)
@@ -150,7 +147,7 @@ module Haconiwa
             Logger.debug("OK: kick parent process to resume")
 
             Logger.info "Container is going to exec: #{base.init_command.inspect}"
-            Exec.execve(base.environ, *base.init_command)
+            exec_container!(base)
           rescue => e
             Logger.exception(e)
             exit(127)
@@ -215,6 +212,10 @@ module Haconiwa
         pid_file.remove # in any case
         Logger.puts "Removed pidfile: #{pid_file}"
       end
+    end
+
+    def exec_container!(base)
+      raise "Implement me at subclasses"
     end
 
     def attach(exe)
@@ -694,6 +695,18 @@ module Haconiwa
           end
         end
       end
+    end
+  end
+
+  class LinuxRunner < Runner
+    def exec_container!(base)
+      Exec.execve(base.environ, *base.init_command)
+    end
+  end
+
+  class CRIURunner < Runner
+    def exec_container!(base)
+      # Doing restore via libcriu
     end
   end
 end
