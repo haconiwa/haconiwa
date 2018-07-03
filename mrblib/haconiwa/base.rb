@@ -539,6 +539,10 @@ module Haconiwa
     attr_reader :limits
     attr_accessor :defblock
 
+    def no_special_config?
+      @limits.empty?
+    end
+
     def set_limit(type, soft, hard=nil)
       hard ||= soft
       self.limits << [type, soft, hard]
@@ -553,6 +557,10 @@ module Haconiwa
     end
     attr_reader :groups, :groups_by_controller
     attr_accessor :defblock
+
+    def no_special_config?
+      @groups.empty?
+    end
 
     def [](key)
       @groups[key]
@@ -606,6 +614,10 @@ module Haconiwa
       @whitelist.clear
     end
 
+    def no_special_config? # means reseted to privileged
+      @blacklist.empty? && @whitelist.empty?
+    end
+
     def allow(*keys)
       if keys.first == :all
         @whitelist.clear
@@ -656,6 +668,10 @@ module Haconiwa
       @gid_mapping = nil
     end
     attr_reader :namespaces
+
+    def no_special_config?
+      @namespaces.empty? && @ns_to_path.empty?
+    end
 
     def unshare(ns, options={})
       flag = to_bit(ns)
@@ -794,6 +810,10 @@ module Haconiwa
     end
     attr_accessor :def_action, :defblock
 
+    def no_special_config?
+      !! @defblock
+    end
+
     def filter(options={}, &blk)
       @def_action = options[:default]
       raise("default: must be specified to filter") unless @def_action
@@ -838,6 +858,10 @@ module Haconiwa
       "devpts" => ["devpts", "devpts", "/dev/pts"],
       "shm"    => ["tmpfs", "tmpfs", "/dev/shm"],
     }
+
+    def no_special_config?
+      @mount_points.empty?
+    end
 
     def chroot
       self.rootfs.root

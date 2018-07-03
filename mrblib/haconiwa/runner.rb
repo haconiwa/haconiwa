@@ -414,6 +414,8 @@ module Haconiwa
     end
 
     def apply_namespace(namespace)
+      return if namespace.no_special_config?
+
       if ::Namespace.unshare(namespace.to_flag_for_unshare) < 0
         Logger.exception "Some namespace is unsupported by this kernel. Please check"
       end
@@ -461,6 +463,8 @@ module Haconiwa
     end
 
     def apply_filesystem(base)
+      return if base.filesystem.no_special_config?
+
       cwd = Dir.pwd
       Mount.make_private "/"
       owner_options = base.rootfs.to_owner_options
