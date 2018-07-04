@@ -431,6 +431,10 @@ module Haconiwa
           f.close
         end
       end
+
+      if namespace.flag?(::Namespace::CLONE_NEWNS)
+        Mount.make_private "/"
+      end
     end
 
     def apply_user_namespace(namespace)
@@ -463,10 +467,9 @@ module Haconiwa
     end
 
     def apply_filesystem(base)
-      return if base.filesystem.no_special_config?
+      return if base.filesystem.no_special_config? && base.network_mountpoint.empty?
 
       cwd = Dir.pwd
-      Mount.make_private "/"
       owner_options = base.rootfs.to_owner_options
       base.filesystem.mount_points.each do |mp|
         Logger.debug("Mounting: #{mp.inspect}")
