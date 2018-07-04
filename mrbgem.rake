@@ -47,6 +47,10 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.add_dependency 'mruby-sprintf'   , :core => 'mruby-sprintf'
   spec.add_dependency 'mruby-print'     , :core => 'mruby-print'
 
+  if spec.build.cc.defines.flatten.include?("HACONIWA_USE_CRIU")
+    spec.add_dependency 'mruby-criu', :github => 'matsumotory/mruby-criu'
+  end
+
   def spec.save_dependent_mgem_revisions
     file DEFS_FILE => DEPENDENT_GEMS do
       f = open(DEFS_FILE, 'w')
