@@ -1,10 +1,15 @@
 # -*- mode: ruby -*-
 Haconiwa.define do |config|
   config.name = "chroot-apache001" # to be hostname
-  config.init_command = "/usr/bin/apachectl -D" # to be first process
+  config.init_command = "/usr/local/bin/httpd-foreground" # to be first process
 
   root = Pathname.new("/var/lib/haconiwa-apache001")
   config.chroot_to root
+  config.environ = {
+    "PATH" => "/usr/local/apache2/bin:#{ENV['PATH']}",
+  }
+  # config.mount_independent "procfs"
+  # config.mount_independent "devtmpfs"
 
   config.capabilities.reset_to_privileged!
 end
