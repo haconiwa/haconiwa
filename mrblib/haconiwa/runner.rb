@@ -1,8 +1,5 @@
 module Haconiwa
   class Runner
-  end
-
-  class LinuxRunner < Runner
     def initialize(base)
       @base = base
       validate_ruid(base)
@@ -150,7 +147,7 @@ module Haconiwa
             Logger.debug("OK: kick parent process to resume")
 
             Logger.info "Container is going to exec: #{base.init_command.inspect}"
-            Exec.execve(base.environ, *base.init_command)
+            exec_container!(base)
           rescue => e
             Logger.exception(e)
             exit(127)
@@ -215,6 +212,10 @@ module Haconiwa
         pid_file.remove # in any case
         Logger.puts "Removed pidfile: #{pid_file}"
       end
+    end
+
+    def exec_container!(base)
+      raise "Implement me at subclasses"
     end
 
     def attach(exe)
@@ -413,6 +414,8 @@ module Haconiwa
     end
 
     def apply_namespace(namespace)
+      return if namespace.no_special_config?
+
       if ::Namespace.unshare(namespace.to_flag_for_unshare) < 0
         Logger.exception "Some namespace is unsupported by this kernel. Please check"
       end
@@ -427,6 +430,10 @@ module Haconiwa
           end
           f.close
         end
+      end
+
+      if namespace.flag?(::Namespace::CLONE_NEWNS)
+        Mount.make_private "/"
       end
     end
 
@@ -460,8 +467,9 @@ module Haconiwa
     end
 
     def apply_filesystem(base)
+      return if base.filesystem.no_special_config? && base.network_mountpoint.empty?
+
       cwd = Dir.pwd
-      Mount.make_private "/"
       owner_options = base.rootfs.to_owner_options
       base.filesystem.mount_points.each do |mp|
         Logger.debug("Mounting: #{mp.inspect}")
@@ -694,6 +702,18 @@ module Haconiwa
           end
         end
       end
+    end
+  end
+
+  class LinuxRunner < Runner
+    def exec_container!(base)
+      Exec.execve(base.environ, *base.init_command)
+    end
+  end
+
+  class CRIURunner < Runner
+    def exec_container!(base)
+      # Doing restore via libcriu
     end
   end
 end

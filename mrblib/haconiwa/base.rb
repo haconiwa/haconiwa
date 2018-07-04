@@ -15,6 +15,7 @@ module Haconiwa
                   :capabilities,
                   :guid,
                   :seccomp,
+                  :checkpoint,
                   :general_hooks,
                   :async_hooks,
                   :wait_interval,
@@ -70,6 +71,7 @@ module Haconiwa
       @capabilities = Capabilities.new
       @guid = Guid.new
       @seccomp = Seccomp.new
+      @checkpoint = Checkpoint.new
       @general_hooks = {}
       @async_hooks = []
       @wait_interval = 5
@@ -175,6 +177,13 @@ module Haconiwa
         blk.call(@resource)
       end
       @resource
+    end
+
+    def checkpoint(&blk)
+      if blk
+        blk.call(@checkpoint)
+      end
+      @checkpoint
     end
 
     def add_mount_point(point, options={})
@@ -330,6 +339,24 @@ module Haconiwa
       end
       raise "Kill does not seem to be completed. Check process of PID=#{::File.read supervisor_all_pid_file}"
     end
+
+    def do_checkpoint(*cmd)
+      target = containers_real_run
+      if target.size != 1
+        raise "Checkpoint now does not support multiple containers"
+      end
+
+      # Haconiwa::CRIUService.new(target.first).create_checkpoint
+    end
+
+    def do_checkpoint(*cmd)
+      target = containers_real_run
+      if target.size != 1
+        raise "Checkpoint now does not support multiple containers"
+      end
+
+      # Haconiwa::CRIUService.new(target.first).restore
+    end
   end
 
   class Base < Barn
@@ -350,6 +377,7 @@ module Haconiwa
         :@capabilities,
         :@guid,
         :@seccomp,
+        :@checkpoint,
         :@general_hooks,
         :@async_hooks,
         :@wait_interval,
@@ -511,6 +539,10 @@ module Haconiwa
     attr_reader :limits
     attr_accessor :defblock
 
+    def no_special_config?
+      @limits.empty?
+    end
+
     def set_limit(type, soft, hard=nil)
       hard ||= soft
       self.limits << [type, soft, hard]
@@ -525,6 +557,10 @@ module Haconiwa
     end
     attr_reader :groups, :groups_by_controller
     attr_accessor :defblock
+
+    def no_special_config?
+      @groups.empty?
+    end
 
     def [](key)
       @groups[key]
@@ -578,6 +614,10 @@ module Haconiwa
       @whitelist.clear
     end
 
+    def no_special_config? # means reseted to privileged
+      @blacklist.empty? && @whitelist.empty?
+    end
+
     def allow(*keys)
       if keys.first == :all
         @whitelist.clear
@@ -628,6 +668,10 @@ module Haconiwa
       @gid_mapping = nil
     end
     attr_reader :namespaces
+
+    def no_special_config?
+      @namespaces.empty? && @ns_to_path.empty?
+    end
 
     def unshare(ns, options={})
       flag = to_bit(ns)
@@ -766,6 +810,10 @@ module Haconiwa
     end
     attr_accessor :def_action, :defblock
 
+    def no_special_config?
+      !! @defblock
+    end
+
     def filter(options={}, &blk)
       @def_action = options[:default]
       raise("default: must be specified to filter") unless @def_action
@@ -810,6 +858,10 @@ module Haconiwa
       "devpts" => ["devpts", "devpts", "/dev/pts"],
       "shm"    => ["tmpfs", "tmpfs", "/dev/shm"],
     }
+
+    def no_special_config?
+      @mount_points.empty?
+    end
 
     def chroot
       self.rootfs.root
@@ -894,5 +946,14 @@ module Haconiwa
     b = Barn.define(&b)
     b.update_project_name!
     b
+  end
+
+  class Checkpoint
+    def initialize
+      @target_syscall = nil
+      @image_dir = "/var/run/haconiwa/checkpoint"
+      @criu_log_file = "/var/log/haconiwa-criu.log"
+    end
+    attr_accessor :target_syscall, :image_dir, :criu_log_file
   end
 end

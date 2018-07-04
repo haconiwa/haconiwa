@@ -17,6 +17,10 @@ def __main__(argv)
     Haconiwa::Cli.run(argv)
   when "attach"
     Haconiwa::Cli.attach(argv)
+  when "checkpoint"
+    Haconiwa::Cli.checkpoint(argv)
+  when "restore"
+    Haconiwa::Cli.restore(argv)
   when "reload"
     Haconiwa::Cli.reload(argv)
   when "kill"
@@ -25,16 +29,18 @@ def __main__(argv)
     puts <<-USAGE
 haconiwa - The MRuby on Container
 commands:
-    new       - generate haconiwa's config DSL file template
-    create    - create the container rootfs
-    provision - provision already booted container rootfs
-    archive   - create, provision, then archive rootfs to image
-    start     - run the container
-    attach    - attach to existing container
-    reload    - reload running container parameters, following its current config
-    kill      - kill the running container
-    version   - show version
-    revisions - show mgem/mruby revisions which haconiwa bin uses
+    new        - generate haconiwa's config DSL file template
+    create     - create the container rootfs
+    provision  - provision already booted container rootfs
+    archive    - create, provision, then archive rootfs to image
+    start      - run the container
+    attach     - attach to existing container
+    checkpoint - create container's checkpoint image following config, using syscall hook
+    restore    - restore a container from checkpint
+    reload     - reload running container parameters, following its current config
+    kill       - kill the running container
+    version    - show version
+    revisions  - show mgem/mruby revisions which haconiwa bin uses
 
 Invoke `haconiwa COMMAND -h' for details.
     USAGE
