@@ -346,16 +346,22 @@ module Haconiwa
         raise "Checkpoint now does not support multiple containers"
       end
 
-      # Haconiwa::CRIUService.new(target.first).create_checkpoint
+      Haconiwa::CRIUService.new(target.first).create_checkpoint
     end
 
-    def do_checkpoint(*cmd)
+    def restore(*_a)
       target = containers_real_run
       if target.size != 1
         raise "Checkpoint now does not support multiple containers"
       end
 
-      # Haconiwa::CRIUService.new(target.first).restore
+      LinuxRunner.new(self).waitall do |_w|
+        pid = ::Process.fork do
+          _w.close if _w
+          target.first.restore
+        end
+        [pid]
+      end
     end
   end
 
@@ -490,6 +496,10 @@ module Haconiwa
     def attach(*run_command)
       self.container_pid_file ||= default_container_pid_file
       LinuxRunner.new(self).attach(run_command)
+    end
+
+    def restore
+      Haconiwa::CRIUService.new(self).restore
     end
 
     def reload(newcg, newcg2, newres)

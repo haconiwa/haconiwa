@@ -24,7 +24,7 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.add_dependency 'mruby-linux-namespace', :mgem => 'mruby-linux-namespace'
   spec.add_dependency 'mruby-process'   , :github => 'iij/mruby-process'
   spec.add_dependency 'mruby-socket'    , :mgem => 'mruby-socket'
-  spec.add_dependency 'mruby-seccomp'   , :github => 'haconiwa/mruby-seccomp'
+  spec.add_dependency 'mruby-seccomp'   , :github => 'chikuwait/mruby-seccomp'
 
   spec.add_dependency 'mruby-onig-regexp', :github => 'udzura/mruby-onig-regexp'
   spec.add_dependency 'mruby-argtable'  , :github => 'udzura/mruby-argtable', :branch => 'static-link-argtable3'
