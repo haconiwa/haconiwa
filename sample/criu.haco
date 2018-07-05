@@ -1,0 +1,23 @@
+# -*- mode: ruby -*-
+Haconiwa.define do |config|
+  config.name = "chroot-apache001" # to be hostname
+  config.init_command = %w(/usr/local/apache2/bin/httpd -DFOREGROUND -X)
+  # config.init_command = %w(/usr/local/bin/httpd-foreground)
+
+  root = Pathname.new("/var/lib/haconiwa-apache001")
+  config.chroot_to root
+  config.environ = {
+    "PATH" => "#{ENV['PATH']}",
+  }
+
+  system "mkdir -p /tmp/criu/images"
+
+  config.checkpoint do |checkpoint|
+    checkpoint.target_syscall :listen, 0
+    checkpoint.images_dir    = "/tmp/criu/images"
+    checkpoint.criu_log_file = "-"
+    checkpoint.criu_service_address = "/var/run/criu_service.socket"
+  end
+
+  config.capabilities.reset_to_privileged!
+end

@@ -4,17 +4,25 @@ module Haconiwa
       @base = base
     end
 
+    def checkpoint
+      @base.checkpoint
+    end
+
     def create_checkpoint
+      syscall = checkpoint.target_syscall
+      if syscall.nil? || syscall.empty?
+        Haconiwa::Logger.exception "Target systemcall not specified. Abort"
+      end
+
       c = CRIU.new
-      c.set_images_dir "/tmp/criu_test"
-      c.set_service_address "/var/run/criu_service.socket"
-      c.set_log_file "-"
-      c.set_log_level 5
+      c.set_images_dir checkpoint.images_dir
+      c.set_service_address checkpoint.criu_service_address
+      c.set_log_file checkpoint.criu_log_file
       c.set_shell_job true
 
       pid = Process.fork do
         context = ::Seccomp.new(default: :allow) do |rule|
-          rule.trace(:listen, 0)
+          rule.trace(*syscall)
         end
         context.load
 
@@ -25,23 +33,23 @@ module Haconiwa
 
       ret = ::Seccomp.start_trace(pid) do |syscall, _pid, ud|
         name = ::Seccomp.syscall_to_name(syscall)
-        Haconiwa::Logger.puts "[#{_pid}]: syscall #{name}(##{syscall}) called. (ud: #{ud}), dump the process image."
+        Haconiwa::Logger.puts "CRIU: syscall #{name}(##{syscall}) called. (ud: #{ud}), dump the process image."
 
         begin
           c.set_pid _pid
           c.dump
         rescue => e
-          Haconiwa::Logger.puts "[#{_pid}]: dump failed: #{e.class}, #{e.message}"
+          Haconiwa::Logger.puts "CRIU: dump failed: #{e.class}, #{e.message}"
         else
-          Haconiwa::Logger.puts "[#{_pid}]: dumped!!"
+          Haconiwa::Logger.puts "CRIU: dumped!!"
         end
       end
-      Haconiwa::Logger.puts ret
     end
 
     def restore
-      images_dir = "/tmp/criu_test"
-      ::Exec.execve(ENV, "/usr/local/sbin/criu", "restore", "--shell-job", "-D", images_dir)
+      # TODO: embed criu(crtools) to haconiwa...
+      # Hooks won't work
+      ::Exec.execve(ENV, "/usr/local/sbin/criu", "restore", "--shell-job", "-D", checkpoint.images_dir)
     end
   end
 end

@@ -952,18 +952,27 @@ module Haconiwa
     end
   end
 
+  class Checkpoint
+    def initialize
+      @target_syscall = nil
+      @images_dir = "/var/run/haconiwa/checkpoint"
+      @criu_log_file = "-"
+      @criu_service_address = "/var/run/criu_service.socket"
+    end
+    attr_accessor :target_syscall, :images_dir, :criu_log_file, :criu_service_address
+
+    def target_syscall(*args)
+      if args.size == 0
+        return @target_syscall
+      else
+        @target_syscall = args
+      end
+    end
+  end
+
   def self.define(&b)
     b = Barn.define(&b)
     b.update_project_name!
     b
-  end
-
-  class Checkpoint
-    def initialize
-      @target_syscall = nil
-      @image_dir = "/var/run/haconiwa/checkpoint"
-      @criu_log_file = "/var/log/haconiwa-criu.log"
-    end
-    attr_accessor :target_syscall, :image_dir, :criu_log_file
   end
 end
