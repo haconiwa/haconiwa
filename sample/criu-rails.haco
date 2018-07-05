@@ -1,0 +1,46 @@
+# -*- mode: ruby -*-
+Haconiwa.define do |config|
+  config.name = "chroot-apache001" # to be hostname
+  config.init_command = %w(/u/app/helloworld/bin/rails server)
+
+  root = Pathname.new("/var/lib/haconiwa/rails-sample")
+  config.chroot_to root
+  config.workdir = "/u/app/helloworld"
+  config.environ = {
+    "PATH" => "/usr/local/bundle/bin:/usr/local/bundle/gems/bin:#{ENV['PATH']}",
+    "DATABASE_URL" => "sqlite3:///tmp/helloworld.sqlite",
+    "RAILS_ENV" => "production",
+    "BUNDLE_PATH" => "/usr/local/bundle",
+    "BUNDLE_APP_CONFIG" => "/usr/local/bundle"
+  }
+
+  system "mkdir -p /tmp/criu/images.rails"
+
+  # TODO: activate checkpoint by syscall
+  # ... or specify timing?
+  config.checkpoint do |checkpoint|
+    checkpoint.target_syscall :listen, 0
+    checkpoint.images_dir    = "/tmp/criu/images.rails"
+    checkpoint.criu_log_file = "-"
+    checkpoint.criu_service_address = "/var/run/criu_service.socket"
+  end
+
+  config.add_async_hook msec: 2500 do |base|
+    c = CRIU.new
+    puts base.checkpoint.images_dir
+    c.set_images_dir base.checkpoint.images_dir
+    c.set_service_address base.checkpoint.criu_service_address
+    c.set_log_file base.checkpoint.criu_log_file
+    c.set_shell_job true
+    begin
+      c.set_pid base.pid
+      c.dump
+    rescue => e
+      Haconiwa::Logger.puts "CRIU[hook]: dump failed: #{e.class}, #{e.message}"
+    else
+      Haconiwa::Logger.puts "CRIU[hook]: dumped!!"
+    end
+  end
+
+  config.capabilities.reset_to_privileged!
+end
