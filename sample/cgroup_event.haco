@@ -19,7 +19,7 @@ haconiwa = Haconiwa.define do |config|
   config.namespace.unshare "uts"
   config.namespace.unshare "pid"
 
-  config.cgroup["memory.limit_in_bytes"] = 16 * 1024 * 1024 # 50MB...
+  config.cgroup["memory.limit_in_bytes"] = 16 * 1024 * 1024 # Please change here :)
 
   Haconiwa::Logger.puts "Memory pressure level: #{level}"
   config.add_cgroup_hook type: "memory_pressure", level: level do |base|
