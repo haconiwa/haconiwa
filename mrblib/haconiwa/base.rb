@@ -17,6 +17,7 @@ module Haconiwa
                   :seccomp,
                   :general_hooks,
                   :async_hooks,
+                  :cgroup_hooks,
                   :wait_interval,
                   :environ,
                   :lxcfs_root,
@@ -72,6 +73,7 @@ module Haconiwa
       @seccomp = Seccomp.new
       @general_hooks = {}
       @async_hooks = []
+      @cgroup_hooks = []
       @wait_interval = 5
       @environ = {}
       @lxcfs_root = nil
@@ -221,6 +223,10 @@ module Haconiwa
     end
     alias after_spawn add_async_hook
 
+    def add_cgroup_hook(options={}, &hook)
+      @cgroup_hooks << WaitLoop::CGroupHook.new(options, &hook)
+    end
+
     def bootstrap
       @bootstrap ||= Bootstrap.new
       yield(@bootstrap) if block_given?
@@ -352,6 +358,7 @@ module Haconiwa
         :@seccomp,
         :@general_hooks,
         :@async_hooks,
+        :@cgroup_hooks,
         :@wait_interval,
         :@environ,
         :@lxcfs_root,
