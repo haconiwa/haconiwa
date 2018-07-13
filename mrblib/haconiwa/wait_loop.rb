@@ -131,7 +131,7 @@ module Haconiwa
 
       def initialize(opt={}, &b)
         @type = opt[:type]
-        if VALID_TYPES.include?(@type.to_s)
+        unless VALID_TYPES.include?(@type.to_s)
           raise "Invalid hook type: #{@type}"
         end
         @level = opt[:level] || "critical"
@@ -157,11 +157,11 @@ module Haconiwa
       end
 
       def open_cgroup_file(base)
-        File.open("/sys/fs/cgroup/memory/#{base.name}/memory.pressure_level")
+        File.open("/sys/fs/cgroup/memory/#{base.name}/memory.pressure_level", "r")
       end
 
       def write_to_control(base, efd, cfd)
-        f = File.open("/sys/fs/cgroup/memory/#{base.name}/cgroup.event_control")
+        f = File.open("/sys/fs/cgroup/memory/#{base.name}/cgroup.event_control", "w")
         f.write "#{efd} #{cfd} #{@level}"
         f.close
       end
