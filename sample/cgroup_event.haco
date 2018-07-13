@@ -1,0 +1,30 @@
+# -*- mode: ruby -*-
+level = ENV['PRESSURE_LEVEL'] || "medium"
+
+haconiwa = Haconiwa.define do |config|
+  config.name = "cgroup-event-test" # to be hostname
+  config.init_command = ["/usr/bin/ruby", "-e", "GC.disable; loop { ha = Hash.new; (1..10000).each {|i| ha[i.to_s] = rand(65535).to_s; sleep 0.0001 } }"]
+  config.daemonize!
+
+  root = Pathname.new("/var/lib/haconiwa/8cfccb3d")
+  config.mount_independent "procfs"
+  config.mount_independent "sysfs"
+  config.mount_independent "devtmpfs"
+  config.mount_independent "devpts"
+  config.mount_network_etc(root, host_root: "/etc")
+  config.chroot_to root
+
+  config.namespace.unshare "mount"
+  config.namespace.unshare "ipc"
+  config.namespace.unshare "uts"
+  config.namespace.unshare "pid"
+
+  config.cgroup["memory.limit_in_bytes"] = 16 * 1024 * 1024 # 50MB...
+
+  Haconiwa::Logger.puts "Memory pressure level: #{level}"
+  config.add_cgroup_hook type: "memory_pressure", level: level do |base|
+    Haconiwa::Logger.puts "[#{base.pid}] Memory pressure now!"
+    system "ps auxf | grep -e RSS -e GC.disable"
+    ::Process.kill :TERM, base.pid
+  end
+end
