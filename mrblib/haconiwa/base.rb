@@ -346,16 +346,22 @@ module Haconiwa
         raise "Checkpoint now does not support multiple containers"
       end
 
-      # Haconiwa::CRIUService.new(target.first).create_checkpoint
+      Haconiwa::CRIUService.new(target.first).create_checkpoint
     end
 
-    def do_checkpoint(*cmd)
+    def restore(*_a)
       target = containers_real_run
       if target.size != 1
         raise "Checkpoint now does not support multiple containers"
       end
 
-      # Haconiwa::CRIUService.new(target.first).restore
+      LinuxRunner.new(self).waitall do |_w|
+        pid = ::Process.fork do
+          _w.close if _w
+          target.first.restore
+        end
+        [pid]
+      end
     end
   end
 
@@ -490,6 +496,10 @@ module Haconiwa
     def attach(*run_command)
       self.container_pid_file ||= default_container_pid_file
       LinuxRunner.new(self).attach(run_command)
+    end
+
+    def restore
+      Haconiwa::CRIUService.new(self).restore
     end
 
     def reload(newcg, newcg2, newres)
@@ -942,18 +952,27 @@ module Haconiwa
     end
   end
 
+  class Checkpoint
+    def initialize
+      @target_syscall = nil
+      @images_dir = "/var/run/haconiwa/checkpoint"
+      @criu_log_file = "-"
+      @criu_service_address = "/var/run/criu_service.socket"
+    end
+    attr_accessor :target_syscall, :images_dir, :criu_log_file, :criu_service_address
+
+    def target_syscall(*args)
+      if args.size == 0
+        return @target_syscall
+      else
+        @target_syscall = args
+      end
+    end
+  end
+
   def self.define(&b)
     b = Barn.define(&b)
     b.update_project_name!
     b
-  end
-
-  class Checkpoint
-    def initialize
-      @target_syscall = nil
-      @image_dir = "/var/run/haconiwa/checkpoint"
-      @criu_log_file = "/var/log/haconiwa-criu.log"
-    end
-    attr_accessor :target_syscall, :image_dir, :criu_log_file
   end
 end

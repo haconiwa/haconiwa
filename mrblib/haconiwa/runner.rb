@@ -146,7 +146,6 @@ module Haconiwa
             kick_ok.close
             Logger.debug("OK: kick parent process to resume")
 
-            Logger.info "Container is going to exec: #{base.init_command.inspect}"
             exec_container!(base)
           rescue => e
             Logger.exception(e)
@@ -707,13 +706,8 @@ module Haconiwa
 
   class LinuxRunner < Runner
     def exec_container!(base)
+      Haconiwa::Logger.info "Container is going to exec: #{base.init_command.inspect}"
       Exec.execve(base.environ, *base.init_command)
-    end
-  end
-
-  class CRIURunner < Runner
-    def exec_container!(base)
-      # Doing restore via libcriu
     end
   end
 end
