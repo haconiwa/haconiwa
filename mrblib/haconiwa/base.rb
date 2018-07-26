@@ -568,6 +568,7 @@ module Haconiwa
       cap_dac_override
       cap_fowner
       cap_fsetid
+      cap_net_bind_service
       cap_net_raw
       cap_setgid
       cap_setfcap
