@@ -1,6 +1,6 @@
 # -*- mode: ruby -*-
 Haconiwa.define do |config|
-  config.name = "chroot-apache001" # to be hostname
+  config.name = "chroot-rails001" # to be hostname
   config.init_command = %w(/u/app/helloworld/bin/rails server)
 
   root = Pathname.new("/var/lib/haconiwa/rails-sample")
@@ -24,6 +24,9 @@ Haconiwa.define do |config|
     checkpoint.criu_log_file = "-"
     checkpoint.criu_service_address = "/var/run/criu_service.socket"
   end
+
+  config.network.namespace = config.name
+  config.network.container_ip = "10.0.0.3"
 
   config.add_async_hook msec: 2500 do |base|
     c = CRIU.new
