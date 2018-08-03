@@ -923,6 +923,10 @@ module Haconiwa
       @veth_guest ||= ::SHA1.sha1_hex(self.namespace)[0, 8] + '_g'
     end
 
+    def container_ip_with_netmask
+      "#{container_ip}/#{netmask}"
+    end
+
     private
     def detect_bridge_ip_mask(brname=@bridge_name)
       `ip -f inet -o addr show #{brname}`.split[3].split('/')

@@ -26,7 +26,11 @@ Haconiwa.define do |config|
   end
 
   config.network.namespace = config.name
-  config.network.container_ip = "10.0.0.3"
+  if ENV['RESTORED_IP']
+    config.network.container_ip = ENV['RESTORED_IP']
+  else
+    config.network.container_ip = "10.0.0.3"
+  end
 
   config.add_async_hook msec: 2500 do |base|
     c = CRIU.new
@@ -45,5 +49,6 @@ Haconiwa.define do |config|
     end
   end
 
+  # config.namespace.unshare "pid"
   config.capabilities.reset_to_privileged!
 end
