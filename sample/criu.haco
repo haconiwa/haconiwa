@@ -12,6 +12,9 @@ Haconiwa.define do |config|
 
   system "mkdir -p /tmp/criu/images"
 
+  config.network.namespace = config.name
+  config.network.container_ip = "10.0.0.2"
+
   config.checkpoint do |checkpoint|
     checkpoint.target_syscall :listen, 0
     checkpoint.images_dir    = "/tmp/criu/images"

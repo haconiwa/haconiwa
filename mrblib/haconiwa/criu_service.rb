@@ -49,7 +49,14 @@ module Haconiwa
     def restore
       # TODO: embed criu(crtools) to haconiwa...
       # Hooks won't work
-      ::Exec.execve(ENV, "/usr/local/sbin/criu", "restore", "--shell-job", "-D", checkpoint.images_dir)
+      cmds = ["/usr/local/sbin/criu", "restore", "--shell-job", "-D", checkpoint.images_dir]
+
+      nw = @base.network
+      if nw.enabled?
+        external_string = "veth[#{nw.veth_guest}]:#{nw.veth_host}@#{nw.bridge_name}"
+        cmds.concat(["--external", external_string])
+      end
+      ::Exec.execve(ENV, *cmds)
     end
   end
 end
