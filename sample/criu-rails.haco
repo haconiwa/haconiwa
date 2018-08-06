@@ -1,6 +1,7 @@
 # -*- mode: ruby -*-
+suffix = ENV['SUFFIX']
 Haconiwa.define do |config|
-  config.name = "chroot-rails001" # to be hostname
+  config.name = "chroot-rails001-#{suffix}" # to be hostname
   config.init_command = %w(/u/app/helloworld/bin/rails server)
 
   root = Pathname.new("/var/lib/haconiwa/rails-sample")
@@ -31,6 +32,8 @@ Haconiwa.define do |config|
   else
     config.network.container_ip = "10.0.0.3"
   end
+  config.network.veth_guest = "veth0" # Fixed
+  config.network.veth_host = ::SHA1.sha1_hex(config.name + config.network.container_ip)[0, 8] + '_h'
 
   config.add_async_hook msec: 2500 do |base|
     c = CRIU.new
@@ -49,6 +52,6 @@ Haconiwa.define do |config|
     end
   end
 
-  # config.namespace.unshare "pid"
+  config.namespace.unshare "pid"
   config.capabilities.reset_to_privileged!
 end
