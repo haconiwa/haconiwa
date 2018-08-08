@@ -1,11 +1,14 @@
 def __main__(argv)
-  if ENV['HACONIWA_RUN_AS_CRIU_ACTION_SCRIPT'] == "true"
+  argv.shift
+
+  if ENV['HACONIWA_RUN_AS_CRIU_ACTION_SCRIPT'] == "true" && !argv[0]
     ret = Haconiwa.run_as_criu_action_script
     exit ret
   end
 
-  argv.shift
   case argv[0]
+  when "_restored" # only invoked via criu
+    Haconiwa::Cli._restored(argv)
   when "version"
     puts "haconiwa: v#{Haconiwa::VERSION}"
   when "revisions"

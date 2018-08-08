@@ -68,13 +68,9 @@ module Haconiwa
         ENV['HACONIWA_RUN_AS_CRIU_ACTION_SCRIPT'] = "true"
       end
 
-      cmds.concat("--", self_exe, "_restored", @base.hacofile, pidfile)
-      pid = Process.fork do
-        ::Exec.execve(ENV, *cmds)
-      end
-
-      pid, s = Process.waitpid2(pid)
-      Haconiwa::Logger.puts("Restored process supervisor exited: #{s.inspect}")
+      cmds.concat(["--exec-cmd", "--", self_exe, "_restored", @base.hacofile, pidfile])
+      Haconiwa::Logger.debug("Going to exec: #{cmds.inspect}")
+      ::Exec.execve(ENV, *cmds)
     end
   end
 end

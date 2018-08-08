@@ -368,6 +368,22 @@ module Haconiwa
         [pid]
       end
     end
+
+    def _restored(pidfile_path)
+      Haconiwa::Logger.puts("Now in exec'ed haconiwa supervisor process")
+      target = containers_real_run
+      if target.size != 1
+        raise "[BUG] Checkpoint now does not support multiple containers"
+      end
+
+      pid = File.open(pidfile_path, 'r').read.to_i
+      self.pid = pid
+      File.unlink(pidfile_path)
+
+      # TODO run fook and waitloop...
+      pid, s = Process.waitpid2(pid)
+      Haconiwa::Logger.puts("Restored process exited: #{s.inspect}")
+    end
   end
 
   class Base < Barn
