@@ -3,6 +3,7 @@ Haconiwa.define do |config|
   config.name = "chroot-apache001" # to be hostname
   config.init_command = %w(/usr/local/apache2/bin/httpd -DFOREGROUND -X)
   # config.init_command = %w(/usr/local/bin/httpd-foreground)
+  config.acts_as_session_leader
 
   root = Pathname.new("/var/lib/haconiwa-apache001")
   config.chroot_to root
@@ -22,5 +23,8 @@ Haconiwa.define do |config|
     checkpoint.criu_service_address = "/var/run/criu_service.socket"
   end
 
+  config.namespace.unshare "uts"
+  config.namespace.unshare "ipc"
+  config.namespace.unshare "pid"
   config.capabilities.reset_to_privileged!
 end

@@ -55,6 +55,12 @@ module Haconiwa
       if nw.enabled?
         external_string = "veth[#{nw.veth_guest}]:#{nw.veth_host}@#{nw.bridge_name}"
         cmds.concat(["--external", external_string])
+
+        hook = File.readlink "/proc/self/exe"
+        cmds.concat(["--action-script", hook])
+
+        ENV['HACONIWA_NEW_IP'] = nw.container_ip_with_netmask
+        ENV['HACONIWA_RUN_AS_CRIU_ACTION_SCRIPT'] = "true"
       end
       ::Exec.execve(ENV, *cmds)
     end

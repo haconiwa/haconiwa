@@ -1,4 +1,9 @@
 def __main__(argv)
+  if ENV['HACONIWA_RUN_AS_CRIU_ACTION_SCRIPT'] == "true"
+    ret = Haconiwa.run_as_criu_action_script
+    exit ret
+  end
+
   argv.shift
   case argv[0]
   when "version"

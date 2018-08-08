@@ -135,6 +135,10 @@ module Haconiwa
       self.command.init_command
     end
 
+    def acts_as_session_leader
+      self.command.session_leader = true
+    end
+
     # aliases
     def chroot_to(dest)
       self.filesystem.rootfs = Rootfs.new(dest)
@@ -248,6 +252,7 @@ module Haconiwa
 
     def daemonize!
       @daemon = true
+      acts_as_session_leader
     end
 
     def cancel_daemonize!
@@ -515,9 +520,11 @@ module Haconiwa
   class Command
     def initialize
       @init_command = ["/bin/bash"] # FIXME: maybe /sbin/init is better
+      @session_leader = false
       @stdin = @stdout = @stderr = nil
     end
     attr_reader :init_command, :stdin, :stdout, :stderr
+    attr_accessor :session_leader
 
     def init_command=(cmd)
       if cmd.is_a?(Array)
@@ -921,6 +928,10 @@ module Haconiwa
 
     def veth_guest
       @veth_guest ||= ::SHA1.sha1_hex(self.namespace)[0, 8] + '_g'
+    end
+
+    def container_ip_with_netmask
+      "#{container_ip}/#{netmask}"
     end
 
     private

@@ -92,7 +92,7 @@ module Haconiwa
             ::Procutil.mark_cloexec
             [r, w2].each {|io| io.close if io }
             done.close
-            ::Procutil.setsid if base.daemon?
+            ::Procutil.setsid if base.command.session_leader
 
             if base.network.enabled?
               nw_handler = NetworkHandler::Bridge.new(base.network)
