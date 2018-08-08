@@ -3,6 +3,7 @@ suffix = ENV['SUFFIX']
 Haconiwa.define do |config|
   config.name = "chroot-rails001-#{suffix}" # to be hostname
   config.init_command = %w(/u/app/helloworld/bin/rails server)
+  config.acts_as_session_leader
 
   root = Pathname.new("/var/lib/haconiwa/rails-sample")
   config.chroot_to root
@@ -52,6 +53,8 @@ Haconiwa.define do |config|
     end
   end
 
+  config.namespace.unshare "uts"
+  config.namespace.unshare "ipc"
   config.namespace.unshare "pid"
   config.capabilities.reset_to_privileged!
 end
