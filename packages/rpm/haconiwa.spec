@@ -1,6 +1,6 @@
 Name: haconiwa
 Epoch: 1
-Version: 0.9.1
+Version: 0.9.2
 Release: 1
 Summary: MRuby on Container
 License: GPLv3+
@@ -49,6 +49,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Wed Aug  8 2018 Uchio Kondo <udzura@udzura.jp> - 1:0.9.2-1
+- Upgrade mruby version
+
 * Mon Apr 16 2018 Uchio Kondo <udzura@udzura.jp> - 1:0.9.1-1
 - Apply some enhancements to reduce memory consumption
 
@@ -63,6 +66,3 @@ fi
 
 * Tue Jun 27 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.8.7-1
 - Support metadata / Prevent doubel startup - and now pid file contains supervisor pid
-
-* Wed May 24 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.8.6-1
-- May fix some segfaults on GC, stopped binary spritting
