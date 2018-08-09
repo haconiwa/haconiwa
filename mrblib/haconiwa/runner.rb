@@ -2,6 +2,7 @@ module Haconiwa
   class Runner
     def initialize(base)
       @base = base
+      @pid_file = nil
       validate_ruid(base)
     end
 
@@ -59,7 +60,7 @@ module Haconiwa
 
     def run(options, init_command)
       begin
-        pid_file = Pidfile.create(@base.container_pid_file)
+        @pid_file = Pidfile.create(@base.container_pid_file)
       rescue => e
         Logger.exception e
       end
@@ -171,11 +172,10 @@ module Haconiwa
         done.read # wait for container is done
         done.close
         persist_namespace(pid, base.namespace)
+        drop_suid_bit
 
         base.created_at = Time.now
         base.supervisor_pid = ::Process.pid
-
-        drop_suid_bit
         Logger.puts "Container fork success and going to wait: pid=#{pid}"
         base.waitloop.wait_interval = base.wait_interval
         base.waitloop.register_hooks(base)
@@ -207,9 +207,9 @@ module Haconiwa
         else
           Logger.warning "Container failed: #{status.inspect}"
         end
-        Logger.puts "Remoing pidfile: #{pid_file}"
-        pid_file.remove # in any case
-        Logger.puts "Removed pidfile: #{pid_file}"
+        Logger.puts "Remoing pidfile: #{@pid_file}"
+        @pid_file.remove # in any case
+        Logger.puts "Removed pidfile: #{@pid_file}"
       end
     end
 
