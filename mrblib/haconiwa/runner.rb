@@ -184,7 +184,7 @@ module Haconiwa
         Logger.exception e
       end
 
-      unless init_command.empty?
+      if !init_command.nil? && !init_command.empty?
         @base.init_command = init_command
       end
     end
@@ -719,6 +719,19 @@ module Haconiwa
     def exec_container!(base)
       Haconiwa::Logger.info "Container is going to exec: #{base.init_command.inspect}"
       Exec.execve(base.environ, *base.init_command)
+    end
+  end
+
+  class CRIURestoredRunner < Runner
+    def run(options, init_command)
+      pid = options[:restored_pid]
+
+      run_container_setup(init_command)
+
+      run_base_setup_before_wait
+      Logger.puts "Container fork success and going to wait: pid=#{pid}"
+      pid, status = @base.waitloop.run_and_wait(pid)
+      run_cleanups_after_exit(status)
     end
   end
 end
