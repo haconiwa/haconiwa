@@ -57,6 +57,11 @@ Haconiwa.define do |config|
     config.add_async_hook msec: 2500, interval_msec: 2500 do |base|
       Haconiwa::Logger.puts "This is a restored process and hooks are available! PID=#{base.pid}"
     end
+
+    config.add_async_hook sec: 30 do |base|
+      Haconiwa::Logger.puts "I am a fastcontainer!!! Bye bye world"
+      ::Process.kill :TERM, base.pid
+    end
   end
 
   config.namespace.unshare "uts"
