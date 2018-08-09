@@ -234,6 +234,10 @@ module Haconiwa
     end
     alias after_spawn add_async_hook
 
+    def current_subcommand
+      ::Haconiwa.current_subcommand
+    end
+
     def bootstrap
       @bootstrap ||= Bootstrap.new
       yield(@bootstrap) if block_given?

@@ -6,7 +6,9 @@ def __main__(argv)
     exit ret
   end
 
-  case argv[0]
+  Haconiwa.current_subcommand = argv[0]
+
+  case Haconiwa.current_subcommand
   when "_restored" # only invoked via criu
     Haconiwa::Cli._restored(argv)
   when "version"

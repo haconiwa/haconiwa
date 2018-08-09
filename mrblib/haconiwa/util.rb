@@ -1,4 +1,12 @@
 module Haconiwa
+  def self.current_subcommand=(sub)
+    @@current_subcommand = sub
+  end
+
+  def self.current_subcommand
+    @@current_subcommand
+  end
+
   module Util
     extend self
     def to_safe_shellargs(args)
