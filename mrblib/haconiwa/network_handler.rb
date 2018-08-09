@@ -11,6 +11,7 @@ class NetworkHandler
     def to_ns_file
       "/var/run/netns/#{network.namespace}"
     end
+    alias ns_file to_ns_file
 
     def generate
       make_network_namespace
@@ -19,6 +20,8 @@ class NetworkHandler
     end
 
     def cleanup
+      return unless File.exist?(ns_file)
+
       unless system("ip netns del #{network.namespace}")
         raise "Cleanup of namespace failed"
       end
