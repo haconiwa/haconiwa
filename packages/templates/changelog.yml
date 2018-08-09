@@ -1,6 +1,6 @@
-latest: 0.10.0.alpha1
+latest: 0.10.0~alpha1
 changelog:
-  - version: 0.10.0.alpha1
+  - version: 0.10.0~alpha1
     messages:
       - Alpha release of criu-included one
     author: Uchio Kondo <udzura@udzura.jp>

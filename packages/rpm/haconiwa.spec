@@ -1,6 +1,6 @@
 Name: haconiwa
 Epoch: 1
-Version: 0.10.0.alpha1
+Version: 0.10.0~alpha1
 Release: 1
 Summary: MRuby on Container
 License: GPLv3+
@@ -49,7 +49,7 @@ fi
 %{_bindir}/*
 
 %changelog
-* Thu Aug  9 2018 Uchio Kondo <udzura@udzura.jp> - 1:0.10.0.alpha1-1
+* Thu Aug  9 2018 Uchio Kondo <udzura@udzura.jp> - 1:0.10.0~alpha1-1
 - Alpha release of criu-included one
 
 * Mon Apr 16 2018 Uchio Kondo <udzura@udzura.jp> - 1:0.9.1-1
