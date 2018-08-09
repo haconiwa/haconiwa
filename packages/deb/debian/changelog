@@ -1,3 +1,9 @@
+haconiwa (0.10.0.alpha1-1) unstable; urgency=medium
+
+  * Alpha release of criu-included one
+
+ -- Uchio Kondo <udzura@udzura.jp>  Thu,  9 Aug 2018 17:30:37 +0900
+
 haconiwa (0.9.1-1) unstable; urgency=medium
 
   * Apply some enhancements to reduce memory consumption
@@ -27,9 +33,3 @@ haconiwa (0.8.7-1) unstable; urgency=medium
   * Support metadata / Prevent doubel startup - and now pid file contains supervisor pid
 
  -- Uchio Kondo <udzura@udzura.jp>  Tue, 27 Jun 2017 13:02:21 +0900
-
-haconiwa (0.8.6-1) unstable; urgency=medium
-
-  * May fix some segfaults on GC, stopped binary spritting
-
- -- Uchio Kondo <udzura@udzura.jp>  Wed, 24 May 2017 15:26:53 +0900

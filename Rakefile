@@ -201,6 +201,9 @@ task :package_regen do
     docker_deb = ERB.new(File.read("packages/templates/Dockerfile.debian9.erb")).result(binding)
     File.write("packages/dockerfiles/Dockerfile.debian9", docker_deb)
 
+    docker_deb = ERB.new(File.read("packages/templates/Dockerfile.bionic.erb")).result(binding)
+    File.write("packages/dockerfiles/Dockerfile.bionic", docker_deb)
+
     docker_rpm = ERB.new(File.read("packages/templates/Dockerfile.centos.erb")).result(binding)
     File.write("packages/dockerfiles/Dockerfile.centos", docker_rpm)
 

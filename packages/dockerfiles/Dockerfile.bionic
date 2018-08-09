@@ -1,5 +1,5 @@
 # -*- mode: dockerfile -*-
-FROM debian:9
+FROM ubuntu:bionic
 MAINTAINER Uchio Kondo <udzura@udzura.jp>
 
 ENV DEBIAN_FRONTEND noninteractive
@@ -11,6 +11,7 @@ RUN apt-get -qq -y install \
     zlib1g-dev libncurses5-dev libssl-dev libpam0g-dev \
     rake autotools-dev cgroup-tools build-essential \
     dh-make xz-utils
+RUN apt-get -qq -y install criu
 
 ENV VERSION 0.10.0.alpha1
 ENV USER root

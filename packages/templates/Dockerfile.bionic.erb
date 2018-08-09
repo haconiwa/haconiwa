@@ -1,5 +1,5 @@
 # -*- mode: dockerfile -*-
-FROM debian:9
+FROM ubuntu:bionic
 MAINTAINER Uchio Kondo <udzura@udzura.jp>
 
 ENV DEBIAN_FRONTEND noninteractive
@@ -11,11 +11,12 @@ RUN apt-get -qq -y install \
     zlib1g-dev libncurses5-dev libssl-dev libpam0g-dev \
     rake autotools-dev cgroup-tools build-essential \
     dh-make xz-utils
+RUN apt-get -qq -y install criu
 
-ENV VERSION 0.10.0.alpha1
+ENV VERSION <%= @latest %>
 ENV USER root
-ENV SRC_PKG_NAME haconiwa_0.10.0.alpha1-1_amd64.deb
-ENV DST_PKG_NAME haconiwa_0.10.0.alpha1-1+debian9_amd64.deb
+ENV SRC_PKG_NAME haconiwa_<%= @latest %>-1_amd64.deb
+ENV DST_PKG_NAME haconiwa_<%= @latest %>-1+debian9_amd64.deb
 VOLUME /out
 
 RUN mkdir -p /libexec
