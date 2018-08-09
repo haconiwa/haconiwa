@@ -49,19 +49,27 @@ module Haconiwa
     def restore
       # TODO: embed criu(crtools) to haconiwa...
       # Hooks won't work
-      cmds = ["/usr/local/sbin/criu", "restore", "--shell-job", "-D", checkpoint.images_dir]
+      pidfile = "/tmp/.__criu_restored_#{@base.name}.pid"
+      cmds = [
+        "/usr/local/sbin/criu", "restore",
+        "--shell-job",
+        "--pidfile", pidfile, # FIXME: shouldn't criu cli pass its pid via envvar?
+        "-D", checkpoint.images_dir
+      ]
+      self_exe = File.readlink "/proc/self/exe"
 
       nw = @base.network
       if nw.enabled?
         external_string = "veth[#{nw.veth_guest}]:#{nw.veth_host}@#{nw.bridge_name}"
         cmds.concat(["--external", external_string])
-
-        hook = File.readlink "/proc/self/exe"
-        cmds.concat(["--action-script", hook])
+        cmds.concat(["--action-script", self_exe])
 
         ENV['HACONIWA_NEW_IP'] = nw.container_ip_with_netmask
         ENV['HACONIWA_RUN_AS_CRIU_ACTION_SCRIPT'] = "true"
       end
+
+      cmds.concat(["--exec-cmd", "--", self_exe, "_restored", @base.hacofile, pidfile])
+      Haconiwa::Logger.debug("Going to exec: #{cmds.inspect}")
       ::Exec.execve(ENV, *cmds)
     end
   end

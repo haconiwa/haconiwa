@@ -131,6 +131,12 @@ module Haconiwa
       base.restore
     end
 
+    def self._restored(args)
+      base, init = get_script_and_eval([args[1]])
+      base.cancel_daemonize!
+      base._restored(args[2])
+    end
+
     def self.reload(args)
       opt = parse_opts(args, '[HACO_FILE]', ignore_catchall: lambda {|o| o['t'].exist? } ) do |o|
         o.integer('t', 'target', 'PPID', "Container's supervisor PID to invoke reload")

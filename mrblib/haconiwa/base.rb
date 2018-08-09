@@ -234,6 +234,10 @@ module Haconiwa
     end
     alias after_spawn add_async_hook
 
+    def current_subcommand
+      ::Haconiwa.current_subcommand
+    end
+
     def bootstrap
       @bootstrap ||= Bootstrap.new
       yield(@bootstrap) if block_given?
@@ -367,6 +371,29 @@ module Haconiwa
         end
         [pid]
       end
+    end
+
+    def _restored(pidfile_path)
+      Haconiwa::Logger.puts("Now in exec'ed haconiwa supervisor process")
+      target = containers_real_run
+      if target.size != 1
+        raise "[BUG] Checkpoint now does not support multiple containers"
+      end
+
+      self.container_pid_file ||= default_container_pid_file
+      pid = File.open(pidfile_path, 'r').read.to_i
+      self.pid = pid
+      File.unlink(pidfile_path)
+
+      CRIURestoredRunner.new(self).run({restored_pid: pid}, nil)
+      Haconiwa::Logger.puts("Restored process exited")
+    rescue => e
+      Haconiwa::Logger.warning("Something is wrong on re-supervise process(This is haconiwa's bug, not image's)")
+      Haconiwa::Logger.warning("#{e.class}, #{e.message}" + "\n" + e.backtrace.join("\n"))
+      Haconiwa::Logger.warning("Force to kill restored processes")
+      ::Process.kill(:KILL, pid) if pid
+
+      raise "Something is wrong on re-supervise process: #{e.class}, #{e.message}"
     end
   end
 
