@@ -59,15 +59,7 @@ module Haconiwa
     end
 
     def run(options, init_command)
-      begin
-        @pid_file = Pidfile.create(@base.container_pid_file)
-      rescue => e
-        Logger.exception e
-      end
-
-      unless init_command.empty?
-        @base.init_command = init_command
-      end
+      run_container_setup(init_command)
 
       raise_container do |base|
         invoke_general_hook(:before_fork, base)
@@ -174,47 +166,66 @@ module Haconiwa
         persist_namespace(pid, base.namespace)
         drop_suid_bit
 
-        base.created_at = Time.now
-        base.supervisor_pid = ::Process.pid
+        run_base_setup_before_wait
         Logger.puts "Container fork success and going to wait: pid=#{pid}"
-        base.waitloop.wait_interval = base.wait_interval
-        base.waitloop.register_hooks(base)
-        base.waitloop.register_sighandlers(base, self)
-        base.waitloop.register_custom_sighandlers(base, base.signal_handler)
-
-        invoke_general_hook(:before_start_wait, base)
-        Logger.debug "WaitLoop instance status: #{base.waitloop.inspect}"
-
         pid, status = base.waitloop.run_and_wait(pid)
-        base.exit_status = status
-        invoke_general_hook(:teardown_container, base)
-        unless status.success?
-          invoke_general_hook(:after_failure, base)
-        end
-
-        cleanup_supervisor(base)
-        if base.network.enabled?
-          nw_handler = NetworkHandler::Bridge.new(base.network)
-          begin
-            nw_handler.cleanup
-          rescue => e
-            Logger.warning "Network cleanup failed: #{e.message}. Skip on quit"
-          end
-        end
-
-        if status.success?
-          Logger.puts "Container successfully exited: #{status.inspect}"
-        else
-          Logger.warning "Container failed: #{status.inspect}"
-        end
-        Logger.puts "Remoing pidfile: #{@pid_file}"
-        @pid_file.remove # in any case
-        Logger.puts "Removed pidfile: #{@pid_file}"
+        run_cleanups_after_exit(status)
       end
     end
 
     def exec_container!(base)
       raise "Implement me at subclasses"
+    end
+
+    def run_container_setup(init_command)
+      begin
+        @pid_file = Pidfile.create(@base.container_pid_file)
+      rescue => e
+        Logger.exception e
+      end
+
+      unless init_command.empty?
+        @base.init_command = init_command
+      end
+    end
+
+    def run_base_setup_before_wait
+      @base.created_at = Time.now
+      @base.supervisor_pid = ::Process.pid
+      @base.waitloop.wait_interval = @base.wait_interval
+      @base.waitloop.register_hooks(@base)
+      @base.waitloop.register_sighandlers(@base, self)
+      @base.waitloop.register_custom_sighandlers(@base, @base.signal_handler)
+
+      invoke_general_hook(:before_start_wait, @base)
+      Logger.debug "WaitLoop instance status: #{@base.waitloop.inspect}"
+    end
+
+    def run_cleanups_after_exit(status)
+      @base.exit_status = status
+      invoke_general_hook(:teardown_container, @base)
+      unless status.success?
+        invoke_general_hook(:after_failure, @base)
+      end
+
+      cleanup_supervisor(@base)
+      if @base.network.enabled?
+        nw_handler = NetworkHandler::Bridge.new(@base.network)
+        begin
+          nw_handler.cleanup
+        rescue => e
+          Logger.warning "Network cleanup failed: #{e.message}. Skip on quit"
+        end
+      end
+
+      if status.success?
+        Logger.puts "Container successfully exited: #{status.inspect}"
+      else
+        Logger.warning "Container failed: #{status.inspect}"
+      end
+      Logger.puts "Remoing pidfile: #{@pid_file}"
+      @pid_file.remove # in any case
+      Logger.puts "Removed pidfile: #{@pid_file}"
     end
 
     def attach(exe)
