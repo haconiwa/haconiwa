@@ -996,8 +996,10 @@ module Haconiwa
       @images_dir = "/var/run/haconiwa/checkpoint"
       @criu_log_file = "-"
       @criu_service_address = "/var/run/criu_service.socket"
+      @criu_bin_path = "/usr/local/sbin/criu"
     end
-    attr_accessor :target_syscall, :images_dir, :criu_log_file, :criu_service_address
+    attr_accessor :target_syscall, :images_dir,
+                  :criu_log_file, :criu_service_address, :criu_bin_path
 
     def target_syscall(*args)
       if args.size == 0
