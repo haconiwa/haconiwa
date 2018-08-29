@@ -64,8 +64,12 @@ Haconiwa.define do |config|
     end
   end
 
+  config.mount_independent "procfs"
+  config.mount_independent "devtmpfs"
+
+  config.namespace.unshare "mount"
   config.namespace.unshare "uts"
   config.namespace.unshare "ipc"
-  config.namespace.unshare "pid"
+  config.namespace.unshare "pid" # also network is unshared
   config.capabilities.reset_to_privileged!
 end

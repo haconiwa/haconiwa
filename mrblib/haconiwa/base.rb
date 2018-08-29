@@ -783,7 +783,9 @@ module Haconiwa
     def to_bit(ns)
       case ns
       when String, Symbol
-        NS_MAPPINGS[ns.to_s]
+        bin = NS_MAPPINGS[ns.to_s]
+        raise(ArgumentError, "Invalid namespace name #{ns.inspect}") unless bin
+        bin
       when Integer
         ns
       end
