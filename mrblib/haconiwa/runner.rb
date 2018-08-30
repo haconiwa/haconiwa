@@ -443,7 +443,8 @@ module Haconiwa
       end
 
       if namespace.flag?(::Namespace::CLONE_NEWNS)
-        Mount.make_private "/"
+        # Mount.make_private "/"
+        Mount.__mount__("none", "/", nil, (Mount::MS_REC | Mount::MS_PRIVATE), nil)
       end
     end
 
@@ -479,6 +480,8 @@ module Haconiwa
     def apply_filesystem(base)
       unless base.filesystem.use_legacy_chroot
         Mount.bind_mount base.filesystem.root_path, base.filesystem.root_path
+        #Mount.make_private base.filesystem.root_path
+        Mount.__mount__("none", base.filesystem.root_path, nil, (Mount::MS_REC | Mount::MS_PRIVATE), nil)
       end
 
       return if base.filesystem.no_special_config? && base.network_mountpoint.empty?

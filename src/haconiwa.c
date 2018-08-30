@@ -44,7 +44,7 @@ int pivot_root(const char *new_root, const char *put_old){
 static mrb_value mrb_haconiwa_pivot_root_to(mrb_state *mrb, mrb_value self)
 {
   char *newroot;
-  int newrootfd = -1, oldrootfd = -1;
+  int newrootfd = -1;
 
   mrb_get_args(mrb, "z", &newroot);
 
@@ -61,20 +61,12 @@ static mrb_value mrb_haconiwa_pivot_root_to(mrb_state *mrb, mrb_value self)
     mrb_sys_fail(mrb, "Cannot pivot_root!");
   }
 
-  oldrootfd = open("./.gc", O_DIRECTORY | O_RDONLY);
-  if (oldrootfd < 0) {
-    mrb_sys_fail(mrb, "open(oldrootfd)");
+  if (chdir("/") < 0) {
+    mrb_sys_fail(mrb, "chdir(newroot) back");
   }
-  if (fchdir(oldrootfd) < 0) {
-    mrb_sys_fail(mrb, "fchdir(oldroot)");
-  }
-  if (umount2(".", MNT_DETACH) < 0) {
+  if (umount2("/.gc", MNT_DETACH) < 0) {
     mrb_sys_fail(mrb, "umount2");
   }
-  if (fchdir(newrootfd) < 0) {
-    mrb_sys_fail(mrb, "fchdir(newroot) back");
-  }
-  close(oldrootfd);
   close(newrootfd);
 
   return mrb_true_value();
