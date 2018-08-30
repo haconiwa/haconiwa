@@ -23,4 +23,6 @@ Haconiwa.define do |config|
   config.namespace.unshare "ipc"
   config.namespace.unshare "uts"
   config.namespace.unshare "pid"
+
+  config.filesystem.use_legacy_chroot = true
 end
