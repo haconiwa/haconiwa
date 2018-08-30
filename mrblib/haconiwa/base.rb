@@ -892,10 +892,12 @@ module Haconiwa
       @mount_points = []
       @independent_mount_points = []
       @rootfs = Rootfs.new(nil)
+      @use_legacy_chroot = false
     end
     attr_accessor :mount_points,
                   :independent_mount_points,
-                  :rootfs
+                  :rootfs,
+                  :use_legacy_chroot
 
     FS_TO_MOUNT = {
       "procfs" => ["proc", "proc", "/proc"],
@@ -912,6 +914,7 @@ module Haconiwa
     def chroot
       self.rootfs.root
     end
+    alias root_path chroot
 
     def mount_independent(fs)
       params = FS_TO_MOUNT[fs]

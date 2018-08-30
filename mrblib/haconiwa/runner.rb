@@ -479,6 +479,10 @@ module Haconiwa
     def apply_filesystem(base)
       return if base.filesystem.no_special_config? && base.network_mountpoint.empty?
 
+      unless base.filesystem.use_legacy_chroot
+        Mount.bind_mount base.filesystem.root_path, base.filesystem.root_path
+      end
+
       cwd = Dir.pwd
       owner_options = base.rootfs.to_owner_options
       base.filesystem.mount_points.each do |mp|
