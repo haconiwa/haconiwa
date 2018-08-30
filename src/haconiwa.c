@@ -48,10 +48,6 @@ static mrb_value mrb_haconiwa_pivot_root_to(mrb_state *mrb, mrb_value self)
 
   mrb_get_args(mrb, "z", &newroot);
 
-  oldrootfd = open("/", O_DIRECTORY | O_RDONLY);
-  if (oldrootfd < 0) {
-    mrb_sys_fail(mrb, "open(/)");
-  }
   newrootfd = open(newroot, O_DIRECTORY | O_RDONLY);
   if (newrootfd < 0) {
     mrb_sys_fail(mrb, "open(newroot)");
@@ -65,6 +61,10 @@ static mrb_value mrb_haconiwa_pivot_root_to(mrb_state *mrb, mrb_value self)
     mrb_sys_fail(mrb, "Cannot pivot_root!");
   }
 
+  oldrootfd = open("./.gc", O_DIRECTORY | O_RDONLY);
+  if (oldrootfd < 0) {
+    mrb_sys_fail(mrb, "open(oldrootfd)");
+  }
   if (fchdir(oldrootfd) < 0) {
     mrb_sys_fail(mrb, "fchdir(oldroot)");
   }
