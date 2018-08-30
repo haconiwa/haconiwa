@@ -46,11 +46,11 @@ Haconiwa.define do |config|
       c.set_shell_job true
       begin
         c.set_pid base.pid
-        c.dump
+        # c.dump
       rescue => e
         Haconiwa::Logger.puts "CRIU[hook]: dump failed: #{e.class}, #{e.message}"
       else
-        Haconiwa::Logger.puts "CRIU[hook]: dumped!!"
+        Haconiwa::Logger.puts "CRIU[hook]: dump skipped!!"
       end
     end
   else
@@ -72,4 +72,8 @@ Haconiwa.define do |config|
   config.namespace.unshare "ipc"
   config.namespace.unshare "pid" # also network is unshared
   config.capabilities.reset_to_privileged!
+
+  if ENV['USE_LEGACY_CHROOT']
+    config.filesystem.use_legacy_chroot = true
+  end
 end

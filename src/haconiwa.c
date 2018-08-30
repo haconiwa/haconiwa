@@ -60,7 +60,8 @@ static mrb_value mrb_haconiwa_pivot_root_to(mrb_state *mrb, mrb_value self)
     mrb_sys_fail(mrb, "fchdir(newroot)");
   }
 
-  if (pivot_root(".", ".") < 0) {
+  if (pivot_root(".", "./.gc") < 0) {
+    perror("pivot_root");
     mrb_sys_fail(mrb, "Cannot pivot_root!");
   }
 

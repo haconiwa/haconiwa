@@ -477,11 +477,11 @@ module Haconiwa
     end
 
     def apply_filesystem(base)
-      return if base.filesystem.no_special_config? && base.network_mountpoint.empty?
-
       unless base.filesystem.use_legacy_chroot
         Mount.bind_mount base.filesystem.root_path, base.filesystem.root_path
       end
+
+      return if base.filesystem.no_special_config? && base.network_mountpoint.empty?
 
       cwd = Dir.pwd
       owner_options = base.rootfs.to_owner_options
@@ -651,8 +651,15 @@ module Haconiwa
 
     def do_chroot(base)
       if base.filesystem.chroot
-        Dir.chdir ExpandPath.expand([base.filesystem.chroot, base.workdir].join('/'))
-        Dir.chroot base.filesystem.chroot
+        if base.filesystem.use_legacy_chroot
+          Dir.chroot base.filesystem.chroot
+        else
+          Dir.mkdir("#{base.filesystem.root_path}/.gc") rescue nil
+          Haconiwa.pivot_root_to base.filesystem.root_path
+          Dir.rmdir "/.gc"
+
+          Dir.chdir base.workdir
+        end
       else
         Dir.chdir base.workdir
       end
