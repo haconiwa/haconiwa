@@ -67,6 +67,9 @@ Haconiwa.define do |config|
 
   config.mount_independent "procfs"
   config.mount_independent "devtmpfs"
+  config.mount_independent "sysfs"
+  config.mount_independent "devpts"
+  config.mount_independent "shm"
 
   config.namespace.unshare "mount"
   config.namespace.unshare "uts"
