@@ -68,7 +68,12 @@ module Haconiwa
         ENV['HACONIWA_RUN_AS_CRIU_ACTION_SCRIPT'] = "true"
       end
 
-      cmds.concat(["--exec-cmd", "--", self_exe, "_restored", @base.hacofile, pidfile])
+      cmds.concat(
+        [
+          "--root", @base.filesystem.root_path,
+          "--exec-cmd",
+          "--", self_exe, "_restored", @base.hacofile, pidfile
+        ])
       Haconiwa::Logger.debug("Going to exec: #{cmds.inspect}")
       ::Exec.execve(ENV, *cmds)
     end

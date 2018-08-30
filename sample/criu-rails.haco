@@ -3,7 +3,8 @@ suffix = ENV['SUFFIX']
 Haconiwa.define do |config|
   config.name = "chroot-rails001-#{suffix}" # to be hostname
   config.init_command = %w(/u/app/helloworld/bin/rails server)
-  config.acts_as_session_leader
+  #config.acts_as_session_leader
+  config.daemonize!
 
   root = Pathname.new("/var/lib/haconiwa/rails-sample")
   config.chroot_to root
@@ -46,7 +47,7 @@ Haconiwa.define do |config|
       c.set_shell_job true
       begin
         c.set_pid base.pid
-        # c.dump
+        c.dump
       rescue => e
         Haconiwa::Logger.puts "CRIU[hook]: dump failed: #{e.class}, #{e.message}"
       else
