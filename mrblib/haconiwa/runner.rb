@@ -443,7 +443,8 @@ module Haconiwa
       end
 
       if namespace.flag?(::Namespace::CLONE_NEWNS)
-        Mount.make_private "/"
+        # Mount.make_private "/"
+        Mount.__mount__("none", "/", nil, (Mount::MS_REC | Mount::MS_PRIVATE), nil)
       end
     end
 
@@ -477,6 +478,12 @@ module Haconiwa
     end
 
     def apply_filesystem(base)
+      unless base.filesystem.use_legacy_chroot
+        Mount.bind_mount base.filesystem.root_path, base.filesystem.root_path
+        #Mount.make_private base.filesystem.root_path
+        Mount.__mount__("none", base.filesystem.root_path, nil, (Mount::MS_REC | Mount::MS_PRIVATE), nil)
+      end
+
       return if base.filesystem.no_special_config? && base.network_mountpoint.empty?
 
       cwd = Dir.pwd
@@ -647,8 +654,15 @@ module Haconiwa
 
     def do_chroot(base)
       if base.filesystem.chroot
-        Dir.chdir ExpandPath.expand([base.filesystem.chroot, base.workdir].join('/'))
-        Dir.chroot base.filesystem.chroot
+        if base.filesystem.use_legacy_chroot
+          Dir.chroot base.filesystem.chroot
+        else
+          Dir.mkdir("#{base.filesystem.root_path}/.gc") rescue nil
+          Haconiwa.pivot_root_to base.filesystem.root_path
+          Dir.rmdir "/.gc"
+
+          Dir.chdir base.workdir
+        end
       else
         Dir.chdir base.workdir
       end

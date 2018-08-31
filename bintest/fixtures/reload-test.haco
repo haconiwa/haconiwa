@@ -48,4 +48,6 @@ apk --no-cache add ruby
   end
 
   config.support_reload :cgroup, :resource
+
+  config.filesystem.use_legacy_chroot = true
 end

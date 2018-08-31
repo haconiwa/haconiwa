@@ -3,7 +3,8 @@ suffix = ENV['SUFFIX']
 Haconiwa.define do |config|
   config.name = "chroot-rails001-#{suffix}" # to be hostname
   config.init_command = %w(/u/app/helloworld/bin/rails server)
-  config.acts_as_session_leader
+  #config.acts_as_session_leader
+  config.daemonize!
 
   root = Pathname.new("/var/lib/haconiwa/rails-sample")
   config.chroot_to root
@@ -50,7 +51,7 @@ Haconiwa.define do |config|
       rescue => e
         Haconiwa::Logger.puts "CRIU[hook]: dump failed: #{e.class}, #{e.message}"
       else
-        Haconiwa::Logger.puts "CRIU[hook]: dumped!!"
+        Haconiwa::Logger.puts "CRIU[hook]: dump skipped!!"
       end
     end
   else
@@ -64,8 +65,19 @@ Haconiwa.define do |config|
     end
   end
 
+  config.mount_independent "procfs"
+  config.mount_independent "devtmpfs"
+  config.mount_independent "sysfs"
+  config.mount_independent "devpts"
+  config.mount_independent "shm"
+
+  config.namespace.unshare "mount"
   config.namespace.unshare "uts"
   config.namespace.unshare "ipc"
-  config.namespace.unshare "pid"
+  config.namespace.unshare "pid" # also network is unshared
   config.capabilities.reset_to_privileged!
+
+  if ENV['USE_LEGACY_CHROOT']
+    config.filesystem.use_legacy_chroot = true
+  end
 end

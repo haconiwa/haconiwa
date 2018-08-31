@@ -57,6 +57,9 @@ assert('walkthrough') do
     system %Q(sed -i 's!b.os_type.*!b.git_url = "https://github.com/haconiwa/haconiwa-image-alpine"!' #{haconame})
     system %Q(sed -i 's!apk add.*!apk update\\napk upgrade\\napk --no-cache add ruby!' #{haconame})
 
+    # use legacy chroot for test...
+    system %Q(sed -i '6a config.filesystem.use_legacy_chroot = true' #{haconame})
+
     output, status = run_haconiwa "create", haconame
     assert_true status.success?, "Process did not exit cleanly: create"
 

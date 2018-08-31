@@ -65,4 +65,6 @@ apk --no-cache add ruby
       f.puts data
     end
   end
+
+  config.filesystem.use_legacy_chroot = true
 end
