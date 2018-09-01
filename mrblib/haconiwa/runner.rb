@@ -127,6 +127,9 @@ module Haconiwa
             Logger.debug("OK: do_chroot")
             invoke_general_hook(:after_chroot, base)
 
+            apply_apparmor(base.apparmor)
+            Logger.debug("OK: apply_apparmor")
+
             reopen_fds(base.command) if base.daemon?
 
             apply_capability(base.capabilities)
@@ -603,6 +606,10 @@ module Haconiwa
         seccomp.defblock.call(ctx)
         ctx.load
       end
+    end
+
+    def apply_apparmor(apparmor)
+      AppArmor.change_onexec(apparmor) if apparmor
     end
 
     def apply_rlimit(rlimit)
