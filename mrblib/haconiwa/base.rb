@@ -34,6 +34,8 @@ module Haconiwa
                   :reloadable_attr,
                   :exit_status
 
+    alias apparmor_profile= apparmor=
+
     delegate     [:uid,
                   :uid=,
                   :gid,
