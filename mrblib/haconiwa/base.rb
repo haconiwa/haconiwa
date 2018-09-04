@@ -993,6 +993,10 @@ module Haconiwa
         File.exist?(fullpath) ? fullpath : @src
       end
     end
+
+    def chrooted_dest(newroot)
+      @dest.sub(/^#{newroot}/, "")
+    end
   end
 
   class Checkpoint
