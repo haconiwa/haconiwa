@@ -70,6 +70,7 @@ Haconiwa.define do |config|
   config.mount_independent "sysfs"
   config.mount_independent "devpts"
   config.mount_independent "shm"
+  config.add_mount_point "/home/vagrant", to: root.join("home/test-account")
 
   config.namespace.unshare "mount"
   config.namespace.unshare "uts"
