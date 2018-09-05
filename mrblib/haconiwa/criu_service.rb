@@ -62,10 +62,19 @@ module Haconiwa
       if nw.enabled?
         external_string = "veth[#{nw.veth_guest}]:#{nw.veth_host}@#{nw.bridge_name}"
         cmds.concat(["--external", external_string])
-        cmds.concat(["--action-script", self_exe])
 
         ENV['HACONIWA_NEW_IP'] = nw.container_ip_with_netmask
         ENV['HACONIWA_RUN_AS_CRIU_ACTION_SCRIPT'] = "true"
+      end
+
+      unless @base.filesystem.mount_points.empty?
+        cmds.concat(["--external", "mnt[]:"])
+      end
+
+      # Order of external...
+      # FIXME make this command generator a class
+      if nw.enabled?
+        cmds.concat(["--action-script", self_exe])
       end
 
       cmds.concat(

@@ -45,13 +45,14 @@ Haconiwa.define do |config|
       c.set_service_address base.checkpoint.criu_service_address
       c.set_log_file base.checkpoint.criu_log_file
       c.set_shell_job true
+      c.add_external "mnt[]"
       begin
         c.set_pid base.pid
         c.dump
       rescue => e
         Haconiwa::Logger.puts "CRIU[hook]: dump failed: #{e.class}, #{e.message}"
       else
-        Haconiwa::Logger.puts "CRIU[hook]: dump skipped!!"
+        Haconiwa::Logger.puts "CRIU[hook]: dump OK!!"
       end
     end
   else
@@ -59,7 +60,7 @@ Haconiwa.define do |config|
       Haconiwa::Logger.puts "This is a restored process and hooks are available! PID=#{base.pid}"
     end
 
-    config.add_async_hook sec: 30 do |base|
+    config.add_async_hook sec: 90 do |base|
       Haconiwa::Logger.puts "I am a fastcontainer!!! Bye bye world"
       ::Process.kill :TERM, base.pid
     end
@@ -70,6 +71,7 @@ Haconiwa.define do |config|
   config.mount_independent "sysfs"
   config.mount_independent "devpts"
   config.mount_independent "shm"
+  config.add_mount_point "/home/vagrant", to: root.join("home/test-account")
 
   config.namespace.unshare "mount"
   config.namespace.unshare "uts"

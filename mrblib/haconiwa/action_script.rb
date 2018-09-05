@@ -8,6 +8,7 @@ module Haconiwa
     dev_name_line = `nsenter --net -t #{ENV['CRTOOLS_INIT_PID']} ip addr show`.lines.
                       select {|l| l =~ /^[0-9]+:/ }.
                       select {|l| l !~ /\s+lo:/ }.
+                      select {|l| l =~ /veth0/ }.
                       first
     Haconiwa::Logger.debug "dev_name_line = #{dev_name_line}"
     unless dev_name_line
