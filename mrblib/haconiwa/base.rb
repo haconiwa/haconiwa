@@ -15,6 +15,7 @@ module Haconiwa
                   :capabilities,
                   :guid,
                   :seccomp,
+                  :apparmor,
                   :checkpoint,
                   :general_hooks,
                   :async_hooks,
@@ -32,6 +33,8 @@ module Haconiwa
                   :metadata,
                   :reloadable_attr,
                   :exit_status
+
+    alias apparmor_profile= apparmor=
 
     delegate     [:uid,
                   :uid=,
@@ -71,6 +74,7 @@ module Haconiwa
       @capabilities = Capabilities.new
       @guid = Guid.new
       @seccomp = Seccomp.new
+      @apparmor = nil
       @checkpoint = Checkpoint.new
       @general_hooks = {}
       @async_hooks = []
@@ -415,6 +419,7 @@ module Haconiwa
         :@capabilities,
         :@guid,
         :@seccomp,
+        :@apparmor,
         :@checkpoint,
         :@general_hooks,
         :@async_hooks,

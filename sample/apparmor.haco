@@ -1,0 +1,31 @@
+# -*- mode: ruby -*-
+Haconiwa.define do |config|
+  config.name = "haconiwa-apparmor-test"
+
+  config.bootstrap do |b|
+    b.strategy = "lxc"
+    b.os_type = "ubuntu"
+  end
+
+  config.init_command = ["/bin/bash"]
+
+  root = Pathname.new("/var/lib/haconiwa/8cfccb3d")
+  config.chroot_to root
+
+  config.add_mount_point "tmpfs", to: root.join("tmp"), fs: "tmpfs"
+  config.mount_independent "procfs"
+  config.mount_independent "sysfs"
+  config.mount_independent "devtmpfs"
+  config.mount_independent "devpts"
+  config.mount_independent "shm"
+
+  config.namespace.unshare "mount"
+  config.namespace.unshare "ipc"
+  config.namespace.unshare "uts"
+  config.namespace.unshare "pid"
+
+  # To begin with you need to load a new profile in AppArmor for use with containers:
+  # apparmor_parser /etc/apparmor.d/haconiwa/haconiwa-deny-top-command
+  # In this example, load profile named `haconiwa-deny-top-command`.
+  config.apparmor = "haconiwa-deny-top-command"
+end
