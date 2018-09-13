@@ -111,6 +111,14 @@ module Haconiwa
       end
 
       cmds.options.concat(["--root", @base.filesystem.root_path])
+
+      unless checkpoint.extra_criu_options.empty?
+        cmds.options.concat(checkpoint.extra_criu_options)
+      end
+      checkpoint.extra_criu_externals.each do |extra|
+        cmds.externals << extra
+      end
+
       cmds.exec_cmd = [self_exe, "_restored", @base.hacofile, pidfile]
 
       Haconiwa::Logger.debug("Going to exec: #{cmds.inspect}")

@@ -1048,9 +1048,13 @@ module Haconiwa
       @criu_log_file = "-"
       @criu_service_address = "/var/run/criu_service.socket"
       @criu_bin_path = "/usr/local/sbin/criu"
+
+      @extra_criu_options = []
+      @extra_criu_externals = []
     end
     attr_accessor :target_syscall, :images_dir,
-                  :criu_log_file, :criu_service_address, :criu_bin_path
+                  :criu_log_file, :criu_service_address, :criu_bin_path,
+                  :extra_criu_options, :extra_criu_externals
 
     def target_syscall(*args)
       if args.size == 0
