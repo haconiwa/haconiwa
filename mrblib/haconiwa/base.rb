@@ -1015,9 +1015,10 @@ module Haconiwa
       @dest = options.delete(:to)
       @dest = @dest.to_s if @dest
       @fs = options.delete(:fs)
+      @criu_ext_key = options.delete(:criu_ext_key)
       @options = options
     end
-    attr_accessor :src, :dest, :fs, :options
+    attr_accessor :src, :dest, :fs, :criu_ext_key, :options
 
     def normalized_src(cwd="/")
       if @src.start_with?('/')
