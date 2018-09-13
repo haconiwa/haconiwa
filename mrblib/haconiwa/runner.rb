@@ -123,14 +123,13 @@ module Haconiwa
 
             invoke_general_hook(:before_chroot, base)
 
+            reopen_fds_host(base.command) if base.daemon?
             do_chroot(base)
             Logger.debug("OK: do_chroot")
             invoke_general_hook(:after_chroot, base)
 
             apply_apparmor(base.apparmor)
             Logger.debug("OK: apply_apparmor")
-
-            reopen_fds(base.command) if base.daemon?
 
             apply_capability(base.capabilities)
             Logger.debug("OK: apply_capability")
@@ -142,6 +141,7 @@ module Haconiwa
             kick_ok.close
             Logger.debug("OK: kick parent process to resume")
 
+            reopen_fds_container(base.command) if base.daemon?
             exec_container!(base)
           rescue => e
             Logger.exception(e)
@@ -651,12 +651,23 @@ module Haconiwa
       end
     end
 
-    def reopen_fds(command)
-      devnull = "/dev/null"
-      inio  = command.stdin  || File.open(devnull, 'r')
-      outio = command.stdout || File.open(devnull, 'a')
-      errio = command.stderr || File.open(devnull, 'a')
-      ::Procutil.fd_reopen3(inio.fileno, outio.fileno, errio.fileno)
+    def reopen_fds_host(command)
+      if command.any_log_to_host_file?
+        inio  = command.stdin.to_io_readonly
+        outio = command.stdout.to_io
+        errio = command.stderr.to_io
+        ::Procutil.fd_reopen3(inio.fileno, outio.fileno, errio.fileno)
+      end
+    end
+
+    def reopen_fds_container(command)
+      # Run in process after chroot/pivot_root
+      unless command.any_log_to_host_file?
+        inio  = command.stdin.to_io_readonly
+        outio = command.stdout.to_io
+        errio = command.stderr.to_io
+        ::Procutil.fd_reopen3(inio.fileno, outio.fileno, errio.fileno)
+      end
     end
 
     def do_chroot(base)
