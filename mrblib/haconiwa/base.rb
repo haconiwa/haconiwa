@@ -553,7 +553,7 @@ module Haconiwa
     def initialize
       @init_command = ["/bin/bash"] # FIXME: maybe /sbin/init is better
       @session_leader = false
-      @stdin = @stdout = @stderr = nil
+      @stdin = @stdout = @stderr = LoggerIO.new
     end
     attr_reader :init_command, :stdin, :stdout, :stderr
     attr_accessor :session_leader
@@ -566,17 +566,49 @@ module Haconiwa
       end
     end
 
-    # TODO: support options other than file:
+    class LoggerIO
+      DEVNULL = "/dev/null"
+
+      # TODO: support options other than file:
+      def initialize(options={})
+        @file = options[:file]
+        @host_file = options[:host_file]
+      end
+      attr_accessor :file, :host_file
+
+      def target_file
+        @host_file || @file || nil
+      end
+
+      def to_io
+        if !target_file
+          return File.open(DEVNULL, 'a')
+        end
+        File.open(target_file, 'a+')
+      end
+
+      def to_io_readonly
+        if !target_file
+          return File.open(DEVNULL, 'r')
+        end
+        File.open(target_file, 'r+')
+      end
+    end
+
     def set_stdin(options)
-      @stdin = File.open(options[:file], 'r+')
+      @stdin = LoggerIO.new(options)
     end
 
     def set_stdout(options)
-      @stdout = File.open(options[:file], 'a+')
+      @stdout = LoggerIO.new(options)
     end
 
     def set_stderr(options)
-      @stderr = File.open(options[:file], 'a+')
+      @stderr = LoggerIO.new(options)
+    end
+
+    def any_log_to_host_file?
+      @stdin.host_file || @stdout.host_file || @stderr.host_file
     end
   end
 
