@@ -953,6 +953,10 @@ module Haconiwa
     end
     alias root_path chroot
 
+    def external_mount_points
+      @mount_points.select{|mp| mp.criu_ext_key }
+    end
+
     def mount_independent(fs)
       params = FS_TO_MOUNT[fs]
       raise("Unsupported: #{fs}") unless params

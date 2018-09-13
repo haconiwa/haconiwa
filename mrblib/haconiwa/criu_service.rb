@@ -99,6 +99,9 @@ module Haconiwa
 
       unless @base.filesystem.mount_points.empty?
         cmds.externals << "mnt[]:"
+        @base.filesystem.external_mount_points.each do |mp|
+          cmds.externals << "mnt[#{mp.criu_ext_key}]:#{mp.src}"
+        end
       end
 
       # Order of external...
