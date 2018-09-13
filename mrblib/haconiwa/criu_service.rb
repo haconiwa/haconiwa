@@ -51,10 +51,11 @@ module Haconiwa
         @bin_path = bin_path
         @options = []
         @externals = []
+        @cg_roots = []
         @run_exec_cmd = true
         @exec_cmd = nil
       end
-      attr_accessor :options, :externals, :exec_cmd
+      attr_accessor :options, :externals, :cg_roots, :exec_cmd
 
       def to_execve_arg
         [
@@ -68,6 +69,9 @@ module Haconiwa
         a = @options.dup
         @externals.each do |opt|
           a.concat(["--external", opt])
+        end
+        @cg_roots.each do |root|
+          a.concat(["--cgroup-root", root])
         end
         if @exec_cmd
           a.concat(["--exec-cmd", "--"])
@@ -101,6 +105,10 @@ module Haconiwa
         @base.filesystem.external_mount_points.each do |mp|
           cmds.externals << "mnt[#{mp.criu_ext_key}]:#{mp.src}"
         end
+      end
+
+      @base.cgroup.controllers_in_real_dirname.each do |dir|
+        cmds.cg_roots << "#{dir}:/#{@base.name}"
       end
 
       # Order of external...

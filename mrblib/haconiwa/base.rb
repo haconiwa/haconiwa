@@ -656,6 +656,19 @@ module Haconiwa
       return value
     end
 
+    def controllers_in_real_dirname
+      controllers.map { |name|
+        case name
+        when "cpu", "cpuacct"
+          "cpu,cpuacct"
+        when "net_cls", "net_prio"
+          "net_cls,net_prio"
+        else
+          name
+        end
+      }
+    end
+
     def to_controllers
       @groups_by_controller.keys.uniq
     end
