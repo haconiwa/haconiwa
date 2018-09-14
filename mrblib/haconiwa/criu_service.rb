@@ -46,45 +46,82 @@ module Haconiwa
       end
     end
 
+    class RestoreCMD
+      def initialize(bin_path)
+        @bin_path = bin_path
+        @options = []
+        @externals = []
+        @run_exec_cmd = true
+        @exec_cmd = nil
+      end
+      attr_accessor :options, :externals, :exec_cmd
+
+      def to_execve_arg
+        [
+          @bin_path,
+          "restore"
+        ] + rest_arguments
+      end
+      alias inspect to_execve_arg
+
+      def rest_arguments
+        a = @options.dup
+        @externals.each do |opt|
+          a.concat(["--external", opt])
+        end
+        if @exec_cmd
+          a.concat(["--exec-cmd", "--"])
+          a.concat(@exec_cmd.dup)
+        end
+        a
+      end
+    end
+
     def restore
       # TODO: embed criu(crtools) to haconiwa...
       # Hooks won't work
       pidfile = "/tmp/.__criu_restored_#{@base.name}.pid"
-      cmds = [
-        checkpoint.criu_bin_path, "restore",
-        "--shell-job",
-        "--pidfile", pidfile, # FIXME: shouldn't criu cli pass its pid via envvar?
-        "-D", checkpoint.images_dir
-      ]
+      cmds = RestoreCMD.new(checkpoint.criu_bin_path)
+      cmds.options << "--shell-job"
+      cmds.options.concat ["--pidfile", pidfile] # FIXME: shouldn't criu cli pass its pid via envvar?
+      cmds.options.concat ["-D",checkpoint.images_dir]
       self_exe = File.readlink "/proc/self/exe"
 
       nw = @base.network
       if nw.enabled?
         external_string = "veth[#{nw.veth_guest}]:#{nw.veth_host}@#{nw.bridge_name}"
-        cmds.concat(["--external", external_string])
+        cmds.externals << external_string
 
         ENV['HACONIWA_NEW_IP'] = nw.container_ip_with_netmask
         ENV['HACONIWA_RUN_AS_CRIU_ACTION_SCRIPT'] = "true"
       end
 
       unless @base.filesystem.mount_points.empty?
-        cmds.concat(["--external", "mnt[]:"])
+        cmds.externals << "mnt[]:"
+        @base.filesystem.external_mount_points.each do |mp|
+          cmds.externals << "mnt[#{mp.criu_ext_key}]:#{mp.src}"
+        end
       end
 
       # Order of external...
       # FIXME make this command generator a class
       if nw.enabled?
-        cmds.concat(["--action-script", self_exe])
+        cmds.options.concat(["--action-script", self_exe])
       end
 
-      cmds.concat(
-        [
-          "--root", @base.filesystem.root_path,
-          "--exec-cmd",
-          "--", self_exe, "_restored", @base.hacofile, pidfile
-        ])
+      cmds.options.concat(["--root", @base.filesystem.root_path])
+
+      unless checkpoint.extra_criu_options.empty?
+        cmds.options.concat(checkpoint.extra_criu_options)
+      end
+      checkpoint.extra_criu_externals.each do |extra|
+        cmds.externals << extra
+      end
+
+      cmds.exec_cmd = [self_exe, "_restored", @base.hacofile, pidfile]
+
       Haconiwa::Logger.debug("Going to exec: #{cmds.inspect}")
-      ::Exec.execve(ENV, *cmds)
+      ::Exec.execve(ENV, *cmds.to_execve_arg)
     end
   end
 end

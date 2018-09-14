@@ -953,6 +953,10 @@ module Haconiwa
     end
     alias root_path chroot
 
+    def external_mount_points
+      @mount_points.select{|mp| mp.criu_ext_key }
+    end
+
     def mount_independent(fs)
       params = FS_TO_MOUNT[fs]
       raise("Unsupported: #{fs}") unless params
@@ -1015,9 +1019,10 @@ module Haconiwa
       @dest = options.delete(:to)
       @dest = @dest.to_s if @dest
       @fs = options.delete(:fs)
+      @criu_ext_key = options.delete(:criu_ext_key)
       @options = options
     end
-    attr_accessor :src, :dest, :fs, :options
+    attr_accessor :src, :dest, :fs, :criu_ext_key, :options
 
     def normalized_src(cwd="/")
       if @src.start_with?('/')
@@ -1043,9 +1048,13 @@ module Haconiwa
       @criu_log_file = "-"
       @criu_service_address = "/var/run/criu_service.socket"
       @criu_bin_path = "/usr/local/sbin/criu"
+
+      @extra_criu_options = []
+      @extra_criu_externals = []
     end
     attr_accessor :target_syscall, :images_dir,
-                  :criu_log_file, :criu_service_address, :criu_bin_path
+                  :criu_log_file, :criu_service_address, :criu_bin_path,
+                  :extra_criu_options, :extra_criu_externals
 
     def target_syscall(*args)
       if args.size == 0

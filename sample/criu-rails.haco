@@ -46,6 +46,7 @@ Haconiwa.define do |config|
       c.set_log_file base.checkpoint.criu_log_file
       c.set_shell_job true
       c.add_external "mnt[]"
+      c.add_external "mnt[/home/test-account]:my-homedir-1"
       begin
         c.set_pid base.pid
         c.dump
@@ -71,7 +72,8 @@ Haconiwa.define do |config|
   config.mount_independent "sysfs"
   config.mount_independent "devpts"
   config.mount_independent "shm"
-  config.add_mount_point "/home/vagrant", to: root.join("home/test-account")
+  config.add_mount_point "/home/vagrant", to: root.join("home/test-account"),
+                         criu_ext_key: "my-homedir-1"
 
   config.namespace.unshare "mount"
   config.namespace.unshare "uts"
