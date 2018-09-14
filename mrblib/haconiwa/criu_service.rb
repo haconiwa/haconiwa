@@ -81,9 +81,8 @@ module Haconiwa
       # TODO: embed criu(crtools) to haconiwa...
       # Hooks won't work
       pidfile = "/tmp/.__criu_restored_#{@base.name}.pid"
-      cmds = RestoreCMD.new(checkpoint.criu_bin_path)[
-        , "restore",
-      cmds.options << "--shell-job",
+      cmds = RestoreCMD.new(checkpoint.criu_bin_path)
+      cmds.options << "--shell-job"
       cmds.options.concat ["--pidfile", pidfile] # FIXME: shouldn't criu cli pass its pid via envvar?
       cmds.options.concat ["-D",checkpoint.images_dir]
       self_exe = File.readlink "/proc/self/exe"
