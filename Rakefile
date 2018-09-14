@@ -142,9 +142,10 @@ namespace :release do
   end
 
   task :run_ghr do
+    version_dot = Haconiwa::VERSION.gsub(/~/, '.')
     branch = `cd #{pwd} && git rev-parse --abbrev-ref HEAD`.chomp
     sh "cd #{pwd} && git pull --rebase --prune origin #{branch}"
-    sh "cd #{pwd} && ghr -c #{branch} -u haconiwa v#{Haconiwa::VERSION} pkg/"
+    sh "cd #{pwd} && ghr -c #{branch} -u haconiwa v#{version_dot} pkg/"
     sh "cd #{pwd} && git fetch origin"
   end
 
@@ -187,6 +188,7 @@ task :package_regen do
   Dir.chdir pwd do
     data = YAML.load_file("packages/templates/changelog.yml")
     @latest = data["latest"]
+    @latest_dot = @latest.gsub(/~/, '.')
     @changelog = data["changelog"]
 
     deb = ERB.new(File.read("packages/templates/deb-changelog.erb")).result(binding).strip

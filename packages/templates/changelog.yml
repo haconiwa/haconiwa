@@ -1,10 +1,10 @@
-latest: 0.10.0~alpha1
+latest: 0.10.0~alpha2
 changelog:
-  - version: 0.10.0~alpha1
+  - version: 0.10.0~alpha2
     messages:
       - Alpha release of criu-included one
     author: Uchio Kondo <udzura@udzura.jp>
-    date: Thu,  9 Aug 2018 17:30:37 +0900
+    date: Fri, 14 Sep 2018 14:40:35 +0900
   - version: 0.9.1
     messages:
       - Apply some enhancements to reduce memory consumption
