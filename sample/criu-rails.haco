@@ -79,6 +79,13 @@ Haconiwa.define do |config|
   config.namespace.unshare "uts"
   config.namespace.unshare "ipc"
   config.namespace.unshare "pid" # also network is unshared
+
+  config.cgroup(:v1) do |cgroup|
+    cgroup["cpu.cfs_period_us"] = 10000
+    cgroup["cpu.cfs_quota_us"]  =  7000
+    cgroup["pids.max"] = 256
+  end
+
   config.capabilities.reset_to_privileged!
 
   if ENV['USE_LEGACY_CHROOT']
