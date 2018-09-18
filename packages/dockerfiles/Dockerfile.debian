@@ -1,5 +1,5 @@
 # -*- mode: dockerfile -*-
-FROM ubuntu:trusty
+FROM ubuntu:xenial
 MAINTAINER Uchio Kondo <udzura@udzura.jp>
 
 ENV DEBIAN_FRONTEND noninteractive
@@ -11,19 +11,26 @@ RUN apt-get -qq -y install \
     zlib1g-dev libncurses5-dev libssl-dev libpam0g-dev \
     rake autotools-dev cgroup-lite build-essential \
     dh-make xz-utils
+RUN apt-get -qq -y install libprotobuf-dev libprotobuf-c0-dev \
+    protobuf-c-compiler protobuf-compiler python-protobuf \
+    libnl-3-dev libnet-dev libcap-dev pkg-config
+RUN apt-get -qq -y install criu
 
-ENV VERSION 0.10.0~alpha2
+ENV VERSION 0.10.0.alpha2
+ENV VERSION_TILDE 0.10.0~alpha2
 ENV USER root
 VOLUME /out
 
 RUN mkdir -p /libexec
 RUN echo '#!/bin/bash'                         >  /libexec/builddeb.sh
 RUN echo 'set -xe'                             >> /libexec/builddeb.sh
-RUN echo 'git clone https://github.com/haconiwa/haconiwa.git /root/haconiwa-$VERSION' >> /libexec/builddeb.sh
-RUN echo 'cd /root/haconiwa-$VERSION'          >> /libexec/builddeb.sh
+RUN echo 'git clone https://github.com/haconiwa/haconiwa.git /root/haconiwa-$VERSION_TILDE' >> /libexec/builddeb.sh
+RUN echo 'cd /root/haconiwa-$VERSION_TILDE'          >> /libexec/builddeb.sh
 RUN echo 'git checkout $(git rev-parse v$VERSION)' >> /libexec/builddeb.sh
+RUN echo 'sed -i.bak "1iENV[%(CRIU_TMP_DIR)] = %(/tmp/criu-build)" build_config.rb' >> /libexec/builddeb.sh
+RUN echo 'sed -i.bak "s;matsumotory/mruby-criu;haconiwa/mruby-criu;" mrbgem.rake' >> /libexec/builddeb.sh
 RUN echo 'rake mruby'                          >> /libexec/builddeb.sh
-RUN echo 'dh_make --multi --createorig -y'     >> /libexec/builddeb.sh
+RUN echo 'dh_make --single --createorig -y'     >> /libexec/builddeb.sh
 RUN echo 'cp -v packages/deb/debian/* debian/' >> /libexec/builddeb.sh
 RUN echo 'rm -rf debian/control.* debian/*.ex debian/*.EX' >> /libexec/builddeb.sh
 RUN echo 'debuild -uc -us'                     >> /libexec/builddeb.sh
