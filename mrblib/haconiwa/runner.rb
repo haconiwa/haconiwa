@@ -268,10 +268,15 @@ module Haconiwa
       end
     end
 
-    def apply_masked_paths(filesystem)
-      # This will run in chroot
-      filesystem.masked_paths.each do |path|
-        Mount.bind_mount "/dev/null", path, {}
+    def apply_masked_paths(base)
+      base.filesystem.masked_paths.each do |path|
+        if File.exist? path
+          if File.directory? path
+            Mount.mount 'empty', path, type: 'tmpfs'
+          else
+            Mount.bind_mount "/dev/null", path, {}
+          end
+        end
       end
     end
 

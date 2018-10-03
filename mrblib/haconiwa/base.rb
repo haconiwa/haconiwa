@@ -149,6 +149,10 @@ module Haconiwa
       filesystem.rootfs
     end
 
+    def hashed_name
+      ::SHA1.sha1_hex(self.name)[0, 16]
+    end
+
     def support_reload(*names)
       names.each do |name|
         unless [:cgroup, :resource].include?(name)
@@ -803,6 +807,15 @@ module Haconiwa
 
   class Filesystem
     MASKED_PATHS_DEFAULT = [
+      "/proc/acpi",
+      "/proc/kcore",
+      "/proc/keys",
+      "/proc/latency_stats",
+      "/proc/timer_list",
+      "/proc/timer_stats",
+      "/proc/sched_debug",
+      "/proc/scsi",
+      "/sys/firmware"
     ]
 
     def initialize
