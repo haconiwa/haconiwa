@@ -802,13 +802,18 @@ module Haconiwa
   end
 
   class Filesystem
+    MASKED_PATHS_DEFAULT = [
+    ]
+
     def initialize
       @mount_points = []
       @independent_mount_points = []
+      @masked_paths = MASKED_PATHS_DEFAULT
       @rootfs = Rootfs.new(nil)
     end
     attr_accessor :mount_points,
                   :independent_mount_points,
+                  :masked_paths,
                   :rootfs
 
     FS_TO_MOUNT = {
@@ -833,6 +838,10 @@ module Haconiwa
       end
 
       self.independent_mount_points << MountPoint.new(params[1], to: params[2], fs: params[0])
+    end
+
+    def add_masked_path(path)
+      @masked_paths << path
     end
   end
 
