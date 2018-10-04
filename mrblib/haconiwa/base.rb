@@ -1058,6 +1058,7 @@ module Haconiwa
     def initialize
       @target_syscall = nil
       @images_dir = "/var/run/haconiwa/checkpoint"
+      @log_level = 1
       @criu_log_file = "-"
       @criu_service_address = "/var/run/criu_service.socket"
       @criu_bin_path = "/usr/local/sbin/criu"
@@ -1065,7 +1066,7 @@ module Haconiwa
       @extra_criu_options = []
       @extra_criu_externals = []
     end
-    attr_accessor :target_syscall, :images_dir,
+    attr_accessor :target_syscall, :images_dir, :log_level,
                   :criu_log_file, :criu_service_address, :criu_bin_path,
                   :extra_criu_options, :extra_criu_externals
 

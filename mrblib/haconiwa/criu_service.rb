@@ -86,6 +86,10 @@ module Haconiwa
       # Hooks won't work
       pidfile = "/tmp/.__criu_restored_#{@base.name}.pid"
       cmds = RestoreCMD.new(checkpoint.criu_bin_path)
+      if checkpoint.log_level > 1
+        cmds.options.concat ["-v#{checkpoint.log_level}"]
+      end
+
       cmds.options << "--shell-job"
       cmds.options.concat ["--pidfile", pidfile] # FIXME: shouldn't criu cli pass its pid via envvar?
       cmds.options.concat ["-D",checkpoint.images_dir]
