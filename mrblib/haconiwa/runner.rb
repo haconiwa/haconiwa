@@ -134,6 +134,7 @@ module Haconiwa
             invoke_general_hook(:before_chroot, base)
 
             do_chroot(base)
+            apply_masked_paths(base)
             Logger.debug("OK: do_chroot")
             invoke_general_hook(:after_chroot, base)
 
@@ -264,6 +265,18 @@ module Haconiwa
         Logger.puts "Process successfully exited: #{status.inspect}"
       else
         Logger.warning "Process failed: #{status.inspect}"
+      end
+    end
+
+    def apply_masked_paths(base)
+      base.filesystem.masked_paths.each do |path|
+        if File.exist? path
+          if File.directory? path
+            Mount.mount 'empty', path, type: 'tmpfs'
+          else
+            Mount.bind_mount "/dev/null", path, {}
+          end
+        end
       end
     end
 
