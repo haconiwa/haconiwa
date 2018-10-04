@@ -1,5 +1,5 @@
 # -*- mode: dockerfile -*-
-FROM ubuntu:trusty
+FROM ubuntu:xenial
 MAINTAINER Uchio Kondo <udzura@udzura.jp>
 
 ENV DEBIAN_FRONTEND noninteractive
@@ -23,7 +23,7 @@ RUN echo 'git clone https://github.com/haconiwa/haconiwa.git /root/haconiwa-$VER
 RUN echo 'cd /root/haconiwa-$VERSION'          >> /libexec/builddeb.sh
 RUN echo 'git checkout $(git rev-parse v$VERSION)' >> /libexec/builddeb.sh
 RUN echo 'rake mruby'                          >> /libexec/builddeb.sh
-RUN echo 'dh_make --multi --createorig -y'     >> /libexec/builddeb.sh
+RUN echo 'dh_make --single --createorig -y'     >> /libexec/builddeb.sh
 RUN echo 'cp -v packages/deb/debian/* debian/' >> /libexec/builddeb.sh
 RUN echo 'rm -rf debian/control.* debian/*.ex debian/*.EX' >> /libexec/builddeb.sh
 RUN echo 'debuild -uc -us'                     >> /libexec/builddeb.sh

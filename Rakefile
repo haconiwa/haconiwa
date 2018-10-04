@@ -168,7 +168,6 @@ namespace :release do
   desc "release packages to packagecloud"
   task :packagecloud do
     Dir.chdir pwd do
-      sh "package_cloud push udzura/haconiwa/ubuntu/trusty pkg/haconiwa_#{Haconiwa::VERSION}-1_amd64.deb"
       sh "package_cloud push udzura/haconiwa/ubuntu/xenial pkg/haconiwa_#{Haconiwa::VERSION}-1_amd64.deb"
       sh "package_cloud push udzura/haconiwa/debian/jessie pkg/haconiwa_#{Haconiwa::VERSION}-1_amd64.deb"
       sh "package_cloud push udzura/haconiwa/debian/stretch pkg/haconiwa_#{Haconiwa::VERSION}-1+debian9_amd64.deb"
