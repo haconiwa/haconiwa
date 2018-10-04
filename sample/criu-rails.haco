@@ -3,7 +3,7 @@ suffix = ENV['SUFFIX']
 Haconiwa.define do |config|
   config.name = "chroot-rails001-#{suffix}" # to be hostname
   config.init_command = %w(/u/app/helloworld/bin/rails server)
-  #config.acts_as_session_leader
+  # config.acts_as_session_leader
   config.daemonize!
 
   root = Pathname.new("/var/lib/haconiwa/rails-sample")
@@ -24,7 +24,8 @@ Haconiwa.define do |config|
   config.checkpoint do |checkpoint|
     checkpoint.target_syscall :listen, 0
     checkpoint.images_dir    = "/tmp/criu/images.rails"
-    checkpoint.criu_log_file = "-"
+    checkpoint.log_level     = 3
+    checkpoint.criu_log_file = "/var/log/criu-restore.log"
     checkpoint.criu_service_address = "/var/run/criu_service.socket"
   end
 
