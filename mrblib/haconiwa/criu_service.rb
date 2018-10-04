@@ -91,6 +91,7 @@ module Haconiwa
       end
 
       cmds.options << "--shell-job"
+      cmds.options.concat ["--log-file", checkpoint.criu_log_file]
       cmds.options.concat ["--pidfile", pidfile] # FIXME: shouldn't criu cli pass its pid via envvar?
       cmds.options.concat ["-D",checkpoint.images_dir]
       self_exe = File.readlink "/proc/self/exe"
