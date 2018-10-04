@@ -84,7 +84,7 @@ module Haconiwa
     def restore
       # TODO: embed criu(crtools) to haconiwa...
       # Hooks won't work
-      pidfile = "/tmp/.__criu_restored_#{@base.name}.pid"
+      pidfile = "/tmp/.__cr_#{@base.name}_#{UUID.secure_uuid("%04x%04x")}.pid"
       cmds = RestoreCMD.new(checkpoint.criu_bin_path)
       if checkpoint.log_level > 1
         cmds.options.concat ["-v#{checkpoint.log_level}"]
