@@ -1,5 +1,10 @@
-latest: 0.9.2
+latest: 0.9.3
 changelog:
+  - version: 0.9.3
+    messages:
+      - Support masking of sensitive files and dirs
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Thu,  4 Oct 2018 14:18:04 +0900
   - version: 0.9.2
     messages:
       - Upgrade mruby version
