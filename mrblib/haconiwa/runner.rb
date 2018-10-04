@@ -134,7 +134,7 @@ module Haconiwa
             invoke_general_hook(:before_chroot, base)
 
             do_chroot(base)
-            apply_masked_paths(base.filesystem)
+            apply_masked_paths(base)
             Logger.debug("OK: do_chroot")
             invoke_general_hook(:after_chroot, base)
 
