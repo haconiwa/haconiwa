@@ -18,6 +18,8 @@ module Haconiwa
       :after_reload,
       :after_failure,
       :system_failure,
+      :before_restore,
+      :after_restore,
     ]
 
     LOCKFILE_DIR = "/var/lock"
@@ -341,6 +343,14 @@ module Haconiwa
       end
     end
 
+    def invoke_general_hook(hookpoint, base)
+      hook = base.general_hooks[hookpoint]
+      hook.call(base) if hook
+    rescue Exception => e
+      Logger.warning("General container hook at #{hookpoint.inspect} failed. Skip")
+      Logger.warning("#{e.class} - #{e.message}")
+    end
+
     private
 
     def ppid_to_pid(ppid)
@@ -416,14 +426,6 @@ module Haconiwa
       if ret < 0
         Logger.exception "Unsharing or setting PID namespace failed"
       end
-    end
-
-    def invoke_general_hook(hookpoint, base)
-      hook = base.general_hooks[hookpoint]
-      hook.call(base) if hook
-    rescue Exception => e
-      Logger.warning("General container hook at #{hookpoint.inspect} failed. Skip")
-      Logger.warning("#{e.class} - #{e.message}")
     end
 
     def apply_namespace(namespace)
@@ -757,6 +759,8 @@ module Haconiwa
   class CRIURestoredRunner < Runner
     def run(options, init_command)
       pid = options[:restored_pid]
+      @base.pid = pid
+      invoke_general_hook(:after_restore, @base)
 
       run_container_setup(init_command)
 

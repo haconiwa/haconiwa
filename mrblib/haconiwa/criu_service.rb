@@ -128,8 +128,18 @@ module Haconiwa
 
       cmds.exec_cmd = [self_exe, "_restored", @base.hacofile, pidfile]
 
+      invoke_general_hook(:before_restore, @base)
       Haconiwa::Logger.debug("Going to exec: #{cmds.inspect}")
       ::Exec.execve(ENV, *cmds.to_execve_arg)
+    end
+
+    # FIXME: make it a module...
+    def invoke_general_hook(hookpoint, base)
+      hook = base.general_hooks[hookpoint]
+      hook.call(base) if hook
+    rescue Exception => e
+      Logger.warning("General container hook at #{hookpoint.inspect} failed. Skip")
+      Logger.warning("#{e.class} - #{e.message}")
     end
   end
 end
