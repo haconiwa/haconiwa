@@ -1,24 +1,12 @@
 module Haconiwa
   class Runner
+    include Hookable
+
     def initialize(base)
       @base = base
       @pid_file = nil
       validate_ruid(base)
     end
-
-    VALID_HOOKS = [
-      :setup,
-      :before_fork,
-      :after_fork,
-      :before_chroot,
-      :after_chroot,
-      :before_start_wait,
-      :teardown_container,
-      :teardown,
-      :after_reload,
-      :after_failure,
-      :system_failure,
-    ]
 
     LOCKFILE_DIR = "/var/lock"
 
@@ -418,14 +406,6 @@ module Haconiwa
       end
     end
 
-    def invoke_general_hook(hookpoint, base)
-      hook = base.general_hooks[hookpoint]
-      hook.call(base) if hook
-    rescue Exception => e
-      Logger.warning("General container hook at #{hookpoint.inspect} failed. Skip")
-      Logger.warning("#{e.class} - #{e.message}")
-    end
-
     def apply_namespace(namespace)
       return if namespace.no_special_config?
 
@@ -757,6 +737,8 @@ module Haconiwa
   class CRIURestoredRunner < Runner
     def run(options, init_command)
       pid = options[:restored_pid]
+      @base.pid = pid
+      invoke_general_hook(:after_restore, @base)
 
       run_container_setup(init_command)
 

@@ -68,6 +68,14 @@ Haconiwa.define do |config|
     end
   end
 
+  config.add_general_hook :before_restore do |base|
+    Haconiwa::Logger.info "Now in :before_restore!"
+  end
+
+  config.add_general_hook :after_restore do |base|
+    Haconiwa::Logger.info "Now in :after_restore! PID=#{base.pid}"
+  end
+
   config.mount_independent "procfs"
   config.mount_independent "devtmpfs"
   config.mount_independent "sysfs"

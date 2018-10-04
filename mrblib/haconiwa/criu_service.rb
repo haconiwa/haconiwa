@@ -1,5 +1,7 @@
 module Haconiwa
   class CRIUService
+    include Hookable
+
     def initialize(base)
       @base = base
     end
@@ -133,6 +135,7 @@ module Haconiwa
 
       cmds.exec_cmd = [self_exe, "_restored", @base.hacofile, pidfile]
 
+      invoke_general_hook(:before_restore, @base)
       Haconiwa::Logger.debug("Going to exec: #{cmds.inspect}")
       ::Exec.execve(ENV, *cmds.to_execve_arg)
     end
