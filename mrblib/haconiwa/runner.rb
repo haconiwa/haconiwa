@@ -1,26 +1,12 @@
 module Haconiwa
   class Runner
+    include Hookable
+
     def initialize(base)
       @base = base
       @pid_file = nil
       validate_ruid(base)
     end
-
-    VALID_HOOKS = [
-      :setup,
-      :before_fork,
-      :after_fork,
-      :before_chroot,
-      :after_chroot,
-      :before_start_wait,
-      :teardown_container,
-      :teardown,
-      :after_reload,
-      :after_failure,
-      :system_failure,
-      :before_restore,
-      :after_restore,
-    ]
 
     LOCKFILE_DIR = "/var/lock"
 
@@ -341,14 +327,6 @@ module Haconiwa
           raise "Invalid user/group to invoke suid-haconiwa: #{::Process::Sys.getuid}:#{::Process::Sys.getgid}"
         end
       end
-    end
-
-    def invoke_general_hook(hookpoint, base)
-      hook = base.general_hooks[hookpoint]
-      hook.call(base) if hook
-    rescue Exception => e
-      Logger.warning("General container hook at #{hookpoint.inspect} failed. Skip")
-      Logger.warning("#{e.class} - #{e.message}")
     end
 
     private
