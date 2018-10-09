@@ -1077,6 +1077,11 @@ module Haconiwa
         @target_syscall = args
       end
     end
+
+    def dump(base, opt={})
+      service = CRIUService::DumpViaAPI.new(base)
+      service.dump(opt[:pid] || base.pid)
+    end
   end
 
   def self.define(&b)
