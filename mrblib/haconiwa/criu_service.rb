@@ -48,6 +48,31 @@ module Haconiwa
       end
     end
 
+    class DumpViaAPI
+      def initialize(base)
+        @base = base
+      end
+      attr_accessor :options, :externals
+
+      def dump(target_pid)
+        c = CRIU.new
+        c.set_images_dir @base.checkpoint.images_dir
+        c.set_service_address @base.checkpoint.criu_service_address
+        c.set_log_file @base.checkpoint.criu_log_file
+        c.set_shell_job true
+
+        unless @base.filesystem.mount_points.empty?
+          c.add_external "mnt[]:"
+          @base.filesystem.external_mount_points.each do |mp|
+            c.add_external "mnt[#{mp.dest}]:#{mp.criu_ext_key}"
+          end
+        end
+
+        c.set_pid target_pid
+        c.dump
+      end
+    end
+
     class RestoreCMD
       def initialize(bin_path)
         @bin_path = bin_path

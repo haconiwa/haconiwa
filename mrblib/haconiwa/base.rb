@@ -353,13 +353,29 @@ module Haconiwa
       raise "Kill does not seem to be completed. Check process of PID=#{::File.read supervisor_all_pid_file}"
     end
 
-    def do_checkpoint(*cmd)
+    def do_checkpoint(target_pid=nil)
       target = containers_real_run
       if target.size != 1
         raise "Checkpoint now does not support multiple containers"
       end
 
-      Haconiwa::CRIUService.new(target.first).create_checkpoint
+      base = target.first
+      if !target_pid
+        CRIUService.new(base).create_checkpoint
+      else
+        if target_pid <= 0
+          base.container_pid_file ||= base.default_container_pid_file
+          begin
+            ppid = ::Pidfile.pidof(base.container_pid_file)
+            base.pid = Util.ppid_to_pid(ppid)
+            target_pid = base.pid
+          rescue => e
+            Logger.exception "PID detecting failed: #{e.class}, #{e.message}. It seems you should specify container PID by -t option"
+          end
+        end
+        service = CRIUService::DumpViaAPI.new(base)
+        service.dump(target_pid)
+      end
     end
 
     def restore(*_a)
@@ -1013,7 +1029,7 @@ module Haconiwa
     end
 
     def veth_guest
-      @veth_guest ||= ::SHA1.sha1_hex(self.namespace)[0, 8] + '_g'
+      @veth_guest ||= "veth0"
     end
 
     def container_ip_with_netmask
@@ -1076,6 +1092,11 @@ module Haconiwa
       else
         @target_syscall = args
       end
+    end
+
+    def dump(base, opt={})
+      service = CRIUService::DumpViaAPI.new(base)
+      service.dump(opt[:pid] || base.pid)
     end
   end
 

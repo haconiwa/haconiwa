@@ -25,7 +25,7 @@ Haconiwa.define do |config|
     checkpoint.target_syscall :listen, 0
     checkpoint.images_dir    = "/tmp/criu/images.rails"
     checkpoint.log_level     = 3
-    checkpoint.criu_log_file = "/var/log/criu-restore.log"
+    checkpoint.criu_log_file = "-"
     checkpoint.criu_service_address = "/var/run/criu_service.socket"
   end
 
@@ -35,24 +35,15 @@ Haconiwa.define do |config|
   else
     config.network.container_ip = "10.0.0.3"
   end
-  config.network.veth_guest = "veth0" # Fixed
   config.network.veth_host = ::SHA1.sha1_hex(config.name + config.network.container_ip)[0, 8] + '_h'
 
   if ::Haconiwa.current_subcommand != "_restored"
     config.add_async_hook msec: 2500 do |base|
-      c = CRIU.new
-      puts base.checkpoint.images_dir
-      c.set_images_dir base.checkpoint.images_dir
-      c.set_service_address base.checkpoint.criu_service_address
-      c.set_log_file base.checkpoint.criu_log_file
-      c.set_shell_job true
-      c.add_external "mnt[]"
-      c.add_external "mnt[/home/test-account]:my-homedir-1"
       begin
-        c.set_pid base.pid
-        c.dump
+        base.checkpoint.dump base
       rescue => e
         Haconiwa::Logger.puts "CRIU[hook]: dump failed: #{e.class}, #{e.message}"
+        ::Process.kill :TERM, base.pid
       else
         Haconiwa::Logger.puts "CRIU[hook]: dump OK!!"
       end
