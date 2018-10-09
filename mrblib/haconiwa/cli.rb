@@ -116,8 +116,14 @@ module Haconiwa
 
     def self.checkpoint(args)
       opt = parse_opts(args, 'HACO_FILE') do |o|
+        o.integer('t', 'target', 'PID', "Container's *root* PID to make checkpoint.")
       end
-      get_base(opt.catchall.values).do_checkpoint
+      target_pid = if opt['t'].exist?
+                     opt['t'].value
+                   else
+                     nil
+                   end
+      get_base(opt.catchall.values).do_checkpoint(target_pid)
     end
 
     def self.restore(args)
