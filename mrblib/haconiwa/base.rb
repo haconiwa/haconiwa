@@ -1018,7 +1018,7 @@ module Haconiwa
     end
 
     def veth_guest
-      @veth_guest ||= ::SHA1.sha1_hex(self.namespace)[0, 8] + '_g'
+      @veth_guest ||= "veth0"
     end
 
     def container_ip_with_netmask
