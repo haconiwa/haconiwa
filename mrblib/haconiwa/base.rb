@@ -359,10 +359,21 @@ module Haconiwa
         raise "Checkpoint now does not support multiple containers"
       end
 
+      base = target.first
       if !target_pid
-        CRIUService.new(target.first).create_checkpoint
+        CRIUService.new(base).create_checkpoint
       else
-        service = CRIUService::DumpViaAPI.new(target.first)
+        if target_pid <= 0
+          base.container_pid_file ||= base.default_container_pid_file
+          begin
+            ppid = ::Pidfile.pidof(base.container_pid_file)
+            base.pid = Util.ppid_to_pid(ppid)
+            target_pid = base.pid
+          rescue => e
+            Logger.exception "PID detecting failed: #{e.class}, #{e.message}. It seems you should specify container PID by -t option"
+          end
+        end
+        service = CRIUService::DumpViaAPI.new(base)
         service.dump(target_pid)
       end
     end

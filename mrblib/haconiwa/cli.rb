@@ -116,10 +116,13 @@ module Haconiwa
 
     def self.checkpoint(args)
       opt = parse_opts(args, 'HACO_FILE') do |o|
-        o.integer('t', 'target', 'PID', "Container's *root* PID to make checkpoint.")
+        o.literal('R', 'running', "Create checkpoint of running container. Detect container's PID via hacofile(in case without --target)")
+        o.integer('t', 'target', 'PID', "Container's *root* PID to make checkpoint. This implies --running")
       end
       target_pid = if opt['t'].exist?
                      opt['t'].value
+                   elsif opt['R'].exist?
+                     0
                    else
                      nil
                    end

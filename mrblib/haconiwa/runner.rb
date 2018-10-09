@@ -224,7 +224,7 @@ module Haconiwa
       if !base.pid
         begin
           ppid = ::Pidfile.pidof(base.container_pid_file)
-          base.pid = ppid_to_pid(ppid)
+          base.pid = Util.ppid_to_pid(ppid)
         rescue => e
           Logger.exception "PID detecting failed: #{e.class}, #{e.message}. It seems you should specify container PID by -t option"
         end
@@ -287,7 +287,7 @@ module Haconiwa
       if !@base.pid
         begin
           ppid = ::Pidfile.pidof(@base.container_pid_file)
-          @base.pid = ppid_to_pid(ppid)
+          @base.pid = Util.ppid_to_pid(ppid)
         rescue => e
           Logger.exception "PID detecting failed: #{e.class}, #{e.message}. It seems you should specify container PID by -t option"
         end
@@ -330,14 +330,6 @@ module Haconiwa
     end
 
     private
-
-    def ppid_to_pid(ppid)
-      status = `find /proc -maxdepth 2 -regextype posix-basic -regex '/proc/[0-9]\\+/status'`.
-               split.
-               find {|f| File.read(f).include? "PPid:\t#{ppid}\n" rescue false }
-      raise(HacoFatalError, "Container PID not found by find") unless status
-      status.split('/')[2].to_i
-    end
 
     def raise_container(&b)
       b.call(@base)
