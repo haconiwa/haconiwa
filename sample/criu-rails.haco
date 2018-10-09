@@ -35,7 +35,6 @@ Haconiwa.define do |config|
   else
     config.network.container_ip = "10.0.0.3"
   end
-  config.network.veth_guest = "veth0" # Fixed
   config.network.veth_host = ::SHA1.sha1_hex(config.name + config.network.container_ip)[0, 8] + '_h'
 
   if ::Haconiwa.current_subcommand != "_restored"
