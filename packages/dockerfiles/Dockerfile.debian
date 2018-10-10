@@ -16,8 +16,8 @@ RUN apt-get -qq -y install libprotobuf-dev libprotobuf-c0-dev \
     libnl-3-dev libnet-dev libcap-dev pkg-config
 RUN apt-get -qq -y install criu
 
-ENV VERSION 0.10.0.alpha2
-ENV VERSION_TILDE 0.10.0~alpha2
+ENV VERSION 0.10.0.alpha3
+ENV VERSION_TILDE 0.10.0~alpha3
 ENV USER root
 VOLUME /out
 
