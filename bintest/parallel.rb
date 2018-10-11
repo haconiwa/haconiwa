@@ -60,13 +60,19 @@ assert('haconiwa container cannot be invoked when same process is up') do
     _, err, _ = run_parallel "-j", "10", BIN_PATH, "run", haconame, "--", "/bin/sleep", ":::", *((10..19).to_a.map(&:to_s))
     Timeout.timeout 2 do
       until File.exist?("/var/run/haconiwa-#{container_name}.pid")
-        sleep 0.1
+        sleep 0.05
       end
     end
 
     assert_equal 9, err.scan('cannot set lock').size
 
     cnt = `pgrep haconiwa | wc -l`.chomp.to_i
+    Timeout.timeout 3 do
+      until cnt == 2
+        sleep 0.05
+        cnt = `pgrep haconiwa | wc -l`.chomp.to_i
+      end
+    end
     assert_equal 2, cnt
 
     system "killall -9 sleep"

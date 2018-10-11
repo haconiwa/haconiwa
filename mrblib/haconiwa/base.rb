@@ -420,7 +420,9 @@ module Haconiwa
     alias skip_provision skip_bootstrap
 
     def ppid
-      self.container_pid_file ||= default_container_pid_file
+      unless container_pid_file
+        self.container_pid_file = default_container_pid_file
+      end
       ::File.read(container_pid_file).to_i
     rescue => e
       STDERR.puts e
@@ -465,13 +467,17 @@ module Haconiwa
         Logger.puts "Bootstrapping rootfs on run..."
         create(options[:no_provision])
       end
-      self.container_pid_file ||= default_container_pid_file
+      unless container_pid_file
+        self.container_pid_file = default_container_pid_file
+      end
       LinuxRunner.new(self).run(options, init_command)
     end
     alias run start
 
     def attach(*run_command)
-      self.container_pid_file ||= default_container_pid_file
+      unless container_pid_file
+        self.container_pid_file = default_container_pid_file
+      end
       LinuxRunner.new(self).attach(run_command)
     end
 
@@ -480,7 +486,9 @@ module Haconiwa
     end
 
     def kill(signame, timeout)
-      self.container_pid_file ||= default_container_pid_file
+      unless container_pid_file
+        self.container_pid_file = default_container_pid_file
+      end
       LinuxRunner.new(self).kill(signame, timeout)
     end
   end
