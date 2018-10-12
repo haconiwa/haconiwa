@@ -1,3 +1,9 @@
+haconiwa (0.9.4-1) unstable; urgency=medium
+
+  * Backport some of 0.10 features
+
+ -- Uchio Kondo <udzura@udzura.jp>  Fri, 12 Oct 2018 12:05:29 +0900
+
 haconiwa (0.9.3-1) unstable; urgency=medium
 
   * Support masking of sensitive files and dirs
@@ -27,9 +33,3 @@ haconiwa (0.8.9-1) unstable; urgency=medium
   * Support network configuration DSL
 
  -- Uchio Kondo <udzura@udzura.jp>  Wed, 20 Dec 2017 16:33:53 +0900
-
-haconiwa (0.8.8-1) unstable; urgency=medium
-
-  * Support lxcfs API endpoint
-
- -- Uchio Kondo <udzura@udzura.jp>  Tue,  5 Dec 2017 19:13:46 +0900

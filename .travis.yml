@@ -30,6 +30,7 @@ matrix:
 branches:
   only:
     - master
+    - checkpoint
 cache:
   directories:
     - mruby

@@ -10,6 +10,12 @@ deb9:
   volumes:
     - .:/out:rw
 
+bionic:
+  dockerfile: packages/dockerfiles/Dockerfile.bionic
+  build: .
+  volumes:
+    - .:/out:rw
+
 rpm:
   dockerfile: packages/dockerfiles/Dockerfile.centos
   build: .

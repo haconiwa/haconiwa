@@ -25,7 +25,8 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.add_dependency 'mruby-linux-namespace', :mgem => 'mruby-linux-namespace'
   spec.add_dependency 'mruby-process'   , :github => 'iij/mruby-process'
   spec.add_dependency 'mruby-socket'    , :mgem => 'mruby-socket'
-  spec.add_dependency 'mruby-seccomp'   , :github => 'haconiwa/mruby-seccomp'
+  spec.add_dependency 'mruby-seccomp'   , :github => 'chikuwait/mruby-seccomp'
+  spec.add_dependency 'mruby-apparmor'  , :github => 'haconiwa/mruby-apparmor'
 
   spec.add_dependency 'mruby-onig-regexp', :github => 'udzura/mruby-onig-regexp'
   spec.add_dependency 'mruby-argtable'  , :github => 'udzura/mruby-argtable', :branch => 'static-link-argtable3'
@@ -48,6 +49,10 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.add_dependency 'mruby-time'      , :core => 'mruby-time'
   spec.add_dependency 'mruby-sprintf'   , :core => 'mruby-sprintf'
   spec.add_dependency 'mruby-print'     , :core => 'mruby-print'
+
+  if spec.build.cc.defines.flatten.include?("HACONIWA_USE_CRIU")
+    spec.add_dependency 'mruby-criu', :github => 'matsumotory/mruby-criu'
+  end
 
   def spec.save_dependent_mgem_revisions
     file DEFS_FILE => DEPENDENT_GEMS do

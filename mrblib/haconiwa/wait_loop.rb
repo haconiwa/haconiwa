@@ -40,7 +40,7 @@ module Haconiwa
         @mainloop.register_handler(sig, true) do
           unless base.cleaned
             ::Haconiwa::Logger.warning "Supervisor received unintended kill. Cleanup..."
-            runner.cleanup_supervisor(base)
+            runner.run_cleanups_after_exit(::Process::Status.new(base.pid, 127))
           end
           Process.kill :TERM, base.pid
           exit 127
