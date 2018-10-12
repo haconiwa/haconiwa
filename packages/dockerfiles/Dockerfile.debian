@@ -14,13 +14,13 @@ RUN apt-get -qq -y install \
 RUN apt-get -qq -y install libprotobuf-dev libprotobuf-c0-dev \
     protobuf-c-compiler protobuf-compiler python-protobuf \
     libnl-3-dev libnet-dev libcap-dev pkg-config
-RUN apt-get -qq -y install criu
 
 ENV VERSION 0.9.4
 ENV VERSION_TILDE 0.9.4
 ENV USER root
 VOLUME /out
 
+RUN ln -s /tmp/criu-build/lib/c /usr/local/include/criu
 RUN mkdir -p /libexec
 RUN echo '#!/bin/bash'                         >  /libexec/builddeb.sh
 RUN echo 'set -xe'                             >> /libexec/builddeb.sh
