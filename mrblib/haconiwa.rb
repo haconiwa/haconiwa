@@ -28,9 +28,11 @@ def __main__(argv)
   when "attach"
     Haconiwa::Cli.attach(argv)
   when "checkpoint"
-    Haconiwa::Cli.checkpoint(argv)
+    raise NotImplementedError, "0.9.x cannot use checkpoint"
+    # Haconiwa::Cli.checkpoint(argv)
   when "restore"
-    Haconiwa::Cli.restore(argv)
+    raise NotImplementedError, "0.9.x cannot use restore"
+    # Haconiwa::Cli.restore(argv)
   when "reload"
     Haconiwa::Cli.reload(argv)
   when "kill"
@@ -45,8 +47,8 @@ commands:
     archive    - create, provision, then archive rootfs to image
     start      - run the container
     attach     - attach to existing container
-    checkpoint - create container's checkpoint image following config, using syscall hook
-    restore    - restore a container from checkpint
+    checkpoint - create container's checkpoint image following config, using syscall hook # no impl
+    restore    - restore a container from checkpint # no impl
     reload     - reload running container parameters, following its current config
     kill       - kill the running container
     version    - show version
