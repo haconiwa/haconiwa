@@ -1,26 +1,12 @@
 module Haconiwa
   class Runner
-  end
+    include Hookable
 
-  class LinuxRunner < Runner
     def initialize(base)
       @base = base
+      @pid_file = nil
       validate_ruid(base)
     end
-
-    VALID_HOOKS = [
-      :setup,
-      :before_fork,
-      :after_fork,
-      :before_chroot,
-      :after_chroot,
-      :before_start_wait,
-      :teardown_container,
-      :teardown,
-      :after_reload,
-      :after_failure,
-      :system_failure,
-    ]
 
     LOCKFILE_DIR = "/var/lock"
 
@@ -61,15 +47,7 @@ module Haconiwa
     end
 
     def run(options, init_command)
-      begin
-        pid_file = Pidfile.create(@base.container_pid_file)
-      rescue => e
-        Logger.exception e
-      end
-
-      unless init_command.empty?
-        @base.init_command = init_command
-      end
+      run_container_setup(init_command)
 
       raise_container do |base|
         invoke_general_hook(:before_fork, base)
@@ -95,7 +73,7 @@ module Haconiwa
             ::Procutil.mark_cloexec
             [r, w2].each {|io| io.close if io }
             done.close
-            ::Procutil.setsid if base.daemon?
+            ::Procutil.setsid if base.command.session_leader
 
             if base.network.enabled?
               nw_handler = NetworkHandler::Bridge.new(base.network)
@@ -133,12 +111,14 @@ module Haconiwa
 
             invoke_general_hook(:before_chroot, base)
 
+            reopen_fds_host(base.command) if base.daemon?
             do_chroot(base)
             apply_masked_paths(base)
             Logger.debug("OK: do_chroot")
             invoke_general_hook(:after_chroot, base)
 
-            reopen_fds(base.command) if base.daemon?
+            apply_apparmor(base.apparmor)
+            Logger.debug("OK: apply_apparmor")
 
             apply_capability(base.capabilities)
             Logger.debug("OK: apply_capability")
@@ -150,8 +130,8 @@ module Haconiwa
             kick_ok.close
             Logger.debug("OK: kick parent process to resume")
 
-            Logger.info "Container is going to exec: #{base.init_command.inspect}"
-            Exec.execve(base.environ, *base.init_command)
+            reopen_fds_container(base.command) if base.daemon?
+            exec_container!(base)
           rescue => e
             Logger.exception(e)
             exit(127)
@@ -176,46 +156,68 @@ module Haconiwa
         done.read # wait for container is done
         done.close
         persist_namespace(pid, base.namespace)
-
-        base.created_at = Time.now
-        base.supervisor_pid = ::Process.pid
-
         drop_suid_bit
+
+        run_base_setup_before_wait
         Logger.puts "Container fork success and going to wait: pid=#{pid}"
-        base.waitloop.wait_interval = base.wait_interval
-        base.waitloop.register_hooks(base)
-        base.waitloop.register_sighandlers(base, self)
-        base.waitloop.register_custom_sighandlers(base, base.signal_handler)
-
-        invoke_general_hook(:before_start_wait, base)
-        Logger.debug "WaitLoop instance status: #{base.waitloop.inspect}"
-
         pid, status = base.waitloop.run_and_wait(pid)
-        base.exit_status = status
-        invoke_general_hook(:teardown_container, base)
-        unless status.success?
-          invoke_general_hook(:after_failure, base)
-        end
-
-        cleanup_supervisor(base)
-        if base.network.enabled?
-          nw_handler = NetworkHandler::Bridge.new(base.network)
-          begin
-            nw_handler.cleanup
-          rescue => e
-            Logger.warning "Network cleanup failed: #{e.message}. Skip on quit"
-          end
-        end
-
-        if status.success?
-          Logger.puts "Container successfully exited: #{status.inspect}"
-        else
-          Logger.warning "Container failed: #{status.inspect}"
-        end
-        Logger.puts "Remoing pidfile: #{pid_file}"
-        pid_file.remove # in any case
-        Logger.puts "Removed pidfile: #{pid_file}"
+        run_cleanups_after_exit(status)
       end
+    end
+
+    def exec_container!(base)
+      raise "Implement me at subclasses"
+    end
+
+    def run_container_setup(init_command)
+      begin
+        @pid_file = Pidfile.create(@base.container_pid_file)
+      rescue => e
+        Logger.exception e
+      end
+
+      if !init_command.nil? && !init_command.empty?
+        @base.init_command = init_command
+      end
+    end
+
+    def run_base_setup_before_wait
+      @base.created_at = Time.now
+      @base.supervisor_pid = ::Process.pid
+      @base.waitloop.wait_interval = @base.wait_interval
+      @base.waitloop.register_hooks(@base)
+      @base.waitloop.register_sighandlers(@base, self)
+      @base.waitloop.register_custom_sighandlers(@base, @base.signal_handler)
+
+      invoke_general_hook(:before_start_wait, @base)
+      Logger.debug "WaitLoop instance status: #{@base.waitloop.inspect}"
+    end
+
+    def run_cleanups_after_exit(status)
+      @base.exit_status = status
+      invoke_general_hook(:teardown_container, @base)
+      unless status.success?
+        invoke_general_hook(:after_failure, @base)
+      end
+
+      cleanup_supervisor(@base)
+      if @base.network.enabled?
+        nw_handler = NetworkHandler::Bridge.new(@base.network)
+        begin
+          nw_handler.cleanup
+        rescue => e
+          Logger.warning "Network cleanup failed: #{e.message}. Skip on quit"
+        end
+      end
+
+      if status.success?
+        Logger.puts "Container successfully exited: #{status.inspect}"
+      else
+        Logger.warning "Container failed: #{status.inspect}"
+      end
+      Logger.puts "Remoing pidfile: #{@pid_file}"
+      @pid_file.remove # in any case
+      Logger.puts "Removed pidfile: #{@pid_file}"
     end
 
     def attach(exe)
@@ -223,7 +225,7 @@ module Haconiwa
       if !base.pid
         begin
           ppid = ::Pidfile.pidof(base.container_pid_file)
-          base.pid = ppid_to_pid(ppid)
+          base.pid = Util.ppid_to_pid(ppid)
         rescue => e
           Logger.exception "PID detecting failed: #{e.class}, #{e.message}. It seems you should specify container PID by -t option"
         end
@@ -298,7 +300,7 @@ module Haconiwa
       if !@base.pid
         begin
           ppid = ::Pidfile.pidof(@base.container_pid_file)
-          @base.pid = ppid_to_pid(ppid)
+          @base.pid = Util.ppid_to_pid(ppid)
         rescue => e
           Logger.exception "PID detecting failed: #{e.class}, #{e.message}. It seems you should specify container PID by -t option"
         end
@@ -341,14 +343,6 @@ module Haconiwa
     end
 
     private
-
-    def ppid_to_pid(ppid)
-      status = `find /proc -maxdepth 2 -regextype posix-basic -regex '/proc/[0-9]\\+/status'`.
-               split.
-               find {|f| File.read(f).include? "PPid:\t#{ppid}\n" rescue false }
-      raise(HacoFatalError, "Container PID not found by find") unless status
-      status.split('/')[2].to_i
-    end
 
     def raise_container(&b)
       b.call(@base)
@@ -417,15 +411,9 @@ module Haconiwa
       end
     end
 
-    def invoke_general_hook(hookpoint, base)
-      hook = base.general_hooks[hookpoint]
-      hook.call(base) if hook
-    rescue Exception => e
-      Logger.warning("General container hook at #{hookpoint.inspect} failed. Skip")
-      Logger.warning("#{e.class} - #{e.message}")
-    end
-
     def apply_namespace(namespace)
+      return if namespace.no_special_config?
+
       if ::Namespace.unshare(namespace.to_flag_for_unshare) < 0
         Logger.exception "Some namespace is unsupported by this kernel. Please check"
       end
@@ -440,6 +428,11 @@ module Haconiwa
           end
           f.close
         end
+      end
+
+      if namespace.flag?(::Namespace::CLONE_NEWNS)
+        # Mount.make_private "/"
+        Mount.__mount__("none", "/", nil, (Mount::MS_REC | Mount::MS_PRIVATE), nil)
       end
     end
 
@@ -473,8 +466,15 @@ module Haconiwa
     end
 
     def apply_filesystem(base)
+      unless base.filesystem.use_legacy_chroot
+        Mount.bind_mount base.filesystem.root_path, base.filesystem.root_path
+        #Mount.make_private base.filesystem.root_path
+        Mount.__mount__("none", base.filesystem.root_path, nil, (Mount::MS_REC | Mount::MS_PRIVATE), nil)
+      end
+
+      return if base.filesystem.no_special_config? && base.network_mountpoint.empty?
+
       cwd = Dir.pwd
-      Mount.make_private "/"
       owner_options = base.rootfs.to_owner_options
       base.filesystem.mount_points.each do |mp|
         Logger.debug("Mounting: #{mp.inspect}")
@@ -593,6 +593,10 @@ module Haconiwa
       end
     end
 
+    def apply_apparmor(apparmor)
+      AppArmor.change_onexec(apparmor) if apparmor
+    end
+
     def apply_rlimit(rlimit)
       rlimit.limits.each do |limit|
         type = ::Resource.const_get("RLIMIT_#{limit[0]}")
@@ -632,18 +636,36 @@ module Haconiwa
       end
     end
 
-    def reopen_fds(command)
-      devnull = "/dev/null"
-      inio  = command.stdin  || File.open(devnull, 'r')
-      outio = command.stdout || File.open(devnull, 'a')
-      errio = command.stderr || File.open(devnull, 'a')
-      ::Procutil.fd_reopen3(inio.fileno, outio.fileno, errio.fileno)
+    def reopen_fds_host(command)
+      if command.any_log_to_host_file?
+        inio  = command.stdin.to_io_readonly
+        outio = command.stdout.to_io
+        errio = command.stderr.to_io
+        ::Procutil.fd_reopen3(inio.fileno, outio.fileno, errio.fileno)
+      end
+    end
+
+    def reopen_fds_container(command)
+      # Run in process after chroot/pivot_root
+      unless command.any_log_to_host_file?
+        inio  = command.stdin.to_io_readonly
+        outio = command.stdout.to_io
+        errio = command.stderr.to_io
+        ::Procutil.fd_reopen3(inio.fileno, outio.fileno, errio.fileno)
+      end
     end
 
     def do_chroot(base)
       if base.filesystem.chroot
-        Dir.chdir ExpandPath.expand([base.filesystem.chroot, base.workdir].join('/'))
-        Dir.chroot base.filesystem.chroot
+        if base.filesystem.use_legacy_chroot
+          Dir.chroot base.filesystem.chroot
+        else
+          Dir.mkdir("#{base.filesystem.root_path}/.gc") rescue nil
+          Haconiwa.pivot_root_to base.filesystem.root_path
+          Dir.rmdir "/.gc"
+
+          Dir.chdir base.workdir
+        end
       else
         Dir.chdir base.workdir
       end
@@ -707,6 +729,28 @@ module Haconiwa
           end
         end
       end
+    end
+  end
+
+  class LinuxRunner < Runner
+    def exec_container!(base)
+      Haconiwa::Logger.info "Container is going to exec: #{base.init_command.inspect}"
+      Exec.execve(base.environ, *base.init_command)
+    end
+  end
+
+  class CRIURestoredRunner < Runner
+    def run(options, init_command)
+      pid = options[:restored_pid]
+      @base.pid = pid
+      invoke_general_hook(:after_restore, @base)
+
+      run_container_setup(init_command)
+
+      run_base_setup_before_wait
+      Logger.puts "Container fork success and going to wait: pid=#{pid}"
+      pid, status = @base.waitloop.run_and_wait(pid)
+      run_cleanups_after_exit(status)
     end
   end
 end

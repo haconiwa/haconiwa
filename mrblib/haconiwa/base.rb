@@ -15,6 +15,8 @@ module Haconiwa
                   :capabilities,
                   :guid,
                   :seccomp,
+                  :apparmor,
+                  :checkpoint,
                   :general_hooks,
                   :async_hooks,
                   :cgroup_hooks,
@@ -32,6 +34,8 @@ module Haconiwa
                   :metadata,
                   :reloadable_attr,
                   :exit_status
+
+    alias apparmor_profile= apparmor=
 
     delegate     [:uid,
                   :uid=,
@@ -71,6 +75,8 @@ module Haconiwa
       @capabilities = Capabilities.new
       @guid = Guid.new
       @seccomp = Seccomp.new
+      @apparmor = nil
+      @checkpoint = Checkpoint.new
       @general_hooks = {}
       @async_hooks = []
       @cgroup_hooks = []
@@ -135,6 +141,10 @@ module Haconiwa
       self.command.init_command
     end
 
+    def acts_as_session_leader
+      self.command.session_leader = true
+    end
+
     # aliases
     def chroot_to(dest)
       self.filesystem.rootfs = Rootfs.new(dest)
@@ -183,6 +193,13 @@ module Haconiwa
       @resource
     end
 
+    def checkpoint(&blk)
+      if blk
+        blk.call(@checkpoint)
+      end
+      @checkpoint
+    end
+
     def add_mount_point(point, options={})
       self.namespace.unshare "mount"
       if data = options.delete(:data)
@@ -213,7 +230,7 @@ module Haconiwa
     end
 
     def add_general_hook(hookpoint, &b)
-      raise("Invalid hook point: #{hookpoint.inspect}") unless LinuxRunner::VALID_HOOKS.include?(hookpoint.to_sym)
+      raise("Invalid hook point: #{hookpoint.inspect}") unless Hookable.valid?(hookpoint.to_sym)
       @general_hooks[hookpoint.to_sym] = b
     end
 
@@ -229,6 +246,10 @@ module Haconiwa
 
     def add_cgroup_hook(options={}, &hook)
       @cgroup_hooks << WaitLoop::CGroupHook.new(options, &hook)
+    end
+
+    def current_subcommand
+      ::Haconiwa.current_subcommand
     end
 
     def bootstrap
@@ -249,6 +270,7 @@ module Haconiwa
 
     def daemonize!
       @daemon = true
+      acts_as_session_leader
     end
 
     def cancel_daemonize!
@@ -340,6 +362,69 @@ module Haconiwa
       end
       raise "Kill does not seem to be completed. Check process of PID=#{::File.read supervisor_all_pid_file}"
     end
+
+    def do_checkpoint(target_pid=nil)
+      target = containers_real_run
+      if target.size != 1
+        raise "Checkpoint now does not support multiple containers"
+      end
+
+      base = target.first
+      if !target_pid
+        CRIUService.new(base).create_checkpoint
+      else
+        if target_pid <= 0
+          base.container_pid_file ||= base.default_container_pid_file
+          begin
+            ppid = ::Pidfile.pidof(base.container_pid_file)
+            base.pid = Util.ppid_to_pid(ppid)
+            target_pid = base.pid
+          rescue => e
+            Logger.exception "PID detecting failed: #{e.class}, #{e.message}. It seems you should specify container PID by -t option"
+          end
+        end
+        service = CRIUService::DumpViaAPI.new(base)
+        service.dump(target_pid)
+      end
+    end
+
+    def restore(*_a)
+      target = containers_real_run
+      if target.size != 1
+        raise "Checkpoint now does not support multiple containers"
+      end
+
+      LinuxRunner.new(self).waitall do |_w|
+        pid = ::Process.fork do
+          _w.close if _w
+          target.first.restore
+        end
+        [pid]
+      end
+    end
+
+    def _restored(pidfile_path)
+      Haconiwa::Logger.puts("Now in exec'ed haconiwa supervisor process")
+      target = containers_real_run
+      if target.size != 1
+        raise "[BUG] Checkpoint now does not support multiple containers"
+      end
+
+      self.container_pid_file ||= default_container_pid_file
+      pid = File.open(pidfile_path, 'r').read.to_i
+      self.pid = pid
+      File.unlink(pidfile_path)
+
+      CRIURestoredRunner.new(self).run({restored_pid: pid}, nil)
+      Haconiwa::Logger.puts("Restored process exited")
+    rescue => e
+      Haconiwa::Logger.warning("Something is wrong on re-supervise process(This is haconiwa's bug, not image's)")
+      Haconiwa::Logger.warning("#{e.class}, #{e.message}" + "\n" + e.backtrace.join("\n"))
+      Haconiwa::Logger.warning("Force to kill restored processes")
+      ::Process.kill(:KILL, pid) if pid
+
+      raise "Something is wrong on re-supervise process: #{e.class}, #{e.message}"
+    end
   end
 
   class Base < Barn
@@ -360,6 +445,8 @@ module Haconiwa
         :@capabilities,
         :@guid,
         :@seccomp,
+        :@apparmor,
+        :@checkpoint,
         :@general_hooks,
         :@async_hooks,
         :@cgroup_hooks,
@@ -481,6 +568,10 @@ module Haconiwa
       LinuxRunner.new(self).attach(run_command)
     end
 
+    def restore
+      Haconiwa::CRIUService.new(self).restore
+    end
+
     def reload(newcg, newcg2, newres)
       LinuxRunner.new(self).reload(self.name, newcg, newcg2, newres, self.reloadable_attr)
     end
@@ -496,9 +587,11 @@ module Haconiwa
   class Command
     def initialize
       @init_command = ["/bin/bash"] # FIXME: maybe /sbin/init is better
-      @stdin = @stdout = @stderr = nil
+      @session_leader = false
+      @stdin = @stdout = @stderr = LoggerIO.new
     end
     attr_reader :init_command, :stdin, :stdout, :stderr
+    attr_accessor :session_leader
 
     def init_command=(cmd)
       if cmd.is_a?(Array)
@@ -508,17 +601,49 @@ module Haconiwa
       end
     end
 
-    # TODO: support options other than file:
+    class LoggerIO
+      DEVNULL = "/dev/null"
+
+      # TODO: support options other than file:
+      def initialize(options={})
+        @file = options[:file]
+        @host_file = options[:host_file]
+      end
+      attr_accessor :file, :host_file
+
+      def target_file
+        @host_file || @file || nil
+      end
+
+      def to_io
+        if !target_file
+          return File.open(DEVNULL, 'a')
+        end
+        File.open(target_file, 'a+')
+      end
+
+      def to_io_readonly
+        if !target_file
+          return File.open(DEVNULL, 'r')
+        end
+        File.open(target_file, 'r+')
+      end
+    end
+
     def set_stdin(options)
-      @stdin = File.open(options[:file], 'r+')
+      @stdin = LoggerIO.new(options)
     end
 
     def set_stdout(options)
-      @stdout = File.open(options[:file], 'a+')
+      @stdout = LoggerIO.new(options)
     end
 
     def set_stderr(options)
-      @stderr = File.open(options[:file], 'a+')
+      @stderr = LoggerIO.new(options)
+    end
+
+    def any_log_to_host_file?
+      @stdin.host_file || @stdout.host_file || @stderr.host_file
     end
   end
 
@@ -529,6 +654,10 @@ module Haconiwa
     end
     attr_reader :limits
     attr_accessor :defblock
+
+    def no_special_config?
+      @limits.empty?
+    end
 
     def set_limit(type, soft, hard=nil)
       hard ||= soft
@@ -545,6 +674,10 @@ module Haconiwa
     attr_reader :groups, :groups_by_controller
     attr_accessor :defblock
 
+    def no_special_config?
+      @groups.empty?
+    end
+
     def [](key)
       @groups[key]
     end
@@ -556,6 +689,19 @@ module Haconiwa
       @groups_by_controller[c] ||= []
       @groups_by_controller[c] << [key, attr.join('_')]
       return value
+    end
+
+    def controllers_in_real_dirname
+      controllers.map { |name|
+        case name
+        when "cpu", "cpuacct"
+          "cpu,cpuacct"
+        when "net_cls", "net_prio"
+          "net_cls,net_prio"
+        else
+          name
+        end
+      }
     end
 
     def to_controllers
@@ -596,6 +742,10 @@ module Haconiwa
     def reset_to_privileged!
       @blacklist.clear
       @whitelist.clear
+    end
+
+    def no_special_config? # means reseted to privileged
+      @blacklist.empty? && @whitelist.empty?
     end
 
     def allow(*keys)
@@ -648,6 +798,10 @@ module Haconiwa
       @gid_mapping = nil
     end
     attr_reader :namespaces
+
+    def no_special_config?
+      @namespaces.empty? && @ns_to_path.empty?
+    end
 
     def unshare(ns, options={})
       flag = to_bit(ns)
@@ -715,7 +869,9 @@ module Haconiwa
     def to_bit(ns)
       case ns
       when String, Symbol
-        NS_MAPPINGS[ns.to_s]
+        bin = NS_MAPPINGS[ns.to_s]
+        raise(ArgumentError, "Invalid namespace name #{ns.inspect}") unless bin
+        bin
       when Integer
         ns
       end
@@ -786,6 +942,10 @@ module Haconiwa
     end
     attr_accessor :def_action, :defblock
 
+    def no_special_config?
+      !! @defblock
+    end
+
     def filter(options={}, &blk)
       @def_action = options[:default]
       raise("default: must be specified to filter") unless @def_action
@@ -831,11 +991,13 @@ module Haconiwa
       @independent_mount_points = []
       @masked_paths = MASKED_PATHS_DEFAULT
       @rootfs = Rootfs.new(nil)
+      @use_legacy_chroot = false
     end
     attr_accessor :mount_points,
                   :independent_mount_points,
                   :masked_paths,
-                  :rootfs
+                  :rootfs,
+                  :use_legacy_chroot
 
     FS_TO_MOUNT = {
       "procfs" => ["proc", "proc", "/proc"],
@@ -845,8 +1007,17 @@ module Haconiwa
       "shm"    => ["tmpfs", "tmpfs", "/dev/shm"],
     }
 
+    def no_special_config?
+      @mount_points.empty?
+    end
+
     def chroot
       self.rootfs.root
+    end
+    alias root_path chroot
+
+    def external_mount_points
+      @mount_points.select{|mp| mp.criu_ext_key }
     end
 
     def mount_independent(fs)
@@ -896,7 +1067,11 @@ module Haconiwa
     end
 
     def veth_guest
-      @veth_guest ||= ::SHA1.sha1_hex(self.namespace)[0, 8] + '_g'
+      @veth_guest ||= "veth0"
+    end
+
+    def container_ip_with_netmask
+      "#{container_ip}/#{netmask}"
     end
 
     private
@@ -911,9 +1086,10 @@ module Haconiwa
       @dest = options.delete(:to)
       @dest = @dest.to_s if @dest
       @fs = options.delete(:fs)
+      @criu_ext_key = options.delete(:criu_ext_key)
       @options = options
     end
-    attr_accessor :src, :dest, :fs, :options
+    attr_accessor :src, :dest, :fs, :criu_ext_key, :options
 
     def normalized_src(cwd="/")
       if @src.start_with?('/')
@@ -925,6 +1101,40 @@ module Haconiwa
         fullpath = ExpandPath.expand [cwd, @src].join("/")
         File.exist?(fullpath) ? fullpath : @src
       end
+    end
+
+    def chrooted_dest(newroot)
+      @dest.sub(/^#{newroot}/, "")
+    end
+  end
+
+  class Checkpoint
+    def initialize
+      @target_syscall = nil
+      @images_dir = "/var/run/haconiwa/checkpoint"
+      @log_level = 1
+      @criu_log_file = "-"
+      @criu_service_address = "/var/run/criu_service.socket"
+      @criu_bin_path = "/usr/local/sbin/criu"
+
+      @extra_criu_options = []
+      @extra_criu_externals = []
+    end
+    attr_accessor :target_syscall, :images_dir, :log_level,
+                  :criu_log_file, :criu_service_address, :criu_bin_path,
+                  :extra_criu_options, :extra_criu_externals
+
+    def target_syscall(*args)
+      if args.size == 0
+        return @target_syscall
+      else
+        @target_syscall = args
+      end
+    end
+
+    def dump(base, opt={})
+      service = CRIUService::DumpViaAPI.new(base)
+      service.dump(opt[:pid] || base.pid)
     end
   end
 

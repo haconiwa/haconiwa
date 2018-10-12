@@ -1,0 +1,94 @@
+# -*- mode: ruby -*-
+suffix = ENV['SUFFIX']
+Haconiwa.define do |config|
+  config.name = "chroot-rails001-#{suffix}" # to be hostname
+  config.init_command = %w(/u/app/helloworld/bin/rails server)
+  # config.acts_as_session_leader
+  config.daemonize!
+
+  root = Pathname.new("/var/lib/haconiwa/rails-sample")
+  config.chroot_to root
+  config.workdir = "/u/app/helloworld"
+  config.environ = {
+    "PATH" => "/usr/local/bundle/bin:/usr/local/bundle/gems/bin:#{ENV['PATH']}",
+    "DATABASE_URL" => "sqlite3:///tmp/helloworld.sqlite",
+    "RAILS_ENV" => "production",
+    "BUNDLE_PATH" => "/usr/local/bundle",
+    "BUNDLE_APP_CONFIG" => "/usr/local/bundle"
+  }
+
+  system "mkdir -p /tmp/criu/images.rails"
+
+  # TODO: activate checkpoint by syscall
+  # ... or specify timing?
+  config.checkpoint do |checkpoint|
+    checkpoint.target_syscall :listen, 0
+    checkpoint.images_dir    = "/tmp/criu/images.rails"
+    checkpoint.log_level     = 3
+    checkpoint.criu_log_file = "-"
+    checkpoint.criu_service_address = "/var/run/criu_service.socket"
+  end
+
+  config.network.namespace = config.name
+  if ENV['RESTORED_IP']
+    config.network.container_ip = ENV['RESTORED_IP']
+  else
+    config.network.container_ip = "10.0.0.3"
+  end
+  config.network.veth_host = ::SHA1.sha1_hex(config.name + config.network.container_ip)[0, 8] + '_h'
+
+  if ::Haconiwa.current_subcommand != "_restored"
+    config.add_async_hook msec: 2500 do |base|
+      begin
+        base.checkpoint.dump base
+      rescue => e
+        Haconiwa::Logger.puts "CRIU[hook]: dump failed: #{e.class}, #{e.message}"
+        ::Process.kill :TERM, base.pid
+      else
+        Haconiwa::Logger.puts "CRIU[hook]: dump OK!!"
+      end
+    end
+  else
+    config.add_async_hook msec: 2500, interval_msec: 2500 do |base|
+      Haconiwa::Logger.puts "This is a restored process and hooks are available! PID=#{base.pid}"
+    end
+
+    config.add_async_hook sec: 90 do |base|
+      Haconiwa::Logger.puts "I am a fastcontainer!!! Bye bye world"
+      ::Process.kill :TERM, base.pid
+    end
+  end
+
+  config.add_general_hook :before_restore do |base|
+    Haconiwa::Logger.info "Now in :before_restore!"
+  end
+
+  config.add_general_hook :after_restore do |base|
+    Haconiwa::Logger.info "Now in :after_restore! PID=#{base.pid}"
+  end
+
+  config.mount_independent "procfs"
+  config.mount_independent "devtmpfs"
+  config.mount_independent "sysfs"
+  config.mount_independent "devpts"
+  config.mount_independent "shm"
+  config.add_mount_point "/home/vagrant", to: root.join("home/test-account"),
+                         criu_ext_key: "my-homedir-1"
+
+  config.namespace.unshare "mount"
+  config.namespace.unshare "uts"
+  config.namespace.unshare "ipc"
+  config.namespace.unshare "pid" # also network is unshared
+
+  config.cgroup(:v1) do |cgroup|
+    cgroup["cpu.cfs_period_us"] = 10000
+    cgroup["cpu.cfs_quota_us"]  =  7000
+    cgroup["pids.max"] = 256
+  end
+
+  config.capabilities.reset_to_privileged!
+
+  if ENV['USE_LEGACY_CHROOT']
+    config.filesystem.use_legacy_chroot = true
+  end
+end

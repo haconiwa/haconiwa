@@ -114,6 +114,38 @@ module Haconiwa
       base.attach(*exe)
     end
 
+    def self.checkpoint(args)
+      opt = parse_opts(args, 'HACO_FILE') do |o|
+        o.literal('R', 'running', "Create checkpoint of running container. Detect container's PID via hacofile(in case without --target)")
+        o.integer('t', 'target', 'PID', "Container's *root* PID to make checkpoint. This implies --running")
+      end
+      target_pid = if opt['t'].exist?
+                     opt['t'].value
+                   elsif opt['R'].exist?
+                     0
+                   else
+                     nil
+                   end
+      get_base(opt.catchall.values).do_checkpoint(target_pid)
+    end
+
+    def self.restore(args)
+      opt = parse_opts(args, 'HACO_FILE') do |o|
+        o.literal('D', 'daemon', "Force the container to be daemon")
+        o.literal('T', 'no-daemon', "Force the container not to be daemon, stuck in tty")
+      end
+      base = get_base(opt.catchall.values)
+      base.daemonize! if opt['D'].exist?
+      base.cancel_daemonize! if opt['T'].exist?
+      base.restore
+    end
+
+    def self._restored(args)
+      base, init = get_script_and_eval([args[1]])
+      base.cancel_daemonize!
+      base._restored(args[2])
+    end
+
     def self.reload(args)
       opt = parse_opts(args, '[HACO_FILE]', ignore_catchall: lambda {|o| o['t'].exist? } ) do |o|
         o.integer('t', 'target', 'PPID', "Container's supervisor PID to invoke reload")

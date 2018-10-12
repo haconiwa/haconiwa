@@ -1,5 +1,10 @@
-latest: 0.9.3
+latest: 0.9.4
 changelog:
+  - version: 0.9.4
+    messages:
+      - Backport some of 0.10 features
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Fri, 12 Oct 2018 12:05:29 +0900
   - version: 0.9.3
     messages:
       - Support masking of sensitive files and dirs

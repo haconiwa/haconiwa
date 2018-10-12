@@ -1,6 +1,6 @@
 Name: haconiwa
 Epoch: 1
-Version: 0.9.3
+Version: 0.9.4
 Release: 1
 Summary: MRuby on Container
 License: GPLv3+
@@ -49,6 +49,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Fri Oct 12 2018 Uchio Kondo <udzura@udzura.jp> - 1:0.9.4-1
+- Backport some of 0.10 features
+
 * Thu Oct  4 2018 Uchio Kondo <udzura@udzura.jp> - 1:0.9.3-1
 - Support masking of sensitive files and dirs
 
@@ -63,6 +66,3 @@ fi
 
 * Wed Dec 20 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.8.9-1
 - Support network configuration DSL
-
-* Tue Dec  5 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.8.8-1
-- Support lxcfs API endpoint
