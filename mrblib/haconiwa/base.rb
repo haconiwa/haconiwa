@@ -605,11 +605,9 @@ module Haconiwa
       DEVNULL = "/dev/null"
 
       # TODO: support options other than file:
-      # XXX: Following 0.9 behavior, file: option is handled as host_file:
-      # re-revert here to release 0.10.0
       def initialize(options={})
-        # @file = options[:file]
-        @host_file = options[:file] || options[:host_file]
+        @file = options[:file]
+        @host_file = options[:host_file]
       end
       attr_accessor :file, :host_file
 
