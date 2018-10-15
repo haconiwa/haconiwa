@@ -111,4 +111,6 @@ module Colored
   end
 end unless Object.const_defined? :Colored
 
-String.send(:include, Colored)
+class String
+  include Colored
+end

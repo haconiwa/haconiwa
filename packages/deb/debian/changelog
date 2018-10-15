@@ -1,8 +1,20 @@
-haconiwa (0.10.0~alpha3-1) unstable; urgency=medium
+haconiwa (0.9.4-1) unstable; urgency=medium
 
-  * Alpha release of criu-included one
+  * Backport some of 0.10 features
 
- -- Uchio Kondo <udzura@udzura.jp>  Wed, 10 Oct 2018 12:07:17 +0900
+ -- Uchio Kondo <udzura@udzura.jp>  Fri, 12 Oct 2018 12:05:29 +0900
+
+haconiwa (0.9.3-1) unstable; urgency=medium
+
+  * Support masking of sensitive files and dirs
+
+ -- Uchio Kondo <udzura@udzura.jp>  Thu,  4 Oct 2018 14:18:04 +0900
+
+haconiwa (0.9.2-1) unstable; urgency=medium
+
+  * Upgrade mruby version
+
+ -- Uchio Kondo <udzura@udzura.jp>  Wed,  8 Aug 2018 17:43:36 +0900
 
 haconiwa (0.9.1-1) unstable; urgency=medium
 
@@ -21,15 +33,3 @@ haconiwa (0.8.9-1) unstable; urgency=medium
   * Support network configuration DSL
 
  -- Uchio Kondo <udzura@udzura.jp>  Wed, 20 Dec 2017 16:33:53 +0900
-
-haconiwa (0.8.8-1) unstable; urgency=medium
-
-  * Support lxcfs API endpoint
-
- -- Uchio Kondo <udzura@udzura.jp>  Tue,  5 Dec 2017 19:13:46 +0900
-
-haconiwa (0.8.7-1) unstable; urgency=medium
-
-  * Support metadata / Prevent doubel startup - and now pid file contains supervisor pid
-
- -- Uchio Kondo <udzura@udzura.jp>  Tue, 27 Jun 2017 13:02:21 +0900

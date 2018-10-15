@@ -13,14 +13,15 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.add_dependency 'mruby-eval'      , :core => 'mruby-eval'
   spec.add_dependency 'mruby-random'    , :core => 'mruby-random'
   spec.add_dependency 'mruby-string-ext', :core => 'mruby-string-ext'
+  spec.add_dependency 'mruby-io'        , :core => 'mruby-io'
+  spec.add_dependency 'mruby-metaprog'  , :core => 'mruby-metaprog'
 
-  spec.add_dependency 'mruby-forwardable', :mgem => 'mruby-forwardable'
+  spec.add_dependency 'mruby-forwardable', :github => 'udzura/mruby-forwardable'
   spec.add_dependency 'mruby-shellwords', :mgem => 'mruby-shellwords'
   spec.add_dependency 'mruby-capability', :mgem => 'mruby-capability'
   spec.add_dependency 'mruby-cgroup'    , :mgem => 'mruby-cgroup'
   spec.add_dependency 'mruby-dir'       , :mgem => 'mruby-dir' # with Dir#chroot
   spec.add_dependency 'mruby-env'       , :mgem => 'mruby-env'
-  spec.add_dependency 'mruby-io'        , :mgem => 'mruby-io'
   spec.add_dependency 'mruby-linux-namespace', :mgem => 'mruby-linux-namespace'
   spec.add_dependency 'mruby-process'   , :github => 'iij/mruby-process'
   spec.add_dependency 'mruby-socket'    , :mgem => 'mruby-socket'
@@ -37,6 +38,7 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.add_dependency 'mruby-cgroupv2'  , :github => 'haconiwa/mruby-cgroupv2'
   spec.add_dependency 'mruby-lockfile', :github => 'udzura/mruby-lockfile'
   spec.add_dependency 'mruby-fibered_worker' , :github => 'udzura/mruby-fibered_worker'
+  spec.add_dependency 'mruby-eventfd' , :github => 'matsumotory/mruby-eventfd'
 
   spec.add_dependency 'mruby-syslog'    , :github => 'udzura/mruby-syslog'
   spec.add_dependency 'mruby-sha1', :github => 'mattn/mruby-sha1'

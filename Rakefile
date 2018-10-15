@@ -152,7 +152,7 @@ namespace :release do
   task :shipit => [:tarball, :run_ghr]
 
   desc "Build all of packages in parallel"
-  multitask :packages => [:deb, :deb9, :rpm]
+  multitask :packages => [:deb, :deb9, :bionic, :rpm]
 
   task :deb do
     Dir.chdir(pwd) { sh "docker-compose build deb && docker-compose run deb" }
@@ -162,6 +162,10 @@ namespace :release do
     Dir.chdir(pwd) { sh "docker-compose build deb9 && docker-compose run deb9" }
   end
 
+  task :bionic do
+    Dir.chdir(pwd) { sh "docker-compose build bionic && docker-compose run bionic" }
+  end
+
   task :rpm do
     Dir.chdir(pwd) { sh "docker-compose build rpm && docker-compose run rpm" }
   end
@@ -169,7 +173,7 @@ namespace :release do
   desc "release packages to packagecloud"
   task :packagecloud do
     Dir.chdir pwd do
-      sh "package_cloud push udzura/haconiwa/ubuntu/trusty pkg/haconiwa_#{Haconiwa::VERSION}-1_amd64.deb"
+      sh "package_cloud push udzura/haconiwa/ubuntu/bionic pkg/haconiwa_#{Haconiwa::VERSION}-1+bionic_amd64.deb"
       sh "package_cloud push udzura/haconiwa/ubuntu/xenial pkg/haconiwa_#{Haconiwa::VERSION}-1_amd64.deb"
       sh "package_cloud push udzura/haconiwa/debian/jessie pkg/haconiwa_#{Haconiwa::VERSION}-1_amd64.deb"
       sh "package_cloud push udzura/haconiwa/debian/stretch pkg/haconiwa_#{Haconiwa::VERSION}-1+debian9_amd64.deb"

@@ -65,7 +65,7 @@ module Haconiwa
 
     def boot!(r)
       self.root = r
-      self.project_name ||= File.basename(root.to_str)
+      self.project_name = File.basename(root.to_str) if !project_name
       if File.directory?(root.to_str)
         log("Directory #{root.to_str} already bootstrapped. Skip.")
         return true
@@ -107,9 +107,10 @@ module Haconiwa
           raise "debootstrap command may not be installed yet. Please install via your package manager."
         end
 
-        boot.arch ||= "amd64" # TODO: detection
-        boot.components ||= "main"
-        boot.mirror_url ||= "http://ftp.us.debian.org/debian/"
+        # TODO: detection
+        boot.arch = "amd64" unless boot.arch
+        boot.components = "main" unless boot.components
+        boot.mirror_url = "http://ftp.us.debian.org/debian/" unless boot.mirror_url
 
         cmd.run(Util.safe_shell_fmt(
                   "debootstrap --arch=%s --variant=%s --components=%s %s %s %s",
@@ -129,7 +130,7 @@ module Haconiwa
           raise "mmm... you seem not to have git."
         end
 
-        boot.git_options ||= []
+        boot.git_options = [] unless boot.git_options
 
         cmd.run(Util.safe_shell_fmt("git clone %s %s %s", boot.git_options.join(' '), boot.git_url, boot.root.to_str))
         boot.log("Success!")
@@ -142,7 +143,7 @@ module Haconiwa
         cmd = RunCmd.new("bootstrap.unarchive")
         boot.log("Extracting rootfs...")
 
-        boot.tar_options ||= []
+        boot.tar_options = [] unless boot.tar_options.is_a?(Array)
         boot.tar_options << "-x"
         boot.tar_options << detect_zip_type(boot.archive_path)
         boot.tar_options = boot.tar_options.compact.uniq

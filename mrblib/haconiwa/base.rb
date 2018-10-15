@@ -19,6 +19,7 @@ module Haconiwa
                   :checkpoint,
                   :general_hooks,
                   :async_hooks,
+                  :cgroup_hooks,
                   :wait_interval,
                   :environ,
                   :lxcfs_root,
@@ -78,6 +79,7 @@ module Haconiwa
       @checkpoint = Checkpoint.new
       @general_hooks = {}
       @async_hooks = []
+      @cgroup_hooks = []
       @wait_interval = 5
       @environ = {}
       @lxcfs_root = nil
@@ -155,6 +157,10 @@ module Haconiwa
 
     def rootfs
       filesystem.rootfs
+    end
+
+    def hashed_name
+      ::SHA1.sha1_hex(self.name)[0, 16]
     end
 
     def support_reload(*names)
@@ -237,6 +243,10 @@ module Haconiwa
       @async_hooks << WaitLoop::TimerHook.new(options, &hook)
     end
     alias after_spawn add_async_hook
+
+    def add_cgroup_hook(options={}, &hook)
+      @cgroup_hooks << WaitLoop::CGroupHook.new(options, &hook)
+    end
 
     def current_subcommand
       ::Haconiwa.current_subcommand
@@ -439,6 +449,7 @@ module Haconiwa
         :@checkpoint,
         :@general_hooks,
         :@async_hooks,
+        :@cgroup_hooks,
         :@wait_interval,
         :@environ,
         :@lxcfs_root,
@@ -496,7 +507,9 @@ module Haconiwa
     alias skip_provision skip_bootstrap
 
     def ppid
-      self.container_pid_file ||= default_container_pid_file
+      unless container_pid_file
+        self.container_pid_file = default_container_pid_file
+      end
       ::File.read(container_pid_file).to_i
     rescue => e
       STDERR.puts e
@@ -541,13 +554,17 @@ module Haconiwa
         Logger.puts "Bootstrapping rootfs on run..."
         create(options[:no_provision])
       end
-      self.container_pid_file ||= default_container_pid_file
+      unless container_pid_file
+        self.container_pid_file = default_container_pid_file
+      end
       LinuxRunner.new(self).run(options, init_command)
     end
     alias run start
 
     def attach(*run_command)
-      self.container_pid_file ||= default_container_pid_file
+      unless container_pid_file
+        self.container_pid_file = default_container_pid_file
+      end
       LinuxRunner.new(self).attach(run_command)
     end
 
@@ -560,7 +577,9 @@ module Haconiwa
     end
 
     def kill(signame, timeout)
-      self.container_pid_file ||= default_container_pid_file
+      unless container_pid_file
+        self.container_pid_file = default_container_pid_file
+      end
       LinuxRunner.new(self).kill(signame, timeout)
     end
   end
@@ -707,6 +726,7 @@ module Haconiwa
       cap_dac_override
       cap_fowner
       cap_fsetid
+      cap_net_bind_service
       cap_net_raw
       cap_setgid
       cap_setfcap
@@ -954,14 +974,28 @@ module Haconiwa
   end
 
   class Filesystem
+    MASKED_PATHS_DEFAULT = [
+      "/proc/acpi",
+      "/proc/kcore",
+      "/proc/keys",
+      "/proc/latency_stats",
+      "/proc/timer_list",
+      "/proc/timer_stats",
+      "/proc/sched_debug",
+      "/proc/scsi",
+      "/sys/firmware"
+    ]
+
     def initialize
       @mount_points = []
       @independent_mount_points = []
+      @masked_paths = MASKED_PATHS_DEFAULT
       @rootfs = Rootfs.new(nil)
       @use_legacy_chroot = false
     end
     attr_accessor :mount_points,
                   :independent_mount_points,
+                  :masked_paths,
                   :rootfs,
                   :use_legacy_chroot
 
@@ -996,6 +1030,10 @@ module Haconiwa
       end
 
       self.independent_mount_points << MountPoint.new(params[1], to: params[2], fs: params[0])
+    end
+
+    def add_masked_path(path)
+      @masked_paths << path
     end
   end
 

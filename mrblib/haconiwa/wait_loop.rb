@@ -9,13 +9,26 @@ module Haconiwa
     def register_hooks(base)
       base.async_hooks.each do |hook|
         hook.set_signal!
-        proc = hook.proc
+        blk = hook.proc
         @mainloop.register_timer(hook.signal, hook.timing, hook.interval) do
           ::Haconiwa::Logger.warning("Async hook starting...")
           begin
-            proc.call(base)
+            blk.call(base)
           rescue => e
             ::Haconiwa::Logger.warning("Async hook failed: #{e.class}, #{e.message}")
+          end
+        end
+      end
+
+      base.cgroup_hooks.each do |cghook|
+        cghook.register!(base)
+        blk = cghook.proc
+        @mainloop.register_fd(cghook.fileno) do |_dummy|
+          ::Haconiwa::Logger.warning("Cgroup hook[#{cghook.type}] starting...")
+          begin
+            blk.call(base)
+          rescue => e
+            ::Haconiwa::Logger.warning("Async hook[#{cghook.type}] failed: #{e.class}, #{e.message}")
           end
         end
       end
@@ -110,6 +123,47 @@ module Haconiwa
             TimerHook.signal_pool << @signal
           end
         end
+      end
+    end
+
+    class CGroupHook
+      VALID_TYPES = %w(memory_pressure oom).freeze
+
+      def initialize(opt={}, &b)
+        @type = opt[:type]
+        unless VALID_TYPES.include?(@type.to_s)
+          raise "Invalid hook type: #{@type}"
+        end
+        @level = opt[:level] || "critical"
+        @proc = b
+      end
+      attr_reader :type, :level, :proc
+
+      def register!(base)
+        make_eventfd
+        cfd = open_cgroup_file(base)
+        write_to_control(base, @efd.fd, cfd.fileno)
+        @efd
+      end
+
+      def fileno
+        @efd && @efd.fd
+      end
+      alias fd fileno
+
+      private
+      def make_eventfd
+        @efd = ::Eventfd.new(0, 0) # TODO: define Eventfd::EFD_NONBLOCK
+      end
+
+      def open_cgroup_file(base)
+        File.open("/sys/fs/cgroup/memory/#{base.name}/memory.pressure_level", "r")
+      end
+
+      def write_to_control(base, efd, cfd)
+        f = File.open("/sys/fs/cgroup/memory/#{base.name}/cgroup.event_control", "w")
+        f.write "#{efd} #{cfd} #{@level}"
+        f.close
       end
     end
   end
