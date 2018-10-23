@@ -16,7 +16,6 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.add_dependency 'mruby-io'        , :core => 'mruby-io'
   spec.add_dependency 'mruby-metaprog'  , :core => 'mruby-metaprog'
 
-  spec.add_dependency 'mruby-forwardable', :github => 'udzura/mruby-forwardable'
   spec.add_dependency 'mruby-shellwords', :mgem => 'mruby-shellwords'
   spec.add_dependency 'mruby-capability', :mgem => 'mruby-capability'
   spec.add_dependency 'mruby-cgroup'    , :mgem => 'mruby-cgroup'
