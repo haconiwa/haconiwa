@@ -14,7 +14,9 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.add_dependency 'mruby-random'    , :core => 'mruby-random'
   spec.add_dependency 'mruby-string-ext', :core => 'mruby-string-ext'
   spec.add_dependency 'mruby-io'        , :core => 'mruby-io'
-  spec.add_dependency 'mruby-metaprog'  , :core => 'mruby-metaprog'
+  if Dir.exist?(File.join(MRUBY_ROOT, "mrbgems", "mruby-metaprog"))
+    spec.add_dependency 'mruby-metaprog'  , :core => 'mruby-metaprog'
+  end
 
   spec.add_dependency 'mruby-shellwords', :mgem => 'mruby-shellwords'
   spec.add_dependency 'mruby-capability', :mgem => 'mruby-capability'
