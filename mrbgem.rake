@@ -57,7 +57,7 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   end
 
   def spec.save_dependent_mgem_revisions
-    file DEFS_FILE => (DEPENDENT_GEMS + "#{MRUBY_ROOT}/.git/packed-refs") do
+    file DEFS_FILE => (DEPENDENT_GEMS + ["#{MRUBY_ROOT}/.git/packed-refs"]) do
       f = open(DEFS_FILE, 'w')
       corerev = `git rev-parse HEAD`.chomp
       f.puts %Q<{"MRUBY_CORE_REVISION", "#{corerev}"},>
