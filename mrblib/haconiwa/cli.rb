@@ -29,7 +29,7 @@ module Haconiwa
         o.literal('N', 'no-provision', "Bootstrap but no provisioning")
       end
 
-      get_base(opt.catchall.values).create(opt['N'].exist?)
+      Util.get_base(opt.catchall.values).create(opt['N'].exist?)
     end
 
     def self.provision(args)
@@ -38,7 +38,7 @@ module Haconiwa
       end
 
       ops = opt['r'].exist? ? opt['r'].value.split(',') : []
-      get_base(opt.catchall.values).do_provision(ops)
+      Util.get_base(opt.catchall.values).do_provision(ops)
     end
 
     def self.archive(args)
@@ -60,7 +60,7 @@ module Haconiwa
         tar_options: (opt['O'].exist? ? opt['O'].value.split(',') : nil)
       }
 
-      get_base(opt.catchall.values).archive(parsed)
+      Util.get_base(opt.catchall.values).archive(parsed)
     end
 
     def self.run(args)
@@ -74,7 +74,7 @@ module Haconiwa
       end
       cli_options = {}
 
-      base, init = get_script_and_eval(opt.catchall.values)
+      base, init = Util.get_script_and_eval(opt.catchall.values)
       base.daemonize! if opt['D'].exist?
       base.cancel_daemonize! if opt['T'].exist?
 
@@ -94,7 +94,7 @@ module Haconiwa
         o.string('g', 'gid', 'GID_OR_NAME', "The GID to be set to attaching process")
       end
 
-      base, exe = get_script_and_eval(opt.catchall.values)
+      base, exe = Util.get_script_and_eval(opt.catchall.values)
 
       base.pid  = opt['t'].value if opt['t'].exist?
       base.name = opt['n'].value if opt['n'].exist?
@@ -126,7 +126,7 @@ module Haconiwa
                    else
                      nil
                    end
-      get_base(opt.catchall.values).do_checkpoint(target_pid)
+      Util.get_base(opt.catchall.values).do_checkpoint(target_pid)
     end
 
     def self.restore(args)
@@ -134,14 +134,14 @@ module Haconiwa
         o.literal('D', 'daemon', "Force the container to be daemon")
         o.literal('T', 'no-daemon', "Force the container not to be daemon, stuck in tty")
       end
-      base = get_base(opt.catchall.values)
+      base = Util.get_base(opt.catchall.values)
       base.daemonize! if opt['D'].exist?
       base.cancel_daemonize! if opt['T'].exist?
       base.restore
     end
 
     def self._restored(args)
-      base, init = get_script_and_eval([args[1]])
+      base, init = Util.get_script_and_eval([args[1]])
       base.cancel_daemonize!
       base._restored(args[2])
     end
@@ -154,7 +154,7 @@ module Haconiwa
 
       barn = nil
       if opt.catchall.exist?
-        barn = get_base(opt.catchall.values)
+        barn = Util.get_base(opt.catchall.values)
       end
 
       if opt['n'].exist?
@@ -180,7 +180,7 @@ module Haconiwa
         o.string('s', 'signal', 'SIGFOO', "Signal name. default to TERM")
       end
 
-      barn, _  = get_script_and_eval(opt.catchall.values)
+      barn, _  = Util.get_script_and_eval(opt.catchall.values)
       barn.pid = opt['t'].value if opt['t'].exist?
       signame  = opt['s'].exist? ? opt['s'].value : "TERM"
       timeout  = opt['T'].exist? ? opt['T'].value : 10
@@ -237,25 +237,6 @@ module Haconiwa
       end
 
       return opt
-    end
-
-    def self.get_base(args)
-      script = File.read(args[0])
-      obj = Kernel.eval(script)
-      obj.hacofile = (args[0][0] == '/') ? args[0] : ExpandPath.expand(args[0], Dir.pwd)
-      return obj
-    end
-
-    def self.get_script_and_eval(args)
-      script = File.read(args[0])
-      exe    = args[1..-1]
-      if exe.first == "--"
-        exe.shift
-      end
-      obj = Kernel.eval(script)
-      obj.hacofile = (args[0][0] == '/') ? args[0] : ExpandPath.expand(args[0], Dir.pwd)
-
-      return [obj, exe]
     end
   end
 end
