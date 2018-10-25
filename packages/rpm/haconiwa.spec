@@ -1,6 +1,6 @@
 Name: haconiwa
 Epoch: 1
-Version: 0.9.4
+Version: 0.9.5
 Release: 1
 Summary: MRuby on Container
 License: GPLv3+
@@ -49,6 +49,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Wed Oct 24 2018 Uchio Kondo <udzura@udzura.jp> - 1:0.9.5-1
+- Fix blocking in evaluating a hacofile including some literals
+
 * Fri Oct 12 2018 Uchio Kondo <udzura@udzura.jp> - 1:0.9.4-1
 - Backport some of 0.10 features
 
@@ -63,6 +66,3 @@ fi
 
 * Thu Apr 12 2018 Uchio Kondo <udzura@udzura.jp> - 1:0.9.0-1
 - Change mruby version to current master, drop dependencies to mruby-thread
-
-* Wed Dec 20 2017 Uchio Kondo <udzura@udzura.jp> - 1:0.8.9-1
-- Support network configuration DSL

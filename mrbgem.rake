@@ -14,9 +14,10 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.add_dependency 'mruby-random'    , :core => 'mruby-random'
   spec.add_dependency 'mruby-string-ext', :core => 'mruby-string-ext'
   spec.add_dependency 'mruby-io'        , :core => 'mruby-io'
-  spec.add_dependency 'mruby-metaprog'  , :core => 'mruby-metaprog'
+  if Dir.exist?(File.join(MRUBY_ROOT, "mrbgems", "mruby-metaprog"))
+    spec.add_dependency 'mruby-metaprog'  , :core => 'mruby-metaprog'
+  end
 
-  spec.add_dependency 'mruby-forwardable', :github => 'udzura/mruby-forwardable'
   spec.add_dependency 'mruby-shellwords', :mgem => 'mruby-shellwords'
   spec.add_dependency 'mruby-capability', :mgem => 'mruby-capability'
   spec.add_dependency 'mruby-cgroup'    , :mgem => 'mruby-cgroup'
@@ -25,6 +26,7 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.add_dependency 'mruby-linux-namespace', :mgem => 'mruby-linux-namespace'
   spec.add_dependency 'mruby-process'   , :github => 'iij/mruby-process'
   spec.add_dependency 'mruby-socket'    , :mgem => 'mruby-socket'
+  spec.add_dependency 'mruby-forwardable', :mgem => 'mruby-forwardable'
   spec.add_dependency 'mruby-seccomp'   , :github => 'chikuwait/mruby-seccomp'
   spec.add_dependency 'mruby-apparmor'  , :github => 'haconiwa/mruby-apparmor'
 
@@ -55,7 +57,7 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   end
 
   def spec.save_dependent_mgem_revisions
-    file DEFS_FILE => DEPENDENT_GEMS do
+    file DEFS_FILE => (DEPENDENT_GEMS + ["#{MRUBY_ROOT}/.git/packed-refs"]) do
       f = open(DEFS_FILE, 'w')
       corerev = `git rev-parse HEAD`.chomp
       f.puts %Q<{"MRUBY_CORE_REVISION", "#{corerev}"},>

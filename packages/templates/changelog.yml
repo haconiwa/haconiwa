@@ -1,5 +1,10 @@
-latest: 0.9.4
+latest: 0.9.5
 changelog:
+  - version: 0.9.5
+    messages:
+      - Fix blocking in evaluating a hacofile including some literals
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Wed, 24 Oct 2018 19:46:40 +0900
   - version: 0.9.4
     messages:
       - Backport some of 0.10 features

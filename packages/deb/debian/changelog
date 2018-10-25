@@ -1,3 +1,9 @@
+haconiwa (0.9.5-1) unstable; urgency=medium
+
+  * Fix blocking in evaluating a hacofile including some literals
+
+ -- Uchio Kondo <udzura@udzura.jp>  Wed, 24 Oct 2018 19:46:40 +0900
+
 haconiwa (0.9.4-1) unstable; urgency=medium
 
   * Backport some of 0.10 features
@@ -27,9 +33,3 @@ haconiwa (0.9.0-1) unstable; urgency=medium
   * Change mruby version to current master, drop dependencies to mruby-thread
 
  -- Uchio Kondo <udzura@udzura.jp>  Thu, 12 Apr 2018 19:23:18 +0900
-
-haconiwa (0.8.9-1) unstable; urgency=medium
-
-  * Support network configuration DSL
-
- -- Uchio Kondo <udzura@udzura.jp>  Wed, 20 Dec 2017 16:33:53 +0900
