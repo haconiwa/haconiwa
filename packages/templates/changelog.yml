@@ -1,5 +1,10 @@
-latest: 0.9.5
+latest: 0.10.0~alpha4
 changelog:
+  - version: 0.10.0~alpha4
+    messages:
+      - Alpha release of criu-included one
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Thu, 25 Oct 2018 17:58:04 +0900
   - version: 0.9.5
     messages:
       - Fix blocking in evaluating a hacofile including some literals
