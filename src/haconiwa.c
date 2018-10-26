@@ -49,6 +49,7 @@ int pivot_root(const char *new_root, const char *put_old){
     char buf2[2048];                                                    \
     if (strerror_r(errno_old, buf1, 1024) < 0) mrb_sys_fail(mrb, "invalid errno"); \
     if (snprintf(buf2, 2048, "%s - %s", msg, buf1) < 0) mrb_sys_fail(mrb, "failed to construct message"); \
+    syslog(LOG_ERR, buf2);                                              \
     mrb_sys_fail(mrb, buf2);                                            \
     errno = errno_old;                                                  \
   } while (0)
