@@ -55,7 +55,7 @@ int pivot_root(const char *new_root, const char *put_old){
 
 /* This function is written after lxc/conf.c
    https://github.com/lxc/lxc/blob/3695b24384b71662a1225f6cc25f702667fbbe38/src/lxc/conf.c#L1495 */
-static int haconiwa_pivot_root(const char *rootfs)
+static int haconiwa_pivot_root(mrb_state *mrb, const char *rootfs)
 {
   int oldroot;
   int newroot = -1, ret = -1;
