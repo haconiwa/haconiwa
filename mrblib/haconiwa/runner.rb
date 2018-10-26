@@ -660,10 +660,7 @@ module Haconiwa
         if base.filesystem.use_legacy_chroot
           Dir.chroot base.filesystem.chroot
         else
-          Dir.mkdir("#{base.filesystem.root_path}/.gc") rescue nil
           Haconiwa.pivot_root_to base.filesystem.root_path
-          Dir.rmdir "/.gc"
-
           Dir.chdir base.workdir
         end
       else
