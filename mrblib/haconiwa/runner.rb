@@ -659,6 +659,7 @@ module Haconiwa
       if base.filesystem.chroot
         if base.filesystem.use_legacy_chroot
           Dir.chroot base.filesystem.chroot
+          Dir.chdir base.workdir
         else
           Haconiwa.pivot_root_to base.filesystem.root_path
           Dir.chdir base.workdir
