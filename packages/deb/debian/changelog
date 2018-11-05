@@ -1,3 +1,9 @@
+haconiwa (0.9.6-1) unstable; urgency=medium
+
+  * Fix missing chdir after chroot when using use_legacy_chroot
+
+ -- Uchio Kondo <udzura@udzura.jp>  Mon,  5 Nov 2018 17:54:35 +0900
+
 haconiwa (0.9.5-1) unstable; urgency=medium
 
   * Fix blocking in evaluating a hacofile including some literals
@@ -27,9 +33,3 @@ haconiwa (0.9.1-1) unstable; urgency=medium
   * Apply some enhancements to reduce memory consumption
 
  -- Uchio Kondo <udzura@udzura.jp>  Mon, 16 Apr 2018 19:19:52 +0900
-
-haconiwa (0.9.0-1) unstable; urgency=medium
-
-  * Change mruby version to current master, drop dependencies to mruby-thread
-
- -- Uchio Kondo <udzura@udzura.jp>  Thu, 12 Apr 2018 19:23:18 +0900

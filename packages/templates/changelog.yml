@@ -1,5 +1,10 @@
-latest: 0.9.5
+latest: 0.9.6
 changelog:
+  - version: 0.9.6
+    messages:
+      - Fix missing chdir after chroot when using use_legacy_chroot
+    author: Uchio Kondo <udzura@udzura.jp>
+    date: Mon,  5 Nov 2018 17:54:35 +0900
   - version: 0.9.5
     messages:
       - Fix blocking in evaluating a hacofile including some literals

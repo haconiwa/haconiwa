@@ -1,6 +1,6 @@
 Name: haconiwa
 Epoch: 1
-Version: 0.9.5
+Version: 0.9.6
 Release: 1
 Summary: MRuby on Container
 License: GPLv3+
@@ -49,6 +49,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Mon Nov  5 2018 Uchio Kondo <udzura@udzura.jp> - 1:0.9.6-1
+- Fix missing chdir after chroot when using use_legacy_chroot
+
 * Wed Oct 24 2018 Uchio Kondo <udzura@udzura.jp> - 1:0.9.5-1
 - Fix blocking in evaluating a hacofile including some literals
 
@@ -63,6 +66,3 @@ fi
 
 * Mon Apr 16 2018 Uchio Kondo <udzura@udzura.jp> - 1:0.9.1-1
 - Apply some enhancements to reduce memory consumption
-
-* Thu Apr 12 2018 Uchio Kondo <udzura@udzura.jp> - 1:0.9.0-1
-- Change mruby version to current master, drop dependencies to mruby-thread
