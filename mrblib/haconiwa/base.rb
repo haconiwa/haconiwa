@@ -33,6 +33,7 @@ module Haconiwa
                   :hacofile,
                   :metadata,
                   :reloadable_attr,
+                  :run_as_restore,
                   :exit_status
 
     alias apparmor_profile= apparmor=
@@ -95,6 +96,7 @@ module Haconiwa
       @bootstrap = @provision = nil
       @project_name = nil
       @metadata = {}
+      @run_as_restore = false
 
       @waitloop = WaitLoop.new
 
@@ -315,6 +317,10 @@ module Haconiwa
     end
 
     def start(options, *init_command)
+      if self.run_as_restore
+        return self.restore()
+      end
+
       targets = containers_real_run
       LinuxRunner.new(self).waitall do |_w|
         targets.map do |c|
@@ -461,6 +467,7 @@ module Haconiwa
         :@bootstrap,
         :@provision,
         :@metadata,
+        :@run_as_restore,
         :@reloadable_attr,
       ].each do |varname|
         value = barn.instance_variable_get(varname)
