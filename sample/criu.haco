@@ -33,4 +33,9 @@ Haconiwa.define do |config|
   config.mount_independent "procfs"
   config.mount_independent "devtmpfs"
   config.capabilities.reset_to_privileged!
+
+  if File.exist? "/tmp/criu/images/core-1.img"
+    Haconiwa::Logger.info "Going to run in restore mode"
+    config.run_as_restore = true
+  end
 end

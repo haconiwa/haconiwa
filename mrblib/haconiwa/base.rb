@@ -317,6 +317,10 @@ module Haconiwa
     end
 
     def start(options, *init_command)
+      if self.run_as_restore
+        return self.restore()
+      end
+
       targets = containers_real_run
       LinuxRunner.new(self).waitall do |_w|
         targets.map do |c|
