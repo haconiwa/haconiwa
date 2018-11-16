@@ -1,8 +1,8 @@
-haconiwa (0.10.0~alpha4-1) unstable; urgency=medium
+haconiwa (0.10.0~alpha5-1) unstable; urgency=medium
 
   * Alpha release of criu-included one
 
- -- Uchio Kondo <udzura@udzura.jp>  Thu, 25 Oct 2018 17:58:04 +0900
+ -- Uchio Kondo <udzura@udzura.jp>  Fri, 16 Nov 2018 17:59:36 +0900
 
 haconiwa (0.9.5-1) unstable; urgency=medium
 
