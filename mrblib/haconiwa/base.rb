@@ -1111,7 +1111,7 @@ module Haconiwa
     end
 
     def chrooted_dest(newroot)
-      @dest.sub(/^#{newroot}/, "")
+      @dest.sub(/^#{newroot.to_s}/, "")
     end
   end
 
