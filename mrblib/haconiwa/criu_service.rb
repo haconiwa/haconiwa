@@ -64,7 +64,7 @@ module Haconiwa
         unless @base.filesystem.mount_points.empty?
           c.add_external "mnt[]:"
           @base.filesystem.external_mount_points.each do |mp|
-            c.add_external "mnt[#{mp.chrooted_dest(@base.root_path)}]:#{mp.criu_ext_key}"
+            c.add_external "mnt[#{mp.chrooted_dest(@base.filesystem.root_path)}]:#{mp.criu_ext_key}"
           end
         end
 
