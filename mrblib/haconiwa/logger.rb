@@ -12,7 +12,7 @@ module Haconiwa
         Syslog.close
       end
       Syslog.open("haconiwa.#{base.name}")
-      @log_level = base.log_level
+      @log_level = [base.log_level, ERROR].min
     end
 
     # Calling this will stop haconiwa process
