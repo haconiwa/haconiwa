@@ -713,21 +713,6 @@ module Haconiwa
     rescue RuntimeError
       false
     end
-
-    def confirm_existence_pid_file(pid_file)
-      if File.exist? pid_file
-        if process_exists?(File.read(pid_file).to_i)
-          raise "PID file #{pid_file} exists. You may be creating the container with existing name #{@base.name}!"
-        else
-          begin
-            File.unlink(pid_file)
-            Logger.debug("Since the process does not exist, delete the PID file #{pid_file}")
-          rescue => e
-            raise "Failed to delete PID file #{pid_file}. (Original message: #{e.message})"
-          end
-        end
-      end
-    end
   end
 
   class LinuxRunner < Runner
