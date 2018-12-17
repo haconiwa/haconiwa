@@ -1,6 +1,7 @@
 assert("Haconiwa::LinuxRunner#confirm_existence_pid_file") do
   begin
     barn = Haconiwa::Barn.new
+    Haconiwa::Logger.setup(barn)
     base = Haconiwa::Base.new(barn)
     runner = Haconiwa::LinuxRunner.new(base)
 
