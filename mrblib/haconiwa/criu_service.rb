@@ -130,6 +130,7 @@ module Haconiwa
 
         ENV['HACONIWA_NEW_IP'] = nw.container_ip_with_netmask
         ENV['HACONIWA_CONTAINER_NICNAME'] = nw.veth_guest # To pass target NIC name
+        ENV['HACONIWA_CONTAINER_DEFAULT_GW'] = nw.bridge_ip
         ENV['HACONIWA_RUN_AS_CRIU_ACTION_SCRIPT'] = "true"
       end
 
