@@ -12,10 +12,12 @@ module Haconiwa
       end
 
       def set_default_instance!(logger)
+        old = @instance
         @instance = logger
+        return old
       end
 
-      %(exception err warning notice info puts debug).each do |meth|
+      %w(setup exception err warning notice info puts debug).each do |meth|
         define_method(meth) do |*arg|
           instance.__send__(meth, *arg)
         end
@@ -24,6 +26,9 @@ module Haconiwa
 
     class SyslogLogger
       def initialize
+        if Syslog.opened?
+          Syslog.close
+        end
         Syslog.open("haconiwa")
         @log_level = INFO
       end
@@ -37,7 +42,7 @@ module Haconiwa
           Syslog.close
         end
         Syslog.open("haconiwa.#{name}")
-        @log_level = [log_level, ERROR].min
+        @log_level = [level, ERROR].min
       end
 
       # Calling this will stop haconiwa process

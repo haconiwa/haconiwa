@@ -4,7 +4,7 @@ module Haconiwa
       return 0
     end
     log_level = ( ENV['DEBUG'] || ENV['VERBOSE'] ) ? Haconiwa::Logger::DEBUG : Haconiwa::Logger::INFO
-    ::Syslog._setup("haconiwa.action-script", log_level)
+    Haconiwa::Logger.instance._setup("haconiwa.action-script", log_level)
 
     dev_name_line = `nsenter --net -t #{ENV['CRTOOLS_INIT_PID']} ip addr show`.lines.
                       select {|l| l =~ /^[0-9]+:/ }.
