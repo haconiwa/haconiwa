@@ -627,16 +627,16 @@ module Haconiwa
 
       def to_io
         if !target_file
-          return File.open(DEVNULL, 'a')
+          return File.open(DEVNULL, 'w')
         end
-        File.open(target_file, 'a+')
+        File.open(target_file, 'a')
       end
 
       def to_io_readonly
         if !target_file
           return File.open(DEVNULL, 'r')
         end
-        File.open(target_file, 'r+')
+        File.open(target_file, 'r')
       end
     end
 
