@@ -34,7 +34,8 @@ module Haconiwa
                   :metadata,
                   :reloadable_attr,
                   :run_as_restore,
-                  :exit_status
+                  :exit_status,
+                  :log_level
 
     alias apparmor_profile= apparmor=
 
@@ -101,6 +102,7 @@ module Haconiwa
       @waitloop = WaitLoop.new
 
       @containers = []
+      @log_level = Logger::INFO
     end
     attr_accessor :system_exception, :rid_validator, :project_name
     attr_reader :containers, :waitloop
@@ -469,6 +471,7 @@ module Haconiwa
         :@metadata,
         :@run_as_restore,
         :@reloadable_attr,
+        :@log_level,
       ].each do |varname|
         value = barn.instance_variable_get(varname)
         case value

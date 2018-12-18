@@ -659,11 +659,9 @@ module Haconiwa
       if base.filesystem.chroot
         if base.filesystem.use_legacy_chroot
           Dir.chroot base.filesystem.chroot
+          Dir.chdir base.workdir
         else
-          Dir.mkdir("#{base.filesystem.root_path}/.gc") rescue nil
           Haconiwa.pivot_root_to base.filesystem.root_path
-          Dir.rmdir "/.gc"
-
           Dir.chdir base.workdir
         end
       else
@@ -714,21 +712,6 @@ module Haconiwa
       ::Process.kill(0, pid)
     rescue RuntimeError
       false
-    end
-
-    def confirm_existence_pid_file(pid_file)
-      if File.exist? pid_file
-        if process_exists?(File.read(pid_file).to_i)
-          raise "PID file #{pid_file} exists. You may be creating the container with existing name #{@base.name}!"
-        else
-          begin
-            File.unlink(pid_file)
-            Logger.debug("Since the process does not exist, delete the PID file #{pid_file}")
-          rescue
-            raise "Failed to delete PID file #{pid_file}."
-          end
-        end
-      end
     end
   end
 
