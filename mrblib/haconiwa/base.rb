@@ -418,12 +418,12 @@ module Haconiwa
         raise "[BUG] Checkpoint now does not support multiple containers"
       end
 
-      self.container_pid_file ||= default_container_pid_file
+      target.container_pid_file ||= default_container_pid_file
       pid = File.open(pidfile_path, 'r').read.to_i
-      self.pid = pid
+      target.pid = pid
       File.unlink(pidfile_path)
 
-      CRIURestoredRunner.new(self).run({restored_pid: pid}, nil)
+      CRIURestoredRunner.new(target).run({restored_pid: pid}, nil)
       Haconiwa::Logger.puts("Restored process exited")
     rescue => e
       Haconiwa::Logger.warning("Something is wrong on re-supervise process(This is haconiwa's bug, not image's)")
