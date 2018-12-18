@@ -52,6 +52,9 @@ fi
 * Fri Nov 16 2018 Uchio Kondo <udzura@udzura.jp> - 1:0.10.0~alpha5-1
 - Alpha release of criu-included one
 
+* Mon Nov  5 2018 Uchio Kondo <udzura@udzura.jp> - 1:0.9.6-1
+- Fix missing chdir after chroot when using use_legacy_chroot
+
 * Wed Oct 24 2018 Uchio Kondo <udzura@udzura.jp> - 1:0.9.5-1
 - Fix blocking in evaluating a hacofile including some literals
 
@@ -63,6 +66,3 @@ fi
 
 * Wed Aug  8 2018 Uchio Kondo <udzura@udzura.jp> - 1:0.9.2-1
 - Upgrade mruby version
-
-* Mon Apr 16 2018 Uchio Kondo <udzura@udzura.jp> - 1:0.9.1-1
-- Apply some enhancements to reduce memory consumption
