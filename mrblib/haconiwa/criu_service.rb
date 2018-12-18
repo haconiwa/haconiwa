@@ -109,6 +109,12 @@ module Haconiwa
     end
 
     def restore
+      # Force resetting PATH for super-clean environment
+      # to use some command tools like iptables-restore in action sctipt
+      if !ENV['PATH'] || ENV['PATH'] == ""
+        ENV['PATH'] = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+      end
+
       # TODO: embed criu(crtools) to haconiwa...
       # Hooks won't work
       pidfile = "/tmp/.__cr_#{@base.name}_#{UUID.secure_uuid("%04x%04x")}.pid"
