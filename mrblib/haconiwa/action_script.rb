@@ -19,6 +19,10 @@ module Haconiwa
     new_ip = ENV['HACONIWA_NEW_IP']
     Haconiwa::Logger.debug "default ip = #{default_ip}, new ip = #{new_ip}"
 
+    if default_ip == new_ip
+      return 0 # Skipping recreate network
+    end
+
     [
       "nsenter --net -t #{ENV['CRTOOLS_INIT_PID']} ip addr del #{default_ip} dev #{dev_name}",
       "nsenter --net -t #{ENV['CRTOOLS_INIT_PID']} ip addr add #{new_ip} dev #{dev_name}"
