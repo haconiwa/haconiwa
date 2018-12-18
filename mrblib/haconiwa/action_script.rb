@@ -26,8 +26,8 @@ module Haconiwa
 
     [
       "nsenter --net -t #{ENV['CRTOOLS_INIT_PID']} ip addr del #{default_ip} dev #{dev_name}",
-      "nsenter --net -t #{ENV['CRTOOLS_INIT_PID']} ip addr add #{new_ip} dev #{dev_name}"
-      "nsenter --net -t #{ENV['CRTOOLS_INIT_PID']} ip route add default via #{default_gw_ip}"
+      "nsenter --net -t #{ENV['CRTOOLS_INIT_PID']} ip addr add #{new_ip} dev #{dev_name}",
+      "nsenter --net -t #{ENV['CRTOOLS_INIT_PID']} ip route add default via #{default_gw_ip}",
     ].each do |cmd|
       unless system(cmd)
         Haconiwa::Logger.exception "IP assign failed: cmd=#{cmd}"
