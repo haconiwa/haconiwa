@@ -60,6 +60,7 @@ module Haconiwa
         c.set_service_address @base.checkpoint.criu_service_address
         c.set_log_file @base.checkpoint.criu_log_file
         c.set_shell_job true
+        c.set_tcp_established @base.checkpoint.criu_use_tcp_established
 
         unless @base.filesystem.mount_points.empty?
           c.add_external "mnt[]:"
@@ -138,6 +139,10 @@ module Haconiwa
         ENV['HACONIWA_CONTAINER_NICNAME'] = nw.veth_guest # To pass target NIC name
         ENV['HACONIWA_CONTAINER_DEFAULT_GW'] = nw.bridge_ip
         ENV['HACONIWA_RUN_AS_CRIU_ACTION_SCRIPT'] = "true"
+      end
+
+      if @base.checkpoint.criu_use_tcp_established
+        cmds.options.concat ["--tcp-established"]
       end
 
       unless @base.filesystem.mount_points.empty?
