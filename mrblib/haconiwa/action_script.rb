@@ -1,6 +1,6 @@
 module Haconiwa
   def self.run_as_criu_action_script
-    if ENV['CRTOOLS_SCRIPT_ACTION'] != "post-setup-namespaces"
+    if ENV['CRTOOLS_SCRIPT_ACTION'] != "post-restore"
       return 0
     end
     log_level = ( ENV['DEBUG'] || ENV['VERBOSE'] ) ? Haconiwa::Logger::DEBUG : Haconiwa::Logger::INFO
