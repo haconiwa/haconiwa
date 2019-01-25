@@ -60,11 +60,12 @@ module Haconiwa
         c.set_service_address @base.checkpoint.criu_service_address
         c.set_log_file @base.checkpoint.criu_log_file
         c.set_shell_job true
+        c.set_tcp_established @base.checkpoint.criu_use_tcp_established
 
         unless @base.filesystem.mount_points.empty?
           c.add_external "mnt[]:"
           @base.filesystem.external_mount_points.each do |mp|
-            c.add_external "mnt[#{mp.dest}]:#{mp.criu_ext_key}"
+            c.add_external "mnt[#{mp.chrooted_dest(@base.filesystem.root_path)}]:#{mp.criu_ext_key}"
           end
         end
 
@@ -109,6 +110,12 @@ module Haconiwa
     end
 
     def restore
+      # Force resetting PATH for super-clean environment
+      # to use some command tools like iptables-restore in action sctipt
+      if !ENV['PATH'] || ENV['PATH'] == ""
+        ENV['PATH'] = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+      end
+
       # TODO: embed criu(crtools) to haconiwa...
       # Hooks won't work
       pidfile = "/tmp/.__cr_#{@base.name}_#{UUID.secure_uuid("%04x%04x")}.pid"
@@ -129,7 +136,13 @@ module Haconiwa
         cmds.externals << external_string
 
         ENV['HACONIWA_NEW_IP'] = nw.container_ip_with_netmask
+        ENV['HACONIWA_CONTAINER_NICNAME'] = nw.veth_guest # To pass target NIC name
+        ENV['HACONIWA_CONTAINER_DEFAULT_GW'] = nw.bridge_ip
         ENV['HACONIWA_RUN_AS_CRIU_ACTION_SCRIPT'] = "true"
+      end
+
+      if @base.checkpoint.criu_use_tcp_established
+        cmds.options.concat ["--tcp-established"]
       end
 
       unless @base.filesystem.mount_points.empty?

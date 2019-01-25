@@ -1,6 +1,6 @@
 Name: haconiwa
 Epoch: 1
-Version: 0.9.6
+Version: 0.10.0~alpha5
 Release: 1
 Summary: MRuby on Container
 License: GPLv3+
@@ -49,6 +49,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Fri Nov 16 2018 Uchio Kondo <udzura@udzura.jp> - 1:0.10.0~alpha5-1
+- Alpha release of criu-included one
+
 * Mon Nov  5 2018 Uchio Kondo <udzura@udzura.jp> - 1:0.9.6-1
 - Fix missing chdir after chroot when using use_legacy_chroot
 
@@ -63,6 +66,3 @@ fi
 
 * Wed Aug  8 2018 Uchio Kondo <udzura@udzura.jp> - 1:0.9.2-1
 - Upgrade mruby version
-
-* Mon Apr 16 2018 Uchio Kondo <udzura@udzura.jp> - 1:0.9.1-1
-- Apply some enhancements to reduce memory consumption

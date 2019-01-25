@@ -33,6 +33,7 @@ module Haconiwa
                   :hacofile,
                   :metadata,
                   :reloadable_attr,
+                  :run_as_restore,
                   :exit_status,
                   :log_level
 
@@ -96,6 +97,7 @@ module Haconiwa
       @bootstrap = @provision = nil
       @project_name = nil
       @metadata = {}
+      @run_as_restore = false
 
       @waitloop = WaitLoop.new
 
@@ -317,6 +319,10 @@ module Haconiwa
     end
 
     def start(options, *init_command)
+      if self.run_as_restore
+        return self.restore()
+      end
+
       targets = containers_real_run
       LinuxRunner.new(self).waitall do |_w|
         targets.map do |c|
@@ -411,13 +417,14 @@ module Haconiwa
       if target.size != 1
         raise "[BUG] Checkpoint now does not support multiple containers"
       end
+      con = target.first
 
-      self.container_pid_file ||= default_container_pid_file
+      con.container_pid_file ||= default_container_pid_file
       pid = File.open(pidfile_path, 'r').read.to_i
-      self.pid = pid
+      con.pid = pid
       File.unlink(pidfile_path)
 
-      CRIURestoredRunner.new(self).run({restored_pid: pid}, nil)
+      CRIURestoredRunner.new(con).run({restored_pid: pid}, nil)
       Haconiwa::Logger.puts("Restored process exited")
     rescue => e
       Haconiwa::Logger.warning("Something is wrong on re-supervise process(This is haconiwa's bug, not image's)")
@@ -463,6 +470,7 @@ module Haconiwa
         :@bootstrap,
         :@provision,
         :@metadata,
+        :@run_as_restore,
         :@reloadable_attr,
         :@log_level,
       ].each do |varname|
@@ -608,11 +616,9 @@ module Haconiwa
       DEVNULL = "/dev/null"
 
       # TODO: support options other than file:
-      # XXX: Following 0.9 behavior, file: option is handled as host_file:
-      # re-revert here to release 0.10.0
       def initialize(options={})
-        # @file = options[:file]
-        @host_file = options[:file] || options[:host_file]
+        @file = options[:file]
+        @host_file = options[:host_file]
       end
       attr_accessor :file, :host_file
 
@@ -622,16 +628,16 @@ module Haconiwa
 
       def to_io
         if !target_file
-          return File.open(DEVNULL, 'a')
+          return File.open(DEVNULL, 'w')
         end
-        File.open(target_file, 'a+')
+        File.open(target_file, 'a')
       end
 
       def to_io_readonly
         if !target_file
           return File.open(DEVNULL, 'r')
         end
-        File.open(target_file, 'r+')
+        File.open(target_file, 'r')
       end
     end
 
@@ -1109,7 +1115,7 @@ module Haconiwa
     end
 
     def chrooted_dest(newroot)
-      @dest.sub(/^#{newroot}/, "")
+      @dest.sub(/^#{newroot.to_s}/, "")
     end
   end
 
@@ -1121,12 +1127,14 @@ module Haconiwa
       @criu_log_file = "-"
       @criu_service_address = "/var/run/criu_service.socket"
       @criu_bin_path = "/usr/local/sbin/criu"
+      @criu_use_tcp_established = false
 
       @extra_criu_options = []
       @extra_criu_externals = []
     end
     attr_accessor :target_syscall, :images_dir, :log_level,
                   :criu_log_file, :criu_service_address, :criu_bin_path,
+                  :criu_use_tcp_established,
                   :extra_criu_options, :extra_criu_externals
 
     def target_syscall(*args)

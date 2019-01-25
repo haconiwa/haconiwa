@@ -1,36 +1,51 @@
 # -*- mode: ruby -*-
-Haconiwa.define do |config|
-  config.name = "chroot-apache001" # to be hostname
-  config.init_command = %w(/usr/local/apache2/bin/httpd -DFOREGROUND -X)
-  # config.init_command = %w(/usr/local/bin/httpd-foreground)
-  config.daemonize!
-  config.command.set_stdout(file: "/tmp/container-internal.out")
-  config.command.set_stderr(file: "/tmp/container-internal.err")
+Haconiwa.define do |conf|
+  conf.define do |config|
+    config.name = "chroot-apache001" # to be hostname
+    config.init_command = %w(/usr/local/apache2/bin/httpd -DFOREGROUND -X)
+    # config.init_command = %w(/usr/local/bin/httpd-foreground)
+    config.daemonize!
+    config.command.set_stdout(file: "/tmp/container-internal.out")
+    config.command.set_stderr(file: "/tmp/container-internal.err")
 
-  root = Pathname.new("/var/lib/haconiwa-apache001")
-  config.chroot_to root
-  config.environ = {
-    "PATH" => "#{ENV['PATH']}",
-  }
+    root = Pathname.new("/var/lib/haconiwa-apache001")
+    config.chroot_to root
+    config.environ = {
+      "PATH" => "#{ENV['PATH']}",
+    }
 
-  system "mkdir -p /tmp/criu/images"
+    system "mkdir -p /tmp/criu/images"
 
-  config.network.namespace = config.name
-  config.network.container_ip = "10.0.0.2"
+    config.network.namespace = config.name
+    config.network.container_ip = "10.0.0.2"
 
-  config.checkpoint do |checkpoint|
-    checkpoint.target_syscall :listen, 0
-    checkpoint.images_dir    = "/tmp/criu/images"
-    checkpoint.criu_log_file = "-"
-    checkpoint.criu_service_address = "/var/run/criu_service.socket"
+    config.checkpoint do |checkpoint|
+      checkpoint.target_syscall :listen, 0
+      checkpoint.images_dir    = "/tmp/criu/images"
+      checkpoint.criu_log_file = "-"
+      checkpoint.criu_service_address = "/var/run/criu_service.socket"
+    end
+
+    config.namespace.unshare "uts"
+    config.namespace.unshare "ipc"
+    config.namespace.unshare "pid"
+    config.namespace.unshare "mount"
+
+    config.mount_independent "procfs"
+    config.mount_independent "devtmpfs"
+    config.capabilities.reset_to_privileged!
+
+    config.add_async_hook(sec: 10, interval_msec: 10 * 1000) do
+      Haconiwa::Logger.puts "Hi! #{`date`}"
+    end
+
+    config.add_general_hook(:teardown_container) do |b|
+      Haconiwa::Logger.puts "Exit! #{b.exit_status}"
+    end
   end
 
-  config.namespace.unshare "uts"
-  config.namespace.unshare "ipc"
-  config.namespace.unshare "pid"
-  config.namespace.unshare "mount"
-
-  config.mount_independent "procfs"
-  config.mount_independent "devtmpfs"
-  config.capabilities.reset_to_privileged!
+  if File.exist? "/tmp/criu/images/core-1.img"
+    Haconiwa::Logger.info "Going to run in restore mode"
+    conf.run_as_restore = true
+  end
 end
