@@ -379,6 +379,7 @@ module Haconiwa
 
       base = target.first
       if !target_pid
+        Haconiwa::Logger.puts "Warning: feature of checkpoint from scratch boot is alpha version"
         CRIUService.new(base).create_checkpoint
       else
         if target_pid <= 0
