@@ -1,10 +1,10 @@
-latest: 0.10.0~alpha5
+latest: 0.10.0
 changelog:
-  - version: 0.10.0~alpha5
+  - version: 0.10.0
     messages:
-      - Alpha release of criu-included one
+      - First release with checkpoint/restore
     author: Uchio Kondo <udzura@udzura.jp>
-    date: Fri, 16 Nov 2018 17:59:36 +0900
+    date: Mon, 28 Jan 2019 14:41:51 +0900
   - version: 0.9.6
     messages:
       - Fix missing chdir after chroot when using use_legacy_chroot

@@ -379,6 +379,7 @@ module Haconiwa
 
       base = target.first
       if !target_pid
+        Haconiwa::Logger.puts "Warning: feature of checkpoint from scratch boot is alpha version"
         CRIUService.new(base).create_checkpoint
       else
         if target_pid <= 0
@@ -617,7 +618,7 @@ module Haconiwa
 
       # TODO: support options other than file:
       def initialize(options={})
-        @file = options[:file]
+        @file = options[:container_file] || options[:file]
         @host_file = options[:host_file]
       end
       attr_accessor :file, :host_file
