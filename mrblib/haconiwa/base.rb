@@ -617,7 +617,7 @@ module Haconiwa
 
       # TODO: support options other than file:
       def initialize(options={})
-        @file = options[:file]
+        @file = options[:container_file] || options[:file]
         @host_file = options[:host_file]
       end
       attr_accessor :file, :host_file
