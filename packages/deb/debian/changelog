@@ -1,8 +1,8 @@
-haconiwa (0.10.0~alpha5-1) unstable; urgency=medium
+haconiwa (0.10.0-1) unstable; urgency=medium
 
-  * Alpha release of criu-included one
+  * First release with checkpoint/restore
 
- -- Uchio Kondo <udzura@udzura.jp>  Fri, 16 Nov 2018 17:59:36 +0900
+ -- Uchio Kondo <udzura@udzura.jp>  Mon, 28 Jan 2019 14:41:51 +0900
 
 haconiwa (0.9.6-1) unstable; urgency=medium
 
