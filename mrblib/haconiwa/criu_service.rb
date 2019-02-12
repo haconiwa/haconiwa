@@ -175,7 +175,7 @@ module Haconiwa
 
       invoke_general_hook(:before_restore, @base)
       Haconiwa::Logger.debug("Going to exec: #{cmds.inspect}")
-      ::Exec.execve(ENV, *cmds.to_execve_arg)
+      ::Exec.execve(ENV.to_hash, *cmds.to_execve_arg)
     end
   end
 end
