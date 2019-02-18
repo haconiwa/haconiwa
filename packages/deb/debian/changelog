@@ -1,3 +1,9 @@
+haconiwa (0.10.1-1) unstable; urgency=medium
+
+  * Fix restore error due to mruby-exec behavior
+
+ -- Uchio Kondo <udzura@udzura.jp>  Mon, 18 Feb 2019 15:44:56 +0900
+
 haconiwa (0.10.0-1) unstable; urgency=medium
 
   * First release with checkpoint/restore
@@ -27,9 +33,3 @@ haconiwa (0.9.3-1) unstable; urgency=medium
   * Support masking of sensitive files and dirs
 
  -- Uchio Kondo <udzura@udzura.jp>  Thu,  4 Oct 2018 14:18:04 +0900
-
-haconiwa (0.9.2-1) unstable; urgency=medium
-
-  * Upgrade mruby version
-
- -- Uchio Kondo <udzura@udzura.jp>  Wed,  8 Aug 2018 17:43:36 +0900

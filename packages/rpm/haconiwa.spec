@@ -1,6 +1,6 @@
 Name: haconiwa
 Epoch: 1
-Version: 0.10.0
+Version: 0.10.1
 Release: 1
 Summary: MRuby on Container
 License: GPLv3+
@@ -49,6 +49,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Mon Feb 18 2019 Uchio Kondo <udzura@udzura.jp> - 1:0.10.1-1
+- Fix restore error due to mruby-exec behavior
+
 * Mon Jan 28 2019 Uchio Kondo <udzura@udzura.jp> - 1:0.10.0-1
 - First release with checkpoint/restore
 
@@ -63,6 +66,3 @@ fi
 
 * Thu Oct  4 2018 Uchio Kondo <udzura@udzura.jp> - 1:0.9.3-1
 - Support masking of sensitive files and dirs
-
-* Wed Aug  8 2018 Uchio Kondo <udzura@udzura.jp> - 1:0.9.2-1
-- Upgrade mruby version
