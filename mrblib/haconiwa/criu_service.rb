@@ -61,6 +61,7 @@ module Haconiwa
         c.set_log_file @base.checkpoint.criu_log_file
         c.set_shell_job true
         c.set_tcp_established @base.checkpoint.criu_use_tcp_established
+        c.set_leave_running @base.checkpoint.leave_running
 
         unless @base.filesystem.mount_points.empty?
           c.add_external "mnt[]:"
