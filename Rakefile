@@ -135,16 +135,17 @@ namespace :release do
 
     version = ask("New version? [ex. 0.10.1]")
     description = ask("What is changed?")
-    author = `git config user.name`.chomp
-    date = `env LANG=C date +'%a, %e %h %Y %H:%M:%S %z'`
+    author = "%s <%s>" % [`git config user.name`.chomp, `git config user.email`.chomp]
+    date = `env LANG=C date +'%a, %e %h %Y %H:%M:%S %z'`.chomp
 
     newlog = orig.dup
     newlog["changelog"].unshift(
-      "version" => version,
-      "messages" => [description],
+      "version" => version.to_s,
+      "messages" => [description.to_s],
       "author" => author,
       "date" => date
     )
+    newlog["latest"] = version.to_s
 
     File.open(changelog, 'w') do |f|
       f.write YAML.dump(newlog)
