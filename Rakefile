@@ -127,6 +127,31 @@ end
 load File.expand_path("../mrblib/haconiwa/version.rb", __FILE__)
 pwd = File.expand_path("..", __FILE__)
 namespace :release do
+  task :changelog do
+    require 'yaml'
+    require "highline/import"
+    changelog = "#{pwd}/packages/templates/changelog.yml"
+    orig = YAML.load_file(changelog)
+
+    version = ask("New version? [current: #{orig["latest"]}]")
+    description = ask("What is changed?")
+    author = "%s <%s>" % [`git config user.name`.chomp, `git config user.email`.chomp]
+    date = `env LANG=C date +'%a, %e %h %Y %H:%M:%S %z'`.chomp
+
+    newlog = orig.dup
+    newlog["changelog"].unshift(
+      "version" => version.to_s,
+      "messages" => [description.to_s],
+      "author" => author,
+      "date" => date
+    )
+    newlog["latest"] = version.to_s
+
+    File.open(changelog, 'w') do |f|
+      f.write YAML.dump(newlog)
+    end
+  end
+
   task :clean do
     sh "rm -rf #{pwd}/tmp/* #{pwd}/pkg/*"
   end

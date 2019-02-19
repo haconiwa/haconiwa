@@ -1,3 +1,9 @@
+haconiwa (0.10.2-1) unstable; urgency=medium
+
+  * Support leave-running option for dump
+
+ -- Uchio Kondo <udzura@udzura.jp>  Tue, 19 Feb 2019 17:00:29 +0900
+
 haconiwa (0.10.1-1) unstable; urgency=medium
 
   * Fix restore error due to mruby-exec behavior
@@ -27,9 +33,3 @@ haconiwa (0.9.4-1) unstable; urgency=medium
   * Backport some of 0.10 features
 
  -- Uchio Kondo <udzura@udzura.jp>  Fri, 12 Oct 2018 12:05:29 +0900
-
-haconiwa (0.9.3-1) unstable; urgency=medium
-
-  * Support masking of sensitive files and dirs
-
- -- Uchio Kondo <udzura@udzura.jp>  Thu,  4 Oct 2018 14:18:04 +0900

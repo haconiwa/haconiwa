@@ -1,249 +1,256 @@
-latest: 0.10.1
+---
+latest: 0.10.2
 changelog:
-  - version: 0.10.1
-    messages:
-      - Fix restore error due to mruby-exec behavior
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Mon, 18 Feb 2019 15:44:56 +0900
-  - version: 0.10.0
-    messages:
-      - First release with checkpoint/restore
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Mon, 28 Jan 2019 14:41:51 +0900
-  - version: 0.9.6
-    messages:
-      - Fix missing chdir after chroot when using use_legacy_chroot
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Mon,  5 Nov 2018 17:54:35 +0900
-  - version: 0.9.5
-    messages:
-      - Fix blocking in evaluating a hacofile including some literals
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Wed, 24 Oct 2018 19:46:40 +0900
-  - version: 0.9.4
-    messages:
-      - Backport some of 0.10 features
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Fri, 12 Oct 2018 12:05:29 +0900
-  - version: 0.9.3
-    messages:
-      - Support masking of sensitive files and dirs
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Thu,  4 Oct 2018 14:18:04 +0900
-  - version: 0.9.2
-    messages:
-      - Upgrade mruby version
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Wed,  8 Aug 2018 17:43:36 +0900
-  - version: 0.9.1
-    messages:
-      - Apply some enhancements to reduce memory consumption
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Mon, 16 Apr 2018 19:19:52 +0900
-  - version: 0.9.0
-    messages:
-      - Change mruby version to current master, drop dependencies to mruby-thread
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Thu, 12 Apr 2018 19:23:18 +0900
-  - version: 0.8.9
-    messages:
-      - Support network configuration DSL
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Wed, 20 Dec 2017 16:33:53 +0900
-  - version: 0.8.8
-    messages:
-      - Support lxcfs API endpoint
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Tue,  5 Dec 2017 19:13:46 +0900
-  - version: 0.8.7
-    messages:
-      - Support metadata / Prevent doubel startup - and now pid file contains supervisor pid
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Tue, 27 Jun 2017 13:02:21 +0900
-  - version: 0.8.6
-    messages:
-      - May fix some segfaults on GC, stopped binary spritting
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Wed, 24 May 2017 15:26:53 +0900
-  - version: 0.8.5
-    messages:
-      - Add some supports when haconiwa bin is set-user-id-rooted, bump mruby version
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Thu, 27 Apr 2017 13:44:16 +0900
-  - version: 0.8.4
-    messages:
-      - Support seccomp-bpf filter
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Mon, 24 Apr 2017 18:19:01 +0900
-  - version: 0.8.3
-    messages:
-      - Support haconiwa new hooks, including system hooks
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Fri, 21 Apr 2017 17:20:31 +0900
-  - version: 0.8.2
-    messages:
-      - Support haconiwa reload, implement thread watchdog
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Thu, 13 Apr 2017 16:55:17 +0900
-  - version: 0.8.1
-    messages:
-      - Remove experimental features. This destroys some of (minor) backward compatibilities
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Mon,  3 Apr 2017 12:45:35 +0900
-  - version: 0.8.0
-    messages:
-      - Bump mruby\'s version
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Tue, 28 Mar 2017 17:40:03 +0900
-  - version: 0.7.20170302
-    messages:
-      - Snapshot with cgroup warning fix
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Thu,  2 Mar 2017 17:28:47 +0900
-  - version: 0.7.20170216
-    messages:
-      - Snapshot with pid check
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Thu, 16 Feb 2017 17:10:47 +0900
-  - version: 0.7.20170210
-    messages:
-      - Snapshot with fix cgroup creation
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Fri, 10 Feb 2017 16:41:43 +0900
-  - version: 0.7.20170203
-    messages:
-      - Snapshot with forwardports from 0.6
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Fri,  3 Feb 2017 16:18:08 +0900
-  - version: 0.7.0
-    messages:
-      - First implementation of multicontainer DSL
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Mon, 16 Jan 2017 17:13:57 +0900
-  - version: 0.6.5
-    messages:
-      - Suppress cgroup-related warnings
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Thu,  2 Mar 2017 16:44:10 +0900
-  - version: 0.6.4
-    messages:
-      - Spawn new haconiwa even if pid file exists, when no process is alive
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Thu, 16 Feb 2017 16:17:35 +0900
-  - version: 0.6.3
-    messages:
-      - Bump mruby and mgem versions, more verbose exception logs
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Fri,  3 Feb 2017 15:08:11 +0900
-  - version: 0.6.2
-    messages:
-      - Support general hooks, enhanced exception handling/logging
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Tue, 31 Jan 2017 16:32:23 +0900
-  - version: 0.6.1
-    messages:
-      - Support cgroup-v2 DSL
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Thu, 26 Jan 2017 18:07:15 +0900
-  - version: 0.6.0
-    messages:
-      - First 0.6 stable, fix to set cgroup two dot parameters
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Mon, 16 Jan 2017 15:36:57 +0900
-  - version: 0.5.2
-    messages:
-      - Add command.set_stdin/stdout/stderr, and workdir
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Wed, 21 Dec 2016 13:47:13 +0900
-  - version: 0.5.1
-    messages:
-      - Fix that cannot define signal handlers for supervisor
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Fri,  9 Dec 2016 19:14:39 +0900
-  - version: 0.5.0
-    messages:
-      - Add after_spawn hook, intoduce default caps, persistant namespace
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Wed, 30 Nov 2016 13:01:45 +0900
-  - version: 0.4.6
-    messages:
-      - Small fixes in uid mapped attach, support archive subcommand
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Wed, 16 Nov 2016 16:29:46 +0900
-  - version: 0.4.5
-    messages:
-      - Fix brken option haconiwa attach -t, support centos 6 attach
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Mon, 14 Nov 2016 15:44:08 +0900
-  - version: 0.4.4
-    messages:
-      - Fix failing to drop caps when g/uid mappping is active
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Fri, 11 Nov 2016 15:28:45 +0900
-  - version: 0.4.3
-    messages:
-      - Support postprocess hooks for bootstrap, add run -b option
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Thu, 10 Nov 2016 15:23:17 +0900
-  - version: 0.4.2
-    messages:
-      - Logs are now put to syslog, and added CentOS 6 experimental support
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Wed,  9 Nov 2016 16:15:45 +0900
-  - version: 0.4.1
-    messages:
-      - Experimental support for uid/gid mapping, note that some feature might be broken
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Mon,  5 Sep 2016 17:19:01 +0900
-  - version: 0.4.0
-    messages:
-      - Experimental support haconiwa watch, bump mruby, fix some bugs
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Tue, 30 Aug 2016 15:44:41 +0900
-  - version: 0.3.5
-    messages:
-      - Add network etc sharing options
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Mon, 29 Aug 2016 12:34:00 +0900
-  - version: 0.3.4
-    messages:
-      - Support ENV in DSL, fix some bug on run
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Fri, 26 Aug 2016 16:19:38 +0900
-  - version: 0.3.3
-    messages:
-      - Enhance ps subcommand with one more fix
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Wed, 24 Aug 2016 14:48:00 +0900
-  - version: 0.3.3
-    messages:
-      - Fix some haconiwa ps troubles
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Tue, 23 Aug 2016 19:13:30 +0900
-  - version: 0.3.1
-    messages:
-      - Support haconiwa ps, cooperating with etcd
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Tue, 23 Aug 2016 17:03:53 +0900
-  - version: 0.3.0
-    messages:
-      - Support new subcommand to generate DSL boilerplate
-      - Support entering existing namespace(useful with netns)
-      - Add mount_independent, deprecate mount_independent_procfs
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Fri, 19 Aug 2016 19:03:53 +0900
-  - version: 0.2.4
-    messages:
-      - Support create/provision subcommand
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Fri,  5 Aug 2016 18:14:23 +0900
-  - version: 0.2.3
-    messages:
-      - Update licenses
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Tue, 26 Jul 2016 15:42:10 +0900
-  - version: 0.2.2
-    messages:
-      - Initial release of haconiwa package
-    author: Uchio Kondo <udzura@udzura.jp>
-    date: Fri, 22 Jul 2016 16:30:00 +0900
+- version: 0.10.2
+  messages:
+  - Support leave-running option for dump
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Tue, 19 Feb 2019 17:00:29 +0900
+- version: 0.10.1
+  messages:
+  - Fix restore error due to mruby-exec behavior
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Mon, 18 Feb 2019 15:44:56 +0900
+- version: 0.10.0
+  messages:
+  - First release with checkpoint/restore
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Mon, 28 Jan 2019 14:41:51 +0900
+- version: 0.9.6
+  messages:
+  - Fix missing chdir after chroot when using use_legacy_chroot
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Mon,  5 Nov 2018 17:54:35 +0900
+- version: 0.9.5
+  messages:
+  - Fix blocking in evaluating a hacofile including some literals
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Wed, 24 Oct 2018 19:46:40 +0900
+- version: 0.9.4
+  messages:
+  - Backport some of 0.10 features
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Fri, 12 Oct 2018 12:05:29 +0900
+- version: 0.9.3
+  messages:
+  - Support masking of sensitive files and dirs
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Thu,  4 Oct 2018 14:18:04 +0900
+- version: 0.9.2
+  messages:
+  - Upgrade mruby version
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Wed,  8 Aug 2018 17:43:36 +0900
+- version: 0.9.1
+  messages:
+  - Apply some enhancements to reduce memory consumption
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Mon, 16 Apr 2018 19:19:52 +0900
+- version: 0.9.0
+  messages:
+  - Change mruby version to current master, drop dependencies to mruby-thread
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Thu, 12 Apr 2018 19:23:18 +0900
+- version: 0.8.9
+  messages:
+  - Support network configuration DSL
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Wed, 20 Dec 2017 16:33:53 +0900
+- version: 0.8.8
+  messages:
+  - Support lxcfs API endpoint
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Tue,  5 Dec 2017 19:13:46 +0900
+- version: 0.8.7
+  messages:
+  - Support metadata / Prevent doubel startup - and now pid file contains supervisor
+    pid
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Tue, 27 Jun 2017 13:02:21 +0900
+- version: 0.8.6
+  messages:
+  - May fix some segfaults on GC, stopped binary spritting
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Wed, 24 May 2017 15:26:53 +0900
+- version: 0.8.5
+  messages:
+  - Add some supports when haconiwa bin is set-user-id-rooted, bump mruby version
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Thu, 27 Apr 2017 13:44:16 +0900
+- version: 0.8.4
+  messages:
+  - Support seccomp-bpf filter
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Mon, 24 Apr 2017 18:19:01 +0900
+- version: 0.8.3
+  messages:
+  - Support haconiwa new hooks, including system hooks
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Fri, 21 Apr 2017 17:20:31 +0900
+- version: 0.8.2
+  messages:
+  - Support haconiwa reload, implement thread watchdog
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Thu, 13 Apr 2017 16:55:17 +0900
+- version: 0.8.1
+  messages:
+  - Remove experimental features. This destroys some of (minor) backward compatibilities
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Mon,  3 Apr 2017 12:45:35 +0900
+- version: 0.8.0
+  messages:
+  - Bump mruby\'s version
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Tue, 28 Mar 2017 17:40:03 +0900
+- version: 0.7.20170302
+  messages:
+  - Snapshot with cgroup warning fix
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Thu,  2 Mar 2017 17:28:47 +0900
+- version: 0.7.20170216
+  messages:
+  - Snapshot with pid check
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Thu, 16 Feb 2017 17:10:47 +0900
+- version: 0.7.20170210
+  messages:
+  - Snapshot with fix cgroup creation
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Fri, 10 Feb 2017 16:41:43 +0900
+- version: 0.7.20170203
+  messages:
+  - Snapshot with forwardports from 0.6
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Fri,  3 Feb 2017 16:18:08 +0900
+- version: 0.7.0
+  messages:
+  - First implementation of multicontainer DSL
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Mon, 16 Jan 2017 17:13:57 +0900
+- version: 0.6.5
+  messages:
+  - Suppress cgroup-related warnings
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Thu,  2 Mar 2017 16:44:10 +0900
+- version: 0.6.4
+  messages:
+  - Spawn new haconiwa even if pid file exists, when no process is alive
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Thu, 16 Feb 2017 16:17:35 +0900
+- version: 0.6.3
+  messages:
+  - Bump mruby and mgem versions, more verbose exception logs
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Fri,  3 Feb 2017 15:08:11 +0900
+- version: 0.6.2
+  messages:
+  - Support general hooks, enhanced exception handling/logging
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Tue, 31 Jan 2017 16:32:23 +0900
+- version: 0.6.1
+  messages:
+  - Support cgroup-v2 DSL
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Thu, 26 Jan 2017 18:07:15 +0900
+- version: 0.6.0
+  messages:
+  - First 0.6 stable, fix to set cgroup two dot parameters
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Mon, 16 Jan 2017 15:36:57 +0900
+- version: 0.5.2
+  messages:
+  - Add command.set_stdin/stdout/stderr, and workdir
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Wed, 21 Dec 2016 13:47:13 +0900
+- version: 0.5.1
+  messages:
+  - Fix that cannot define signal handlers for supervisor
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Fri,  9 Dec 2016 19:14:39 +0900
+- version: 0.5.0
+  messages:
+  - Add after_spawn hook, intoduce default caps, persistant namespace
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Wed, 30 Nov 2016 13:01:45 +0900
+- version: 0.4.6
+  messages:
+  - Small fixes in uid mapped attach, support archive subcommand
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Wed, 16 Nov 2016 16:29:46 +0900
+- version: 0.4.5
+  messages:
+  - Fix brken option haconiwa attach -t, support centos 6 attach
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Mon, 14 Nov 2016 15:44:08 +0900
+- version: 0.4.4
+  messages:
+  - Fix failing to drop caps when g/uid mappping is active
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Fri, 11 Nov 2016 15:28:45 +0900
+- version: 0.4.3
+  messages:
+  - Support postprocess hooks for bootstrap, add run -b option
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Thu, 10 Nov 2016 15:23:17 +0900
+- version: 0.4.2
+  messages:
+  - Logs are now put to syslog, and added CentOS 6 experimental support
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Wed,  9 Nov 2016 16:15:45 +0900
+- version: 0.4.1
+  messages:
+  - Experimental support for uid/gid mapping, note that some feature might be broken
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Mon,  5 Sep 2016 17:19:01 +0900
+- version: 0.4.0
+  messages:
+  - Experimental support haconiwa watch, bump mruby, fix some bugs
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Tue, 30 Aug 2016 15:44:41 +0900
+- version: 0.3.5
+  messages:
+  - Add network etc sharing options
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Mon, 29 Aug 2016 12:34:00 +0900
+- version: 0.3.4
+  messages:
+  - Support ENV in DSL, fix some bug on run
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Fri, 26 Aug 2016 16:19:38 +0900
+- version: 0.3.3
+  messages:
+  - Enhance ps subcommand with one more fix
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Wed, 24 Aug 2016 14:48:00 +0900
+- version: 0.3.3
+  messages:
+  - Fix some haconiwa ps troubles
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Tue, 23 Aug 2016 19:13:30 +0900
+- version: 0.3.1
+  messages:
+  - Support haconiwa ps, cooperating with etcd
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Tue, 23 Aug 2016 17:03:53 +0900
+- version: 0.3.0
+  messages:
+  - Support new subcommand to generate DSL boilerplate
+  - Support entering existing namespace(useful with netns)
+  - Add mount_independent, deprecate mount_independent_procfs
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Fri, 19 Aug 2016 19:03:53 +0900
+- version: 0.2.4
+  messages:
+  - Support create/provision subcommand
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Fri,  5 Aug 2016 18:14:23 +0900
+- version: 0.2.3
+  messages:
+  - Update licenses
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Tue, 26 Jul 2016 15:42:10 +0900
+- version: 0.2.2
+  messages:
+  - Initial release of haconiwa package
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Fri, 22 Jul 2016 16:30:00 +0900
