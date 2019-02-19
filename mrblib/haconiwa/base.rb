@@ -1129,13 +1129,14 @@ module Haconiwa
       @criu_service_address = "/var/run/criu_service.socket"
       @criu_bin_path = "/usr/local/sbin/criu"
       @criu_use_tcp_established = false
+      @leave_running = false
 
       @extra_criu_options = []
       @extra_criu_externals = []
     end
     attr_accessor :target_syscall, :images_dir, :log_level,
                   :criu_log_file, :criu_service_address, :criu_bin_path,
-                  :criu_use_tcp_established,
+                  :criu_use_tcp_established, :leave_running,
                   :extra_criu_options, :extra_criu_externals
 
     def target_syscall(*args)
