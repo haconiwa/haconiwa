@@ -133,7 +133,7 @@ namespace :release do
     changelog = "#{pwd}/packages/templates/changelog.yml"
     orig = YAML.load_file(changelog)
 
-    version = ask("New version? [ex. 0.10.1]")
+    version = ask("New version? [current: #{orig["latest"]}]")
     description = ask("What is changed?")
     author = "%s <%s>" % [`git config user.name`.chomp, `git config user.email`.chomp]
     date = `env LANG=C date +'%a, %e %h %Y %H:%M:%S %z'`.chomp
