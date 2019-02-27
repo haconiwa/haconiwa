@@ -84,7 +84,7 @@ module Haconiwa
                 Logger.exception(e)
               end
             end
-            invoke_general_hook(:after_network_initialized, barn)
+            invoke_general_hook(:after_network_initialized, base)
             apply_namespace(base.namespace)
 
             Logger.debug("OK: apply_namespace")
