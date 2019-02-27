@@ -4,6 +4,7 @@ module Haconiwa
       :setup,
       :before_fork,
       :after_fork,
+      :after_network_initialized,
       :before_chroot,
       :after_chroot,
       :before_start_wait,
