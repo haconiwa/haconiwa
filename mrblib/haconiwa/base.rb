@@ -88,6 +88,7 @@ module Haconiwa
       @signal_handler = SignalHandler.new
       @attached_capabilities = nil
       @name = "haconiwa-#{Time.now.to_i}"
+      @cgroup_name = nil
       @container_pid_file = nil
       @pid = nil
       @daemon = false
@@ -143,6 +144,14 @@ module Haconiwa
 
     def init_command
       self.command.init_command
+    end
+
+    def cgroup_name=(name)
+      @cgroup_name = name
+    end
+
+    def cgroup_name
+      @cgroup_name || @name
     end
 
     def acts_as_session_leader
