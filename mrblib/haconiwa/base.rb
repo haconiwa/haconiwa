@@ -594,7 +594,7 @@ module Haconiwa
     end
 
     def reload(newcg, newcg2, newres)
-      LinuxRunner.new(self).reload(self.name, newcg, newcg2, newres, self.reloadable_attr)
+      LinuxRunner.new(self).reload(self.cgroup_name, newcg, newcg2, newres, self.reloadable_attr)
     end
 
     def kill(signame, timeout)
