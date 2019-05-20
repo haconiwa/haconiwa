@@ -14,6 +14,7 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.add_dependency 'mruby-random'    , :core => 'mruby-random'
   spec.add_dependency 'mruby-string-ext', :core => 'mruby-string-ext'
   spec.add_dependency 'mruby-io'        , :core => 'mruby-io'
+  spec.add_dependency 'mruby-socket'    , :core => 'mruby-socket'
   if Dir.exist?(File.join(MRUBY_ROOT, "mrbgems", "mruby-metaprog"))
     spec.add_dependency 'mruby-metaprog'  , :core => 'mruby-metaprog'
   end
@@ -25,7 +26,6 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.add_dependency 'mruby-env'       , :mgem => 'mruby-env'
   spec.add_dependency 'mruby-linux-namespace', :mgem => 'mruby-linux-namespace'
   spec.add_dependency 'mruby-process'   , :github => 'iij/mruby-process'
-  spec.add_dependency 'mruby-socket'    , :mgem => 'mruby-socket'
   spec.add_dependency 'mruby-forwardable', :mgem => 'mruby-forwardable'
   spec.add_dependency 'mruby-seccomp'   , :github => 'chikuwait/mruby-seccomp'
   spec.add_dependency 'mruby-apparmor'  , :github => 'haconiwa/mruby-apparmor'
