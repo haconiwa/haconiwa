@@ -64,7 +64,7 @@ assert('walkthrough') do
     assert_true status.success?, "Process did not exit cleanly: create"
 
     assert_true File.directory? "#{HACONIWA_TMP_ROOT}/root"
-    assert_true (/^3\.\d\.\d$/).match(File.read("#{HACONIWA_TMP_ROOT}/etc/alpine-release"))
+    assert_true (/^3\.\d\.\d$/).match(File.read("#{HACONIWA_TMP_ROOT}/etc/alpine-release")) != nil
 
     output, status = run_haconiwa "run", "-T", haconame, "--", "/usr/bin/uptime"
     assert_true status.success?, "Process did not exit cleanly: run"
