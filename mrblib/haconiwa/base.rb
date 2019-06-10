@@ -145,6 +145,14 @@ module Haconiwa
       self.command.init_command
     end
 
+    def cgroup_name=(name)
+      @cgroup.name = name
+    end
+
+    def cgroup_name
+      @cgroup.name || @name
+    end
+
     def acts_as_session_leader
       self.command.session_leader = true
     end
@@ -585,7 +593,7 @@ module Haconiwa
     end
 
     def reload(newcg, newcg2, newres)
-      LinuxRunner.new(self).reload(self.name, newcg, newcg2, newres, self.reloadable_attr)
+      LinuxRunner.new(self).reload(self.cgroup_name, newcg, newcg2, newres, self.reloadable_attr)
     end
 
     def kill(signame, timeout)
@@ -684,7 +692,7 @@ module Haconiwa
       @defblock = nil
     end
     attr_reader :groups, :groups_by_controller
-    attr_accessor :defblock
+    attr_accessor :defblock, :name
 
     def no_special_config?
       @groups.empty?

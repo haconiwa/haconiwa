@@ -508,7 +508,7 @@ module Haconiwa
         Logger.debug "Creating cgroup controller #{controller}"
         Logger.exception("Invalid or unsupported controller name: #{controller}") unless CG_MAPPING.has_key?(controller)
 
-        c = CG_MAPPING[controller].new(base.name)
+        c = CG_MAPPING[controller].new(base.cgroup_name)
         base.cgroup.groups_by_controller[controller].each do |pair|
           key, attr = pair
           value = base.cgroup[key]
@@ -561,7 +561,7 @@ module Haconiwa
       base.cgroup.controllers.each do |controller|
         Logger.exception("Invalid or unsupported controller name: #{controller}") unless CG_MAPPING.has_key?(controller)
 
-        c = CG_MAPPING[controller].new(base.name)
+        c = CG_MAPPING[controller].new(base.cgroup_name)
         c.delete
       end
     end
