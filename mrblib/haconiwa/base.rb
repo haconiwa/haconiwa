@@ -88,7 +88,6 @@ module Haconiwa
       @signal_handler = SignalHandler.new
       @attached_capabilities = nil
       @name = "haconiwa-#{Time.now.to_i}"
-      @cgroup_name = nil
       @container_pid_file = nil
       @pid = nil
       @daemon = false
@@ -147,11 +146,11 @@ module Haconiwa
     end
 
     def cgroup_name=(name)
-      @cgroup_name = name
+      @cgroup.name = name
     end
 
     def cgroup_name
-      @cgroup_name || @name
+      @cgroup.name || @name
     end
 
     def acts_as_session_leader
@@ -693,7 +692,7 @@ module Haconiwa
       @defblock = nil
     end
     attr_reader :groups, :groups_by_controller
-    attr_accessor :defblock
+    attr_accessor :defblock, :name
 
     def no_special_config?
       @groups.empty?
