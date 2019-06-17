@@ -12,5 +12,4 @@ configure:
 	:
 
 install:
-	echo $(PREFIX)
 	rake install prefix=$(PREFIX)
