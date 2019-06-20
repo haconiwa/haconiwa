@@ -127,6 +127,7 @@ end
 load File.expand_path("../mrblib/haconiwa/version.rb", __FILE__)
 pwd = File.expand_path("..", __FILE__)
 namespace :release do
+  desc "append a new changelog"
   task :changelog do
     require 'yaml'
     require "highline/import"

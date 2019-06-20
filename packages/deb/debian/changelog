@@ -1,3 +1,9 @@
+haconiwa (0.10.3-1) unstable; urgency=medium
+
+  * Add cgroup.name DSL, change mruby target to 2.0.1
+
+ -- Uchio Kondo <udzura@udzura.jp>  Thu, 20 Jun 2019 20:00:17 +0900
+
 haconiwa (0.10.2-1) unstable; urgency=medium
 
   * Support leave-running option for dump
@@ -27,9 +33,3 @@ haconiwa (0.9.5-1) unstable; urgency=medium
   * Fix blocking in evaluating a hacofile including some literals
 
  -- Uchio Kondo <udzura@udzura.jp>  Wed, 24 Oct 2018 19:46:40 +0900
-
-haconiwa (0.9.4-1) unstable; urgency=medium
-
-  * Backport some of 0.10 features
-
- -- Uchio Kondo <udzura@udzura.jp>  Fri, 12 Oct 2018 12:05:29 +0900

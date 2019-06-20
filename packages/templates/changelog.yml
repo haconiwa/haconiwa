@@ -1,6 +1,11 @@
 ---
-latest: 0.10.2
+latest: 0.10.3
 changelog:
+- version: 0.10.3
+  messages:
+  - Add cgroup.name DSL, change mruby target to 2.0.1
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Thu, 20 Jun 2019 20:00:17 +0900
 - version: 0.10.2
   messages:
   - Support leave-running option for dump
