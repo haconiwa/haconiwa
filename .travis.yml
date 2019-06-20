@@ -1,4 +1,4 @@
-dist: trusty
+dist: xenial
 sudo: required
 
 language: c
@@ -12,7 +12,7 @@ addons:
       - bison
       - git
       - gperf
-      - cgroup-lite
+      - cgroup-bin
       - libpam0g-dev
       - autotools-dev
       - libcap-dev
