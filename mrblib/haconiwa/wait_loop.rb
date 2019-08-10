@@ -82,8 +82,10 @@ module Haconiwa
     end
 
     def run_and_wait(pid)
+      # Haconiwa supervisor waits just 1 process
       @mainloop.pid = pid
-      p, s = *(@mainloop.run)
+      ret = @mainloop.run
+      p, s = *(ret.first)
       Haconiwa::Logger.puts "Container[Host PID=#{p}] finished: #{s.inspect}"
       return [p, s]
     end
