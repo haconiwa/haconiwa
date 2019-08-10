@@ -1,6 +1,6 @@
 Name: haconiwa
 Epoch: 1
-Version: 0.10.3
+Version: 0.10.4
 Release: 1
 Summary: MRuby on Container
 License: GPLv3+
@@ -49,6 +49,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Sat Aug 10 2019 Uchio Kondo <udzura@udzura.jp> - 1:0.10.4-1
+- Fix broken cleanup by fibered_worker change
+
 * Thu Jun 20 2019 Uchio Kondo <udzura@udzura.jp> - 1:0.10.3-1
 - Add cgroup.name DSL, change mruby target to 2.0.1
 
@@ -63,6 +66,3 @@ fi
 
 * Mon Nov  5 2018 Uchio Kondo <udzura@udzura.jp> - 1:0.9.6-1
 - Fix missing chdir after chroot when using use_legacy_chroot
-
-* Wed Oct 24 2018 Uchio Kondo <udzura@udzura.jp> - 1:0.9.5-1
-- Fix blocking in evaluating a hacofile including some literals

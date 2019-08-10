@@ -1,6 +1,11 @@
 ---
-latest: 0.10.3
+latest: 0.10.4
 changelog:
+- version: 0.10.4
+  messages:
+  - Fix broken cleanup by fibered_worker change
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Sat, 10 Aug 2019 17:14:58 +0900
 - version: 0.10.3
   messages:
   - Add cgroup.name DSL, change mruby target to 2.0.1
