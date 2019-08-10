@@ -60,6 +60,7 @@ apk --no-cache add ruby
     %w(before_fork before_start_wait after_fork after_chroot teardown_container).each do |hook|
       data << "\"#{hook}\": \"#{cache[hook]}\",\n"
     end
+    data << '"teardown": "OK",'
     data << '"dummy": 0 }'
     File.open("#{root.to_s}/log.json", 'w') do |f|
       f.puts data

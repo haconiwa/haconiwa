@@ -43,7 +43,7 @@ def wait_haconiwa(container_name)
   end
 end
 
-assert('haconiwa container is reloadable') do
+assert('haconiwa container hooks work well') do
   haconame = "hooks-#{rand(65535)}-#{$$}.haco"
   Dir.chdir File.dirname(HACONIWA_TMP_ROOT3) do
     @hash = SecureRandom.hex(4)
@@ -69,8 +69,8 @@ assert('haconiwa container is reloadable') do
     end
 
     result = JSON.parse(File.read "#{@rootfs}/log.json")
-    %w(before_fork before_start_wait after_fork teardown_container).each do |hook|
-      assert_equal "OK", result[hook]
+    %w(before_fork before_start_wait after_fork teardown_container teardown).each do |hook|
+      assert_equal "OK", result[hook], "assert that hook #{hook.inspect} was successful"
     end
     hook_txt = File.read "#{@rootfs}/after_chroot.txt"
     assert_equal "OK, this file is from after_chroot hook", hook_txt.chomp
