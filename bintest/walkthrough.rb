@@ -113,6 +113,7 @@ assert('walkthrough') do
     rescue Timeout::Error => e
       warn "container cannot be killed... skipping: #{e.class}, #{e.message}"
     end
+    assert_false File.exist?("/var/run/haconiwa-#{test_name}.pid"), "Haconiwa remove pid file"
     assert_not_include processes, "haconiwa run #{haconame}"
   end
 end
