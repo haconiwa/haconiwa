@@ -51,6 +51,17 @@ module Haconiwa
 
       raise_container do |base|
         invoke_general_hook(:before_fork, base)
+        nw_handler = nil
+        if base.network.enabled?
+          nw_handler = NetworkHandler::Bridge.new(base.network)
+          begin
+            nw_handler.generate
+          rescue => e
+            Logger.warning "Creating veth pair failed"
+            Logger.exception(e)
+          end
+        end
+        invoke_general_hook(:after_network_created, base)
 
         init_pidns_fd = nil
         begin
@@ -75,12 +86,10 @@ module Haconiwa
             done.close
             ::Procutil.setsid if base.command.session_leader
 
-            if base.network.enabled?
-              nw_handler = NetworkHandler::Bridge.new(base.network)
-              begin
-                nw_handler.generate
-                base.namespace.enter "net", via: nw_handler.to_ns_file
-              rescue => e
+            if nw_handler && base.network.enabled?
+              ret = base.namespace.enter("net", via: nw_handler.to_ns_file)
+              if ret < 0
+                e = RuntimeError.new("Entering created netns failed")
                 Logger.exception(e)
               end
             end
