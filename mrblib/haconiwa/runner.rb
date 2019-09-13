@@ -87,11 +87,8 @@ module Haconiwa
             ::Procutil.setsid if base.command.session_leader
 
             if nw_handler && base.network.enabled?
-              ret = base.namespace.enter("net", via: nw_handler.to_ns_file)
-              if ret < 0
-                e = RuntimeError.new("Entering created netns failed")
-                Logger.exception(e)
-              end
+              # Set enter("net) DSL but do not run setns at this time
+              base.namespace.enter("net", via: nw_handler.to_ns_file)
             end
             invoke_general_hook(:after_network_initialized, base)
             apply_namespace(base.namespace)

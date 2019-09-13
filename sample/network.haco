@@ -17,8 +17,8 @@ haconiwa = Haconiwa.define do |config|
   config.namespace.unshare "pid"
 
   config.network.namespace = config.name
-  config.network.container_ip = '10.254.254.10'
-  config.network.bridge_name = 'hogehoge0'
+  config.network.container_ip = '10.0.0.10'
+  # config.network.bridge_name
 
   # sshd needs chroot!
   config.capabilities.allow "cap_sys_chroot"

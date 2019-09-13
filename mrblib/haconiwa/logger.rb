@@ -57,7 +57,11 @@ module Haconiwa
         elsif args.first.is_a? Exception
           e = args.first
           err("#{e.inspect}")
-          err("=> #{e.backtrace.first}") if e.backtrace
+          if e.backtrace
+            e.backtrace[0..2].each do |bt|
+              err("=> #{bt}")
+            end
+          end
           raise(HacoFatalError, e.inspect)
         else
           err(*args)
