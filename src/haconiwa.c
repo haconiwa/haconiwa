@@ -151,12 +151,27 @@ static mrb_value mrb_haconiwa_pivot_root_to(mrb_state *mrb, mrb_value self)
   return mrb_true_value();
 }
 
+/* This should be P/Red to mruby core's mruby-io */
+static mrb_value mrb_haconiwa_mkfifo(mrb_state *mrb, mrb_value self)
+{
+  char *path;
+  mrb_int mode = 0600;
+  mrb_get_args(mrb, "z|i", &path, &mode);
+
+  if(mkfifo(path, (mode_t)mode) < 0) {
+    mrb_sys_fail(mrb, "mkfifo failed");
+  }
+
+  return mrb_str_new_cstr(mrb, path);
+}
+
 void mrb_haconiwa_gem_init(mrb_state *mrb)
 {
   struct RClass *haconiwa;
   haconiwa = mrb_define_module(mrb, "Haconiwa");
   mrb_define_class_method(mrb, haconiwa, "mrbgem_revisions", mrb_haconiwa_mrgbem_revisions, MRB_ARGS_NONE());
   mrb_define_class_method(mrb, haconiwa, "pivot_root_to", mrb_haconiwa_pivot_root_to, MRB_ARGS_REQ(1));
+  mrb_define_class_method(mrb, haconiwa, "mkfifo", mrb_haconiwa_mkfifo, MRB_ARGS_ARG(1, 1));
 
   DONE;
 }
