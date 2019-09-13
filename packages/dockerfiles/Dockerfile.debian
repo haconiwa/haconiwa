@@ -15,8 +15,8 @@ RUN apt-get -qq -y install libprotobuf-dev libprotobuf-c0-dev \
     protobuf-c-compiler protobuf-compiler python-protobuf \
     libnl-3-dev libnet-dev libcap-dev pkg-config
 
-ENV VERSION 0.10.4
-ENV VERSION_TILDE 0.10.4
+ENV VERSION 0.10.5
+ENV VERSION_TILDE 0.10.5
 ENV USER root
 VOLUME /out
 

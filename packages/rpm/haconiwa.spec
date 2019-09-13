@@ -1,6 +1,6 @@
 Name: haconiwa
 Epoch: 1
-Version: 0.10.4
+Version: 0.10.5
 Release: 1
 Summary: MRuby on Container
 License: GPLv3+
@@ -49,6 +49,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Fri Sep 13 2019 Uchio Kondo <udzura@udzura.jp> - 1:0.10.5-1
+- Change veth creation timing
+
 * Sat Aug 10 2019 Uchio Kondo <udzura@udzura.jp> - 1:0.10.4-1
 - Fix broken cleanup by fibered_worker change
 
@@ -63,6 +66,3 @@ fi
 
 * Mon Jan 28 2019 Uchio Kondo <udzura@udzura.jp> - 1:0.10.0-1
 - First release with checkpoint/restore
-
-* Mon Nov  5 2018 Uchio Kondo <udzura@udzura.jp> - 1:0.9.6-1
-- Fix missing chdir after chroot when using use_legacy_chroot

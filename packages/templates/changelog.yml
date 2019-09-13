@@ -1,6 +1,11 @@
 ---
-latest: 0.10.4
+latest: 0.10.5
 changelog:
+- version: 0.10.5
+  messages:
+  - Change veth creation timing
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Fri, 13 Sep 2019 15:27:45 +0900
 - version: 0.10.4
   messages:
   - Fix broken cleanup by fibered_worker change

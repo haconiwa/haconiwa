@@ -15,10 +15,10 @@ RUN apt-get -qq -y install libprotobuf-dev libprotobuf-c0-dev \
     protobuf-c-compiler protobuf-compiler python-protobuf \
     libnl-3-dev libnet-dev libcap-dev pkg-config asciidoc xmlto
 
-ENV VERSION 0.10.4
+ENV VERSION 0.10.5
 ENV USER root
-ENV SRC_PKG_NAME haconiwa_0.10.4-1_amd64.deb
-ENV DST_PKG_NAME haconiwa_0.10.4-1+debian9_amd64.deb
+ENV SRC_PKG_NAME haconiwa_0.10.5-1_amd64.deb
+ENV DST_PKG_NAME haconiwa_0.10.5-1+debian9_amd64.deb
 VOLUME /out
 
 RUN ln -s /tmp/criu-build/lib/c /usr/local/include/criu

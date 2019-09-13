@@ -1,3 +1,9 @@
+haconiwa (0.10.5-1) unstable; urgency=medium
+
+  * Change veth creation timing
+
+ -- Uchio Kondo <udzura@udzura.jp>  Fri, 13 Sep 2019 15:27:45 +0900
+
 haconiwa (0.10.4-1) unstable; urgency=medium
 
   * Fix broken cleanup by fibered_worker change
@@ -27,9 +33,3 @@ haconiwa (0.10.0-1) unstable; urgency=medium
   * First release with checkpoint/restore
 
  -- Uchio Kondo <udzura@udzura.jp>  Mon, 28 Jan 2019 14:41:51 +0900
-
-haconiwa (0.9.6-1) unstable; urgency=medium
-
-  * Fix missing chdir after chroot when using use_legacy_chroot
-
- -- Uchio Kondo <udzura@udzura.jp>  Mon,  5 Nov 2018 17:54:35 +0900
