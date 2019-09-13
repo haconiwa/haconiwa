@@ -106,7 +106,7 @@ module Haconiwa
         runner = RunCmd.new("init.network.bridge")
         [
           "ip link add #{bridge_name} type bridge",
-          "ip addr add #{bridge_ip_netmasks} dev #{bridge_name}",
+          "ip addr add #{bridge_ip_netmask} dev #{bridge_name}",
           "ip link set dev #{bridge_name} up"
         ].each do |cmd|
           _, status = runner.run(cmd)
