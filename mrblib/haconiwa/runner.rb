@@ -102,7 +102,7 @@ module Haconiwa
             Logger.debug("OK: apply_cgroup")
             apply_remount(base)
             Logger.debug("OK: apply_remount")
-            ::Procutil.sethostname(base.name) if base.namespace.flag?(::Namespace::CLONE_NEWUTS)
+            ::Procutil.sethostname(base.hostname) if base.namespace.flag?(::Namespace::CLONE_NEWUTS)
 
             apply_user_namespace(base.namespace)
             if base.namespace.use_guid_mapping?
