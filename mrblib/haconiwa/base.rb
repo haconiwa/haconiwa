@@ -88,6 +88,7 @@ module Haconiwa
       @signal_handler = SignalHandler.new
       @attached_capabilities = nil
       @name = "haconiwa-#{Time.now.to_i}"
+      @hostname = nil
       @container_pid_file = nil
       @pid = nil
       @daemon = false
@@ -160,6 +161,14 @@ module Haconiwa
     # aliases
     def chroot_to(dest)
       self.filesystem.rootfs = Rootfs.new(dest)
+    end
+
+    def hostname
+      @hostname || @name
+    end
+
+    def hostname=(host)
+      @hostname = host
     end
 
     def rootfs_owner(options)
@@ -474,6 +483,7 @@ module Haconiwa
         :@signal_handler,
         :@attached_capabilities,
         :@name,
+        :@hostname,
         :@container_pid_file,
         :@network_mountpoint,
         :@bootstrap,
