@@ -1,10 +1,10 @@
 # -*- mode: ruby -*-
 Haconiwa.define do |conf|
+  conf.daemonize!
   conf.define do |config|
     config.name = "chroot-apache001" # to be hostname
     config.init_command = %w(/usr/local/apache2/bin/httpd -DFOREGROUND -X)
     # config.init_command = %w(/usr/local/bin/httpd-foreground)
-    config.daemonize!
     config.command.set_stdout(file: "/tmp/container-internal.out")
     config.command.set_stderr(file: "/tmp/container-internal.err")
 
@@ -22,7 +22,9 @@ Haconiwa.define do |conf|
     config.checkpoint do |checkpoint|
       checkpoint.target_syscall :listen, 0
       checkpoint.images_dir    = "/tmp/criu/images"
-      checkpoint.criu_log_file = "-"
+      checkpoint.criu_log_file = ENV['CRIU_RESTORE_LOG_FILE'] || "-"
+      checkpoint.criu_bin_path = `which criu`.chomp
+      checkpoint.add_action_script "#{`pwd`.chomp}/sample/test_acrion.sh"
       checkpoint.criu_service_address = "/var/run/criu_service.socket"
     end
 
