@@ -1148,6 +1148,7 @@ module Haconiwa
       @criu_bin_path = "/usr/local/sbin/criu"
       @criu_use_tcp_established = false
       @leave_running = false
+      @criu_custom_action_scripts = []
 
       @extra_criu_options = []
       @extra_criu_externals = []
@@ -1155,6 +1156,7 @@ module Haconiwa
     attr_accessor :target_syscall, :images_dir, :log_level,
                   :criu_log_file, :criu_service_address, :criu_bin_path,
                   :criu_use_tcp_established, :leave_running,
+                  :criu_custom_action_scripts,
                   :extra_criu_options, :extra_criu_externals
 
     def target_syscall(*args)
@@ -1163,6 +1165,11 @@ module Haconiwa
       else
         @target_syscall = args
       end
+    end
+
+    def add_action_script(script)
+      # Timing should be handled in scripts using CRTOOLS_SCRIPT_ACTION
+      @criu_custom_action_scripts << script
     end
 
     def dump(base, opt={})

@@ -162,6 +162,9 @@ module Haconiwa
       if nw.enabled?
         cmds.options.concat(["--action-script", self_exe])
       end
+      checkpoint.criu_custom_action_scripts.each do |as|
+        cmds.options.concat(["--action-script", as])
+      end
 
       cmds.options.concat(["--root", @base.filesystem.root_path])
 
