@@ -147,6 +147,8 @@ module Haconiwa
         ::Namespace.setns(::Namespace::CLONE_NEWPID, fd: init_pidns_fd.fileno) if init_pidns_fd
         base.pid = pid
         kick_ok.close
+        # This is only for debug or performance monitoring
+        invoke_general_hook(:immediately_after_fork_on_parent, base)
 
         if base.namespace.use_guid_mapping?
           Logger.info "Using gid/uid mapping in this container..."
