@@ -1,4 +1,4 @@
-\module Haconiwa
+module Haconiwa
   module Hookable
     VALID_HOOKS = [
       :setup,
