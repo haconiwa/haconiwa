@@ -1,3 +1,9 @@
+haconiwa (0.10.6-1) unstable; urgency=medium
+
+  * Support action script, debug hook, hostname customization
+
+ -- Uchio Kondo <udzura@udzura.jp>  Tue, 24 Sep 2019 18:21:54 +0900
+
 haconiwa (0.10.5-1) unstable; urgency=medium
 
   * Change veth creation timing
@@ -27,9 +33,3 @@ haconiwa (0.10.1-1) unstable; urgency=medium
   * Fix restore error due to mruby-exec behavior
 
  -- Uchio Kondo <udzura@udzura.jp>  Mon, 18 Feb 2019 15:44:56 +0900
-
-haconiwa (0.10.0-1) unstable; urgency=medium
-
-  * First release with checkpoint/restore
-
- -- Uchio Kondo <udzura@udzura.jp>  Mon, 28 Jan 2019 14:41:51 +0900

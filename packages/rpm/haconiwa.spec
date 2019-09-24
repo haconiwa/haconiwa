@@ -1,6 +1,6 @@
 Name: haconiwa
 Epoch: 1
-Version: 0.10.5
+Version: 0.10.6
 Release: 1
 Summary: MRuby on Container
 License: GPLv3+
@@ -49,6 +49,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Tue Sep 24 2019 Uchio Kondo <udzura@udzura.jp> - 1:0.10.6-1
+- Support action script, debug hook, hostname customization
+
 * Fri Sep 13 2019 Uchio Kondo <udzura@udzura.jp> - 1:0.10.5-1
 - Change veth creation timing
 
@@ -63,6 +66,3 @@ fi
 
 * Mon Feb 18 2019 Uchio Kondo <udzura@udzura.jp> - 1:0.10.1-1
 - Fix restore error due to mruby-exec behavior
-
-* Mon Jan 28 2019 Uchio Kondo <udzura@udzura.jp> - 1:0.10.0-1
-- First release with checkpoint/restore

@@ -1,6 +1,11 @@
 ---
-latest: 0.10.5
+latest: 0.10.6
 changelog:
+- version: 0.10.6
+  messages:
+  - Support action script, debug hook, hostname customization
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Tue, 24 Sep 2019 18:21:54 +0900
 - version: 0.10.5
   messages:
   - Change veth creation timing
