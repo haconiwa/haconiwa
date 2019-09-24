@@ -3,6 +3,7 @@ module Haconiwa
     VALID_HOOKS = [
       :setup,
       :before_fork,
+      :immediately_after_fork_on_parent,
       :after_fork,
       :after_network_created,
       :after_network_initialized,
