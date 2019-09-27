@@ -5,15 +5,17 @@
 #include <sys/mount.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/sdt.h>
 #include <fcntl.h>
 #include <syslog.h>
 #include <string.h>
 #include <errno.h>
+#include <time.h>
 
-#include "mruby.h"
-#include "mruby/string.h"
-#include "mruby/hash.h"
-#include "mruby/error.h"
+#include <mruby.h>
+#include <mruby/string.h>
+#include <mruby/hash.h>
+#include <mruby/error.h>
 
 #define DONE mrb_gc_arena_restore(mrb, 0);
 
@@ -165,6 +167,47 @@ static mrb_value mrb_haconiwa_mkfifo(mrb_state *mrb, mrb_value self)
   return mrb_str_new_cstr(mrb, path);
 }
 
+static mrb_value mrb_haconiwa_probe_boottime(mrb_state *mrb, mrb_value self)
+{
+  mrb_int flag;
+  struct timespec tp;
+  mrb_get_args(mrb, "i", &flag);
+  (void)clock_gettime(CLOCK_BOOTTIME, &tp); // This won't be error
+  DTRACE_PROBE3(haconiwa, probe-boottime, (long)flag, tp.tv_sec, tp.tv_nsec);
+  return mrb_nil_value();
+}
+
+static mrb_value mrb_haconiwa_probe_containergen(mrb_state *mrb, mrb_value self)
+{
+  mrb_int flag;
+  struct timespec tp;
+  mrb_get_args(mrb, "i", &flag);
+  (void)clock_gettime(CLOCK_BOOTTIME, &tp);
+  DTRACE_PROBE3(haconiwa, probe-containergen, (long)flag, tp.tv_sec, tp.tv_nsec);
+  return mrb_nil_value();
+}
+
+static mrb_value mrb_haconiwa_probe_misc(mrb_state *mrb, mrb_value self)
+{
+  mrb_int flag;
+  mrb_value arg0;
+  mrb_get_args(mrb, "io", &flag, &arg0);
+
+  if(mrb_fixnum_p(arg0)) {
+    DTRACE_PROBE2(haconiwa, probe-misc, (long)flag, (long)mrb_fixnum(arg0));
+  } else if (mrb_string_p(arg0)) {
+    DTRACE_PROBE2(haconiwa, probe-misc, (long)flag, mrb_str_to_cstr(mrb, arg0));
+  } else {
+    char buf[32];
+    if(snprintf(buf, 32, "mrb_value(%p)", arg0.value.p) < -1) {
+      mrb_sys_fail(mrb, "Failed to setting mrb_value pointer");
+    } else {
+      buf[31] = '\0';
+      DTRACE_PROBE2(haconiwa, probe-misc, (long)flag, buf);
+    }
+  }  return mrb_nil_value();
+}
+
 void mrb_haconiwa_gem_init(mrb_state *mrb)
 {
   struct RClass *haconiwa;
@@ -172,6 +215,10 @@ void mrb_haconiwa_gem_init(mrb_state *mrb)
   mrb_define_class_method(mrb, haconiwa, "mrbgem_revisions", mrb_haconiwa_mrgbem_revisions, MRB_ARGS_NONE());
   mrb_define_class_method(mrb, haconiwa, "pivot_root_to", mrb_haconiwa_pivot_root_to, MRB_ARGS_REQ(1));
   mrb_define_class_method(mrb, haconiwa, "mkfifo", mrb_haconiwa_mkfifo, MRB_ARGS_ARG(1, 1));
+
+  mrb_define_class_method(mrb, haconiwa, "probe_boottime", mrb_haconiwa_probe_boottime, MRB_ARGS_REQ(1));
+  mrb_define_class_method(mrb, haconiwa, "probe_containergen", mrb_haconiwa_probe_boottime, MRB_ARGS_REQ(1));
+  mrb_define_class_method(mrb, haconiwa, "probe", mrb_haconiwa_probe_misc, MRB_ARGS_REQ(2));
 
   DONE;
 }

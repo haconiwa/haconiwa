@@ -62,10 +62,11 @@ Haconiwa.define do |config|
     Haconiwa::Logger.info("This is a hook!!!1: [#{base.pid}]")
     hostname = `hostname`.chomp
     Kernel.slack("This ia an async hook!!1 #{base.name}##{base.pid}, current hostname: #{hostname}")
-    # ::Process.kill :TERM, base.pid
+    Haconiwa.probe(Haconiwa::PHASE_USR1, base.name)
+    Haconiwa.probe_boottime(Haconiwa::PHASE_USR2)
   end
 
-  config.add_async_hook(sec: LIFETIME) do |base|
+  config.add_async_hook(sec: LIFETIME.to_i) do |base|
     msg = "Here comes lifetime... Container abort #{base.name}##{base.pid}"
     Haconiwa::Logger.info(msg)
     Kernel.slack(msg)

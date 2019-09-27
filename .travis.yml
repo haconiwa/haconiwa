@@ -18,6 +18,7 @@ addons:
       - libcap-dev
       - libargtable2-dev
       - parallel
+      - systemtap-sdt-dev
 compiler:
   - gcc
   - clang
