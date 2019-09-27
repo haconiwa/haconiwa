@@ -12,6 +12,7 @@ from bcc.utils import printb
 import os, sys
 
 haconiwa_path_or_pid = sys.argv[1]
+is_inside = sys.argv[2]
 
 bpf_text = """
 #include <uapi/linux/ptrace.h>
@@ -45,7 +46,11 @@ b = None
 if os.path.exists(haconiwa_path_or_pid):
     print("tracing program %s" % haconiwa_path_or_pid)
     u = USDT(path=haconiwa_path_or_pid)
-    u.enable_probe(probe="probe-boottime", fn_name="do_trace")
+    if is_inside:
+        u.enable_probe(probe="probe-boottime", fn_name="do_trace")
+    else:
+        u.enable_probe(probe="probe-containergen", fn_name="do_trace")
+
     b = BPF(text=bpf_text, usdt_contexts=[u])
 else:
     print("tracing PID = %s" % haconiwa_path_or_pid)

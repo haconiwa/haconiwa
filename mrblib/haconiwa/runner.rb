@@ -79,6 +79,7 @@ module Haconiwa
         done, kick_ok = IO.pipe
         Haconiwa.probe_boottime(PHASE_START_FORK)
         pid = Process.fork do
+          Haconiwa.probe_containergen(PHASE_CONTAINER_START)
           invoke_general_hook(:after_fork, base)
 
           begin
@@ -93,16 +94,15 @@ module Haconiwa
             end
             invoke_general_hook(:after_network_initialized, base)
             apply_namespace(base.namespace)
-
-            Logger.debug("OK: apply_namespace")
+            Haconiwa.probe_containergen(PHASE_CONTAINER_NAMESPACE_GENERATED)
             apply_filesystem(base)
-            Logger.debug("OK: apply_filesystem")
+            Haconiwa.probe_containergen(PHASE_CONTAINER_FILESYSTEM_SETUP)
             apply_rlimit(base.resource)
-            Logger.debug("OK: apply_rlimit")
+            Haconiwa.probe_containergen(PHASE_CONTAINER_RLIMIT_SETUP)
             apply_cgroup(base)
-            Logger.debug("OK: apply_cgroup")
+            Haconiwa.probe_containergen(PHASE_CONTAINER_CGROUP_SETUP)
             apply_remount(base)
-            Logger.debug("OK: apply_remount")
+            Haconiwa.probe_containergen(PHASE_CONTAINER_REMOUNTED)
             ::Procutil.sethostname(base.hostname) if base.namespace.flag?(::Namespace::CLONE_NEWUTS)
 
             apply_user_namespace(base.namespace)
@@ -115,28 +115,25 @@ module Haconiwa
               r2.close
               switch_current_namespace_root
             end
-            Logger.debug("OK: apply_user_namespace")
+            Haconiwa.probe_containergen(PHASE_CONTAINER_UID_MAPPING_SETUP)
 
             invoke_general_hook(:before_chroot, base)
 
             reopen_fds_host(base.command) if base.daemon?
             do_chroot(base)
             apply_masked_paths(base)
-            Logger.debug("OK: do_chroot")
+            Haconiwa.probe_containergen(PHASE_CONTAINER_CHROOTED)
             invoke_general_hook(:after_chroot, base)
 
             apply_apparmor(base.apparmor)
-            Logger.debug("OK: apply_apparmor")
 
             apply_capability(base.capabilities)
-            Logger.debug("OK: apply_capability")
+            Haconiwa.probe_containergen(PHASE_CONTAINER_CAPABILITY_SETUP)
             apply_seccomp(base.seccomp)
-            Logger.debug("OK: apply_seccomp")
+            Haconiwa.probe_containergen(PHASE_CONTAINER_SECCOMP_SETUP)
             switch_guid(base.guid)
-            Logger.debug("OK: switch_guid")
             kick_ok.puts "done"
             kick_ok.close
-            Logger.debug("OK: kick parent process to resume")
 
             reopen_fds_container(base.command) if base.daemon?
             exec_container!(base)
@@ -733,6 +730,7 @@ module Haconiwa
   class LinuxRunner < Runner
     def exec_container!(base)
       Haconiwa::Logger.info "Container is going to exec: #{base.init_command.inspect}"
+      Haconiwa.probe_containergen(PHASE_CONTAINER_EXECING)
       Exec.execve(base.environ, *base.init_command)
     end
   end
