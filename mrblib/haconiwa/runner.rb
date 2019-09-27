@@ -77,6 +77,7 @@ module Haconiwa
           r2, w2 = IO.pipe
         end
         done, kick_ok = IO.pipe
+        Haconiwa.probe_boottime(PHASE_START_FORK)
         pid = Process.fork do
           invoke_general_hook(:after_fork, base)
 
@@ -164,13 +165,18 @@ module Haconiwa
 
         done.read # wait for container is done
         done.close
+        Haconiwa.probe_boottime(PHASE_END_SETUP)
+
         persist_namespace(pid, base.namespace)
         drop_suid_bit
 
         run_base_setup_before_wait
         Logger.puts "Container fork success and going to wait: pid=#{pid}"
+        Haconiwa.probe_boottime(PHASE_START_WAIT)
         pid, status = base.waitloop.run_and_wait(pid)
+        Haconiwa.probe_boottime(PHASE_END_WAIT)
         run_cleanups_after_exit(status)
+        Haconiwa.probe_boottime(PHASE_CLEANUP)
       end
     end
 
