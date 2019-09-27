@@ -184,16 +184,16 @@ static mrb_value mrb_haconiwa_probe_misc(mrb_state *mrb, mrb_value self)
   mrb_get_args(mrb, "io", &flag, &arg0);
 
   if(mrb_fixnum_p(arg0)) {
-    DTRACE_PROBE2(haconiwa, probe-boottime, (long)flag, (long)mrb_fixnum(arg0));
+    DTRACE_PROBE2(haconiwa, probe-misc, (long)flag, (long)mrb_fixnum(arg0));
   } else if (mrb_string_p(arg0)) {
-    DTRACE_PROBE2(haconiwa, probe-boottime, (long)flag, mrb_str_to_cstr(mrb, arg0));
+    DTRACE_PROBE2(haconiwa, probe-misc, (long)flag, mrb_str_to_cstr(mrb, arg0));
   } else {
     char buf[32];
     if(snprintf(buf, 32, "mrb_value(%p)", arg0.value.p) < -1) {
       mrb_sys_fail(mrb, "Failed to setting mrb_value pointer");
     } else {
       buf[31] = '\0';
-      DTRACE_PROBE2(haconiwa, probe-boottime, (long)flag, buf);
+      DTRACE_PROBE2(haconiwa, probe-misc, (long)flag, buf);
     }
   }  return mrb_nil_value();
 }
