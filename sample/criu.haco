@@ -23,8 +23,8 @@ Haconiwa.define do |conf|
       checkpoint.target_syscall :listen, 0
       checkpoint.images_dir    = "/tmp/criu/images"
       checkpoint.criu_log_file = ENV['CRIU_RESTORE_LOG_FILE'] || "-"
-      checkpoint.criu_bin_path = `which criu`.chomp
-      checkpoint.add_action_script "#{`pwd`.chomp}/sample/test_acrion.sh"
+      checkpoint.criu_bin_path = ENV['MY_CRIU_BIN_PATH'] || `which criu`.chomp
+      checkpoint.add_action_script "#{`pwd`.chomp}/sample/test_action.sh"
       checkpoint.criu_service_address = "/var/run/criu_service.socket"
     end
 
@@ -37,11 +37,19 @@ Haconiwa.define do |conf|
     config.mount_independent "devtmpfs"
     config.capabilities.reset_to_privileged!
 
+    config.add_general_hook :immediately_after_fork_on_parent do |base|
+      cpid = base.pid
+      $pid = Process.fork do
+        system "timeout -s INT 2s strace -c -f -p #{cpid} > /tmp/strace.boot.#{$$}.log 2>&1"
+      end
+    end
+
     config.add_async_hook(sec: 10, interval_msec: 10 * 1000) do
       Haconiwa::Logger.puts "Hi! #{`date`}"
     end
 
     config.add_general_hook(:teardown_container) do |b|
+      Process.waitpid $pid #rescue nil
       Haconiwa::Logger.puts "Exit! #{b.exit_status}"
     end
   end
