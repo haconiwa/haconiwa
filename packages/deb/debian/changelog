@@ -1,3 +1,9 @@
+haconiwa (0.10.7-1) unstable; urgency=medium
+
+  * Include USDTs for performence monitoring
+
+ -- Uchio Kondo <udzura@udzura.jp>  Fri, 27 Sep 2019 18:46:13 +0900
+
 haconiwa (0.10.6-1) unstable; urgency=medium
 
   * Support action script, debug hook, hostname customization
@@ -27,9 +33,3 @@ haconiwa (0.10.2-1) unstable; urgency=medium
   * Support leave-running option for dump
 
  -- Uchio Kondo <udzura@udzura.jp>  Tue, 19 Feb 2019 17:00:29 +0900
-
-haconiwa (0.10.1-1) unstable; urgency=medium
-
-  * Fix restore error due to mruby-exec behavior
-
- -- Uchio Kondo <udzura@udzura.jp>  Mon, 18 Feb 2019 15:44:56 +0900
