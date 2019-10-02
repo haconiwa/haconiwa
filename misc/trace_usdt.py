@@ -46,7 +46,7 @@ b = None
 if os.path.exists(haconiwa_path_or_pid):
     print("tracing program %s" % haconiwa_path_or_pid)
     u = USDT(path=haconiwa_path_or_pid)
-    if is_inside:
+    if is_inside == "0":
         u.enable_probe(probe="probe-boottime", fn_name="do_trace")
     else:
         u.enable_probe(probe="probe-containergen", fn_name="do_trace")
