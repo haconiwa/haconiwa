@@ -51,8 +51,10 @@ module Haconiwa
 
       raise_container do |base|
         invoke_general_hook(:before_fork, base)
+        hpid = Process.pid
         nw_handler = nil
         if base.network.enabled?
+          Haconiwa.probe_phase_pass(PHASE_START_CREATE_NETWORK, hpid)
           nw_handler = NetworkHandler::Bridge.new(base.network)
           begin
             nw_handler.generate
@@ -60,6 +62,7 @@ module Haconiwa
             Logger.warning "Creating veth pair failed"
             Logger.exception(e)
           end
+          Haconiwa.probe_phase_pass(PHASE_END_CREATE_NETWORK, hpid)
         end
         invoke_general_hook(:after_network_created, base)
 
@@ -77,9 +80,9 @@ module Haconiwa
           r2, w2 = IO.pipe
         end
         done, kick_ok = IO.pipe
-        Haconiwa.probe_boottime(PHASE_START_FORK)
+        Haconiwa.probe_phase_pass(PHASE_START_FORK, hpid)
         pid = Process.fork do
-          Haconiwa.probe_containergen(PHASE_CONTAINER_START)
+          Haconiwa.probe_phase_pass(PHASE_CONTAINER_START, hpid)
           invoke_general_hook(:after_fork, base)
 
           begin
@@ -94,15 +97,15 @@ module Haconiwa
             end
             invoke_general_hook(:after_network_initialized, base)
             apply_namespace(base.namespace)
-            Haconiwa.probe_containergen(PHASE_CONTAINER_NAMESPACE_GENERATED)
+            Haconiwa.probe_phase_pass(PHASE_CONTAINER_NAMESPACE_GENERATED, hpid)
             apply_filesystem(base)
-            Haconiwa.probe_containergen(PHASE_CONTAINER_FILESYSTEM_SETUP)
+            Haconiwa.probe_phase_pass(PHASE_CONTAINER_FILESYSTEM_SETUP, hpid)
             apply_rlimit(base.resource)
-            Haconiwa.probe_containergen(PHASE_CONTAINER_RLIMIT_SETUP)
+            Haconiwa.probe_phase_pass(PHASE_CONTAINER_RLIMIT_SETUP, hpid)
             apply_cgroup(base)
-            Haconiwa.probe_containergen(PHASE_CONTAINER_CGROUP_SETUP)
+            Haconiwa.probe_phase_pass(PHASE_CONTAINER_CGROUP_SETUP, hpid)
             apply_remount(base)
-            Haconiwa.probe_containergen(PHASE_CONTAINER_REMOUNTED)
+            Haconiwa.probe_phase_pass(PHASE_CONTAINER_REMOUNTED, hpid)
             ::Procutil.sethostname(base.hostname) if base.namespace.flag?(::Namespace::CLONE_NEWUTS)
 
             apply_user_namespace(base.namespace)
@@ -115,28 +118,28 @@ module Haconiwa
               r2.close
               switch_current_namespace_root
             end
-            Haconiwa.probe_containergen(PHASE_CONTAINER_UID_MAPPING_SETUP)
+            Haconiwa.probe_phase_pass(PHASE_CONTAINER_UID_MAPPING_SETUP, hpid)
 
             invoke_general_hook(:before_chroot, base)
 
             reopen_fds_host(base.command) if base.daemon?
             do_chroot(base)
             apply_masked_paths(base)
-            Haconiwa.probe_containergen(PHASE_CONTAINER_CHROOTED)
+            Haconiwa.probe_phase_pass(PHASE_CONTAINER_CHROOTED, hpid)
             invoke_general_hook(:after_chroot, base)
 
             apply_apparmor(base.apparmor)
 
             apply_capability(base.capabilities)
-            Haconiwa.probe_containergen(PHASE_CONTAINER_CAPABILITY_SETUP)
+            Haconiwa.probe_phase_pass(PHASE_CONTAINER_CAPABILITY_SETUP, hpid)
             apply_seccomp(base.seccomp)
-            Haconiwa.probe_containergen(PHASE_CONTAINER_SECCOMP_SETUP)
+            Haconiwa.probe_phase_pass(PHASE_CONTAINER_SECCOMP_SETUP, hpid)
             switch_guid(base.guid)
             kick_ok.puts "done"
             kick_ok.close
 
             reopen_fds_container(base.command) if base.daemon?
-            exec_container!(base)
+            exec_container!(base, hpid)
           rescue => e
             Logger.exception(e)
             exit(127)
@@ -162,22 +165,22 @@ module Haconiwa
 
         done.read # wait for container is done
         done.close
-        Haconiwa.probe_boottime(PHASE_END_SETUP)
+        Haconiwa.probe_phase_pass(PHASE_END_SETUP, hpid)
 
         persist_namespace(pid, base.namespace)
         drop_suid_bit
 
         run_base_setup_before_wait
         Logger.puts "Container fork success and going to wait: pid=#{pid}"
-        Haconiwa.probe_boottime(PHASE_START_WAIT)
+        Haconiwa.probe_phase_pass(PHASE_START_WAIT, hpid)
         pid, status = base.waitloop.run_and_wait(pid)
-        Haconiwa.probe_boottime(PHASE_END_WAIT)
+        Haconiwa.probe_phase_pass(PHASE_END_WAIT, hpid)
         run_cleanups_after_exit(status)
-        Haconiwa.probe_boottime(PHASE_CLEANUP)
+        Haconiwa.probe_phase_pass(PHASE_CLEANUP, hpid)
       end
     end
 
-    def exec_container!(base)
+    def exec_container!(base, hpid)
       raise "Implement me at subclasses"
     end
 
@@ -728,9 +731,9 @@ module Haconiwa
   end
 
   class LinuxRunner < Runner
-    def exec_container!(base)
+    def exec_container!(base, hpid)
       Haconiwa::Logger.info "Container is going to exec: #{base.init_command.inspect}"
-      Haconiwa.probe_containergen(PHASE_CONTAINER_EXECING)
+      Haconiwa.probe_phase_pass(PHASE_CONTAINER_EXECING, hpid)
       Exec.execve(base.environ, *base.init_command)
     end
   end
