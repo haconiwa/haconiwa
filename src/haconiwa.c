@@ -169,9 +169,9 @@ static mrb_value mrb_haconiwa_mkfifo(mrb_state *mrb, mrb_value self)
 
 static mrb_value mrb_haconiwa_probe_phase_pass(mrb_state *mrb, mrb_value self)
 {
-  mrb_int hpid, phase;
-  mrb_get_args(mrb, "ii", &hpid, &phase);
-  DTRACE_PROBE2(haconiwa, bootstrap-phase-pass, (long)hpid, (long)phase);
+  mrb_int phase, hpid;
+  mrb_get_args(mrb, "ii", &phase, &hpid);
+  DTRACE_PROBE2(haconiwa, bootstrap-phase-pass, (long)phase, (long)hpid);
   return mrb_nil_value();
 }
 
