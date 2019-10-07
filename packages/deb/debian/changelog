@@ -1,3 +1,9 @@
+haconiwa (0.10.8-1) unstable; urgency=medium
+
+  * Refine probes, check NS before create network
+
+ -- Uchio Kondo <udzura@udzura.jp>  Mon,  7 Oct 2019 20:23:55 +0900
+
 haconiwa (0.10.7-1) unstable; urgency=medium
 
   * Include USDTs for performence monitoring
@@ -27,9 +33,3 @@ haconiwa (0.10.3-1) unstable; urgency=medium
   * Add cgroup.name DSL, change mruby target to 2.0.1
 
  -- Uchio Kondo <udzura@udzura.jp>  Thu, 20 Jun 2019 20:00:17 +0900
-
-haconiwa (0.10.2-1) unstable; urgency=medium
-
-  * Support leave-running option for dump
-
- -- Uchio Kondo <udzura@udzura.jp>  Tue, 19 Feb 2019 17:00:29 +0900

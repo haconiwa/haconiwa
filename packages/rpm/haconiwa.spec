@@ -1,6 +1,6 @@
 Name: haconiwa
 Epoch: 1
-Version: 0.10.7
+Version: 0.10.8
 Release: 1
 Summary: MRuby on Container
 License: GPLv3+
@@ -49,6 +49,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Mon Oct  7 2019 Uchio Kondo <udzura@udzura.jp> - 1:0.10.8-1
+- Refine probes, check NS before create network
+
 * Fri Sep 27 2019 Uchio Kondo <udzura@udzura.jp> - 1:0.10.7-1
 - Include USDTs for performence monitoring
 
@@ -63,6 +66,3 @@ fi
 
 * Thu Jun 20 2019 Uchio Kondo <udzura@udzura.jp> - 1:0.10.3-1
 - Add cgroup.name DSL, change mruby target to 2.0.1
-
-* Tue Feb 19 2019 Uchio Kondo <udzura@udzura.jp> - 1:0.10.2-1
-- Support leave-running option for dump
