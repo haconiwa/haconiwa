@@ -51,8 +51,10 @@ module Haconiwa
 
       raise_container do |base|
         invoke_general_hook(:before_fork, base)
+        hpid = Process.pid
         nw_handler = nil
         if base.network.enabled?
+          Haconiwa.probe_phase_pass(PHASE_START_CREATE_NETWORK, hpid)
           nw_handler = NetworkHandler::Bridge.new(base.network)
           begin
             nw_handler.generate
@@ -60,6 +62,7 @@ module Haconiwa
             Logger.warning "Creating veth pair failed"
             Logger.exception(e)
           end
+          Haconiwa.probe_phase_pass(PHASE_END_CREATE_NETWORK, hpid)
         end
         invoke_general_hook(:after_network_created, base)
 
@@ -77,7 +80,6 @@ module Haconiwa
           r2, w2 = IO.pipe
         end
         done, kick_ok = IO.pipe
-        hpid = Process.pid
         Haconiwa.probe_phase_pass(PHASE_START_FORK, hpid)
         pid = Process.fork do
           Haconiwa.probe_phase_pass(PHASE_CONTAINER_START, hpid)
