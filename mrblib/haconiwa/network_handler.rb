@@ -18,9 +18,13 @@ module Haconiwa
         # TODO: defaulting to too verbose, this should be configurable
         setup_cmd_logger
 
-        make_network_namespace
-        make_veth
-        make_container_network
+        # Check NetNS file already exists
+        # Haconiwa believes that network is OK when ns already exists
+        unless File.exist?(self.ns_file)
+          make_network_namespace
+          make_veth
+          make_container_network
+        end
       rescue => e
         @failed = true
         raise(e)
@@ -40,7 +44,6 @@ module Haconiwa
 
       private
       def make_network_namespace
-        return if File.exist?(ns_file)
         unless safe_ip_run("ip netns add %s", network.namespace)
           raise "Creating namespace failed: ip netns add #{network.namespace}"
         end
