@@ -62,8 +62,8 @@ Haconiwa.define do |config|
     Haconiwa::Logger.info("This is a hook!!!1: [#{base.pid}]")
     hostname = `hostname`.chomp
     Kernel.slack("This ia an async hook!!1 #{base.name}##{base.pid}, current hostname: #{hostname}")
-    Haconiwa.probe(Haconiwa::PHASE_USR1, base.name)
-    Haconiwa.probe_boottime(Haconiwa::PHASE_USR2)
+    Haconiwa.probe_str(Haconiwa::PHASE_USR1, base.name)
+    Haconiwa.probe_phase_pass(Haconiwa::PHASE_USR2, Process.pid)
   end
 
   config.add_async_hook(sec: LIFETIME.to_i) do |base|
