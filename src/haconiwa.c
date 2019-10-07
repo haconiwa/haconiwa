@@ -167,23 +167,11 @@ static mrb_value mrb_haconiwa_mkfifo(mrb_state *mrb, mrb_value self)
   return mrb_str_new_cstr(mrb, path);
 }
 
-static mrb_value mrb_haconiwa_probe_boottime(mrb_state *mrb, mrb_value self)
+static mrb_value mrb_haconiwa_probe_phase_pass(mrb_state *mrb, mrb_value self)
 {
-  mrb_int flag;
-  struct timespec tp;
-  mrb_get_args(mrb, "i", &flag);
-  (void)clock_gettime(CLOCK_BOOTTIME, &tp); // This won't be error
-  DTRACE_PROBE3(haconiwa, probe-boottime, (long)flag, tp.tv_sec, tp.tv_nsec);
-  return mrb_nil_value();
-}
-
-static mrb_value mrb_haconiwa_probe_containergen(mrb_state *mrb, mrb_value self)
-{
-  mrb_int flag;
-  struct timespec tp;
-  mrb_get_args(mrb, "i", &flag);
-  (void)clock_gettime(CLOCK_BOOTTIME, &tp);
-  DTRACE_PROBE3(haconiwa, probe-containergen, (long)flag, tp.tv_sec, tp.tv_nsec);
+  mrb_int hpid, phase;
+  mrb_get_args(mrb, "ii", &hpid, &phase);
+  DTRACE_PROBE2(haconiwa, bootstrap-phase-pass, (long)hpid, (long)phase);
   return mrb_nil_value();
 }
 
@@ -216,8 +204,7 @@ void mrb_haconiwa_gem_init(mrb_state *mrb)
   mrb_define_class_method(mrb, haconiwa, "pivot_root_to", mrb_haconiwa_pivot_root_to, MRB_ARGS_REQ(1));
   mrb_define_class_method(mrb, haconiwa, "mkfifo", mrb_haconiwa_mkfifo, MRB_ARGS_ARG(1, 1));
 
-  mrb_define_class_method(mrb, haconiwa, "probe_boottime", mrb_haconiwa_probe_boottime, MRB_ARGS_REQ(1));
-  mrb_define_class_method(mrb, haconiwa, "probe_containergen", mrb_haconiwa_probe_boottime, MRB_ARGS_REQ(1));
+  mrb_define_class_method(mrb, haconiwa, "probe_phase_pass", mrb_haconiwa_probe_phase_pass, MRB_ARGS_REQ(2));
   mrb_define_class_method(mrb, haconiwa, "probe", mrb_haconiwa_probe_misc, MRB_ARGS_REQ(2));
 
   DONE;
