@@ -178,22 +178,30 @@ static mrb_value mrb_haconiwa_probe_phase_pass(mrb_state *mrb, mrb_value self)
 static mrb_value mrb_haconiwa_probe_misc(mrb_state *mrb, mrb_value self)
 {
   mrb_int flag;
-  mrb_value arg0;
-  mrb_get_args(mrb, "io", &flag, &arg0);
+  mrb_int arg0;
+  mrb_get_args(mrb, "ii", &flag, &arg0);
 
-  if(mrb_fixnum_p(arg0)) {
-    DTRACE_PROBE2(haconiwa, probe-misc, (long)flag, (long)mrb_fixnum(arg0));
-  } else if (mrb_string_p(arg0)) {
-    DTRACE_PROBE2(haconiwa, probe-misc, (long)flag, mrb_str_to_cstr(mrb, arg0));
+  DTRACE_PROBE2(haconiwa, probe-misc, (long)flag, (long)arg0);
+  return mrb_nil_value();
+}
+
+static mrb_value mrb_haconiwa_probe_misc_str(mrb_state *mrb, mrb_value self)
+{
+  mrb_int flag;
+  mrb_value arg0;
+  char buf[64];
+
+  mrb_get_args(mrb, "io", &flag, &arg0);
+  if (mrb_string_p(arg0)) {
+    (void)strncpy(buf, mrb_str_to_cstr(mrb, arg0), 64);
   } else {
-    char buf[32];
-    if(snprintf(buf, 32, "mrb_value(%p)", arg0.value.p) < -1) {
+    if(snprintf(buf, 64, "mrb_value(%p)", arg0.value.p) < -1) {
       mrb_sys_fail(mrb, "Failed to setting mrb_value pointer");
-    } else {
-      buf[31] = '\0';
-      DTRACE_PROBE2(haconiwa, probe-misc, (long)flag, buf);
     }
-  }  return mrb_nil_value();
+  }
+  buf[64] = '\0';
+  DTRACE_PROBE2(haconiwa, probe-misc-str, (long)flag, mrb_str_to_cstr(mrb, arg0));
+  return mrb_nil_value();
 }
 
 void mrb_haconiwa_gem_init(mrb_state *mrb)
@@ -206,6 +214,7 @@ void mrb_haconiwa_gem_init(mrb_state *mrb)
 
   mrb_define_class_method(mrb, haconiwa, "probe_phase_pass", mrb_haconiwa_probe_phase_pass, MRB_ARGS_REQ(2));
   mrb_define_class_method(mrb, haconiwa, "probe", mrb_haconiwa_probe_misc, MRB_ARGS_REQ(2));
+  mrb_define_class_method(mrb, haconiwa, "probe_str", mrb_haconiwa_probe_misc_str, MRB_ARGS_REQ(2));
 
   DONE;
 }
