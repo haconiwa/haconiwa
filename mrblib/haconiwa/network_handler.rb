@@ -40,6 +40,7 @@ module Haconiwa
 
       private
       def make_network_namespace
+        return if File.exist?(ns_file)
         unless safe_ip_run("ip netns add %s", network.namespace)
           raise "Creating namespace failed: ip netns add #{network.namespace}"
         end
