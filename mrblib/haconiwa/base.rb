@@ -344,6 +344,7 @@ module Haconiwa
       LinuxRunner.new(self).waitall do |_w|
         targets.map do |c|
           pid = ::Process.fork do
+            Haconiwa.probe_phase_pass(PHASE_START_SV, Process.pid)
             _w.close if _w
             c.start(options, *init_command)
           end

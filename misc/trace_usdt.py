@@ -43,14 +43,14 @@ b = None
 if os.path.exists(haconiwa_path_or_pid):
     print("tracing program %s" % haconiwa_path_or_pid)
     u = USDT(path=haconiwa_path_or_pid)
-    u.enable_probe(probe="bootstrap-phase-pass", fn_name="do_trace")
+    u.enable_probe(probe="bootstrap_phase_pass", fn_name="do_trace")
 
     b = BPF(text=bpf_text, usdt_contexts=[u])
 else:
     print("tracing PID = %s" % haconiwa_path_or_pid)
     u2 = USDT(pid=int(haconiwa_path_or_pid))
-    # u2.enable_probe(probe="probe-misc", fn_name="do_trace")
-    u2.enable_probe(probe="probe-misc-str", fn_name="do_trace_str")
+    # u2.enable_probe(probe="probe_misc", fn_name="do_trace")
+    u2.enable_probe(probe="probe_misc_str", fn_name="do_trace_str")
     b = BPF(text=bpf_text_str, usdt_contexts=[u2])
 
 print("%-18s %-16s %-6s %s" % ("TIME(s)", "COMM", "PID", "VALUE"))

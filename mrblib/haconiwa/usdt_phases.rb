@@ -1,5 +1,6 @@
 module Haconiwa
-  PHASE_START_EVAL   = 1
+  PHASE_CLI_START    = 0
+  PHASE_START_SV     = 1
   PHASE_START_FORK   = 2
   PHASE_END_SETUP    = 3
   PHASE_START_WAIT   = 4

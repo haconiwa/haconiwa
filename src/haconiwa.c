@@ -171,7 +171,7 @@ static mrb_value mrb_haconiwa_probe_phase_pass(mrb_state *mrb, mrb_value self)
 {
   mrb_int phase, hpid;
   mrb_get_args(mrb, "ii", &phase, &hpid);
-  DTRACE_PROBE2(haconiwa, bootstrap-phase-pass, (long)phase, (long)hpid);
+  DTRACE_PROBE2(haconiwa, bootstrap_phase_pass, (long)phase, (long)hpid);
   return mrb_nil_value();
 }
 
@@ -181,7 +181,7 @@ static mrb_value mrb_haconiwa_probe_misc(mrb_state *mrb, mrb_value self)
   mrb_int arg0;
   mrb_get_args(mrb, "ii", &flag, &arg0);
 
-  DTRACE_PROBE2(haconiwa, probe-misc, (long)flag, (long)arg0);
+  DTRACE_PROBE2(haconiwa, probe_misc, (long)flag, (long)arg0);
   return mrb_nil_value();
 }
 
@@ -200,7 +200,7 @@ static mrb_value mrb_haconiwa_probe_misc_str(mrb_state *mrb, mrb_value self)
     }
   }
   buf[64] = '\0';
-  DTRACE_PROBE2(haconiwa, probe-misc-str, (long)flag, mrb_str_to_cstr(mrb, arg0));
+  DTRACE_PROBE2(haconiwa, probe_misc_str, (long)flag, mrb_str_to_cstr(mrb, arg0));
   return mrb_nil_value();
 }
 

@@ -1,0 +1,4 @@
+BEGIN { printf("Starting trace...\n"); }
+usdt:./mruby/bin/haconiwa:haconiwa:bootstrap_phase_pass /arg0 > 10/ {
+	printf("[%d] Pass: hpid: %d, phase: %d\n", nsecs, arg1, arg0);
+}

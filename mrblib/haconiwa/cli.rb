@@ -74,7 +74,7 @@ module Haconiwa
       end
       cli_options = {}
 
-      Haconiwa.probe_phase_pass(PHASE_START_EVAL, Process.pid)
+      Haconiwa.probe_phase_pass(PHASE_CLI_START, Process.pid)
       base, init = Util.get_script_and_eval(opt.catchall.values)
       base.daemonize! if opt['D'].exist?
       base.cancel_daemonize! if opt['T'].exist?
