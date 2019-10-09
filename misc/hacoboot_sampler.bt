@@ -1,0 +1,38 @@
+#!/usr/bin/env bpftrace
+/* Show max/min/avg of haconiwa's workload time to execve/listen called */
+
+usdt:./mruby/bin/haconiwa:haconiwa:bootstrap_phase_pass / arg0 == 1 /
+{
+    @run[tid] = nsecs;
+}
+
+usdt:./mruby/bin/haconiwa:haconiwa:bootstrap_phase_pass / arg0 == 2 /
+{
+    @this_fork[tid] = 1;
+}
+
+/* inherit process id */
+tracepoint:syscalls:sys_exit_clone / @this_fork[tid] /
+{
+    @boot[args->ret] = @run[tid];
+    delete(@this_fork[tid]);
+    delete(@run[tid]);
+}
+
+tracepoint:syscalls:sys_enter_execve / @boot[tid] && str(args->filename) == str($1) /
+{
+    $execve = nsecs - @boot[tid];
+    @execve__count = count();
+    @execve_avg = avg($execve);
+    @execve_max = max($execve);
+    @execve_min = min($execve);
+}
+
+tracepoint:syscalls:sys_exit_listen / @boot[tid] / {
+    $listen = nsecs - @boot[tid];
+    @listen__count = count();
+    @listen_avg = avg($listen);
+    @listen_max = max($listen);
+    @listen_min = min($listen);
+    delete(@boot[tid]);
+}
