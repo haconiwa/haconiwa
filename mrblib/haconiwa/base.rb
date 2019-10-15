@@ -19,6 +19,7 @@ module Haconiwa
                   :checkpoint,
                   :general_hooks,
                   :async_hooks,
+                  :readiness_hooks,
                   :cgroup_hooks,
                   :wait_interval,
                   :environ,
@@ -81,6 +82,7 @@ module Haconiwa
       @checkpoint = Checkpoint.new
       @general_hooks = {}
       @async_hooks = []
+      @readiness_hooks = []
       @cgroup_hooks = []
       @wait_interval = 5
       @environ = {}
@@ -264,6 +266,10 @@ module Haconiwa
       @async_hooks << WaitLoop::TimerHook.new(options, &hook)
     end
     alias after_spawn add_async_hook
+
+    def add_readiness_hook(options={}, &hook)
+      @readiness_hooks << WaitLoop::ReadinessHook.new(options, &hook)
+    end
 
     def add_cgroup_hook(options={}, &hook)
       @cgroup_hooks << WaitLoop::CGroupHook.new(options, &hook)
@@ -477,6 +483,7 @@ module Haconiwa
         :@checkpoint,
         :@general_hooks,
         :@async_hooks,
+        :@readiness_hooks,
         :@cgroup_hooks,
         :@wait_interval,
         :@environ,
