@@ -48,6 +48,10 @@ Haconiwa.define do |conf|
       Haconiwa::Logger.puts "Hi! #{`date`}"
     end
 
+    config.add_readiness_hook(port: 80, timeout: 10) do |base|
+      Haconiwa::Logger.puts "Port 80 looks ready, yey!!! pid = #{base.pid}"
+    end
+
     config.add_general_hook(:teardown_container) do |b|
       Process.waitpid $pid #rescue nil
       Haconiwa::Logger.puts "Exit! #{b.exit_status}"

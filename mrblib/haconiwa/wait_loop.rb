@@ -32,6 +32,39 @@ module Haconiwa
           end
         end
       end
+
+      base.readiness_hooks.each do |hook|
+        hook.set_signal!
+        sig = hook.signal
+        blk = hook.proc
+        check_str4 = "00000000:%04X" % hook.readiness_port
+        check_str6 = "00000000000000000000000000000000:%04X" % hook.readiness_port
+        timeout = Time.now.to_i + hook.timeout
+        @mainloop.register_timer(hook.signal, hook.timing, hook.interval) do
+          begin
+            next unless base.pid
+            ::Haconiwa::Logger.debug("Check readiness: pid = #{base.pid}, port = #{hook.readiness_port}")
+            cmd = "#{hook.nsenter_path} --net --pid --mount -t #{base.pid}"
+
+            if `#{cmd} cat /proc/net/tcp`.include?(check_str4) || `#{cmd} cat /proc/net/tcp6`.include?(check_str6)
+              blk.call(base)
+              if t = @mainloop.timer_for(sig)
+                ::Haconiwa::Logger.puts("Check hook stopped successfully")
+                t[0].stop
+              end
+            end
+          rescue => e
+            ::Haconiwa::Logger.warning("Check hook failed: #{e.class}, #{e.message}")
+          ensure
+            if timeout < Time.now.to_i
+              ::Haconiwa::Logger.warning("Check hook stopped for timeout")
+              if t = @mainloop.timer_for(sig)
+                t[0].stop
+              end
+            end
+          end
+        end
+      end
     end
 
     def register_sighandlers(base, runner)
@@ -105,7 +138,7 @@ module Haconiwa
                   elsif s = timing[:hour]
                     s * 1000 * 60 * 60
                   else
-                    raise(ArgumentError, "Invalid option: #{timing.inspect}")
+                    timing_default(timing)
                   end
         @interval = timing[:interval_msec] || 0 # TODO: other time scales
         @proc = b
@@ -125,6 +158,27 @@ module Haconiwa
             TimerHook.signal_pool << @signal
           end
         end
+      end
+
+      def timing_default(opt)
+        raise(ArgumentError, "Invalid option: #{opt.inspect}")
+      end
+    end
+
+    class ReadinessHook < TimerHook
+      def initialize(options={}, &b)
+        super
+        @timing ||= 50
+        @interval = 10 if @interval <= 0
+        @readiness_port = options[:port] || options[:readiness_port]
+        @timeout = options[:timeout] || 1800 # (sec)
+        @nsenter_path = options[:nsenter_path] || 'nsenter'
+      end
+      attr_accessor :readiness_port, :timeout, :nsenter_path
+
+      def timing_default(opt)
+        # skip
+        nil
       end
     end
 
