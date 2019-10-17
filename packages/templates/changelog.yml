@@ -1,6 +1,11 @@
 ---
-latest: 0.10.8
+latest: 0.10.9
 changelog:
+- version: 0.10.9
+  messages:
+  - Add readiness hooks
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Thu, 17 Oct 2019 16:09:42 +0900
 - version: 0.10.8
   messages:
   - Refine probes, check NS before create network

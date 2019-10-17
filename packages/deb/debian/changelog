@@ -1,3 +1,9 @@
+haconiwa (0.10.9-1) unstable; urgency=medium
+
+  * Add readiness hooks
+
+ -- Uchio Kondo <udzura@udzura.jp>  Thu, 17 Oct 2019 16:09:42 +0900
+
 haconiwa (0.10.8-1) unstable; urgency=medium
 
   * Refine probes, check NS before create network
@@ -27,9 +33,3 @@ haconiwa (0.10.4-1) unstable; urgency=medium
   * Fix broken cleanup by fibered_worker change
 
  -- Uchio Kondo <udzura@udzura.jp>  Sat, 10 Aug 2019 17:14:58 +0900
-
-haconiwa (0.10.3-1) unstable; urgency=medium
-
-  * Add cgroup.name DSL, change mruby target to 2.0.1
-
- -- Uchio Kondo <udzura@udzura.jp>  Thu, 20 Jun 2019 20:00:17 +0900
