@@ -41,6 +41,7 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.add_dependency 'mruby-lockfile', :github => 'udzura/mruby-lockfile'
   spec.add_dependency 'mruby-fibered_worker' , :github => 'udzura/mruby-fibered_worker'
   spec.add_dependency 'mruby-eventfd' , :github => 'matsumotory/mruby-eventfd'
+  spec.add_dependency 'mruby-file-listen-checker', github: 'pyama86/mruby-file-listen-checker'
 
   spec.add_dependency 'mruby-syslog'    , :github => 'udzura/mruby-syslog'
   spec.add_dependency 'mruby-sha1', :github => 'mattn/mruby-sha1'
