@@ -1076,15 +1076,24 @@ module Haconiwa
   end
 
   class Network
+    def initialize
+      @cleanup = true
+    end
+
     attr_accessor :container_ip,
                   :bridge_ip,
                   :netmask,
                   :namespace
+                  :cleanup
     attr_writer   :veth_host,
                   :veth_guest
 
     def enabled?
       !!(container_ip)
+    end
+
+    def cleanup?
+      cleanup
     end
 
     def bridge_name
