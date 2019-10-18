@@ -1083,7 +1083,7 @@ module Haconiwa
     attr_accessor :container_ip,
                   :bridge_ip,
                   :netmask,
-                  :namespace
+                  :namespace,
                   :cleanup
     attr_writer   :veth_host,
                   :veth_guest
