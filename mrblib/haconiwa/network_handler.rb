@@ -34,7 +34,7 @@ module Haconiwa
       end
 
       def cleanup
-        return unless File.exist?(ns_file)
+        return if !File.exist?(ns_file) || !network.cleanup?
 
         unless system("ip netns del #{network.namespace}")
           raise "Cleanup of namespace failed"
