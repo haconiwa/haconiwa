@@ -11,7 +11,7 @@ module Haconiwa
         hook.set_signal!
         blk = hook.proc
         @mainloop.register_timer(hook.signal, hook.timing, hook.interval) do
-          ::Haconiwa::Logger.warning("Async hook starting...")
+          ::Haconiwa::Logger.debug("Async hook starting...")
           begin
             blk.call(base)
           rescue => e
