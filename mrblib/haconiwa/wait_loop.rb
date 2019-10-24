@@ -46,13 +46,17 @@ module Haconiwa
               exit 0 if ::FileListenCheck.new(hook.readiness_ip, hook.readiness_port).listen? || FileListenCheck.new(hook.readiness_ipv6, hook.readiness_port).listen6?
               exit 1
             } rescue nil
-            blk.call(base, ok)
+            ret = blk.call(base, ok)
 
-            if ok
+            if ret && ok
               if t = @mainloop.timer_for(sig)
                 ::Haconiwa::Logger.puts("Check hook stopped successfully")
                 t[0].stop
               end
+            end
+
+            if !ret && ok
+              ::Haconiwa::Logger.warning("Listen check seems ok, but final check failed. If it seems strange for you, check the hook itself returns intended true/false by internal logic")
             end
           rescue => e
             ::Haconiwa::Logger.warning("Check hook failed: #{e.class}, #{e.message}")

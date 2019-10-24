@@ -51,8 +51,10 @@ Haconiwa.define do |conf|
     config.add_readiness_hook(port: 80, timeout: 10, interval_msec: 250) do |base, ok|
       if ok
         Haconiwa::Logger.puts "Port 80 looks ready, yey!!! pid = #{base.pid}"
+        true
       else
         Haconiwa::Logger.puts "not ready: #{Time.now}"
+        false
       end
     end
 

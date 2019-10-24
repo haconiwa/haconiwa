@@ -41,6 +41,7 @@ Haconiwa.define do |config|
     config.add_readiness_hook(port: 3000, timeout: 10, interval_msec: 250) do |base, ok|
       if ok
         Haconiwa::Logger.puts "Port 3000 looks ready, yey!!! pid = #{base.pid}"
+        true
     #   begin
     #     base.checkpoint.dump base
     #   rescue => e
