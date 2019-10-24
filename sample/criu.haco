@@ -39,17 +39,21 @@ Haconiwa.define do |conf|
 
     config.add_general_hook :immediately_after_fork_on_parent do |base|
       cpid = base.pid
-      $pid = Process.fork do
-        system "timeout -s INT 2s strace -c -f -p #{cpid} > /tmp/strace.boot.#{$$}.log 2>&1"
-      end
+      # $pid = Process.fork do
+      #   system "timeout -s INT 2s strace -c -f -p #{cpid} > /tmp/strace.boot.#{$$}.log 2>&1"
+      # end
     end
 
     config.add_async_hook(sec: 10, interval_msec: 10 * 1000) do
       Haconiwa::Logger.puts "Hi! #{`date`}"
     end
 
-    config.add_readiness_hook(port: 80, timeout: 10) do |base|
-      Haconiwa::Logger.puts "Port 80 looks ready, yey!!! pid = #{base.pid}"
+    config.add_readiness_hook(port: 80, timeout: 10, interval_msec: 250) do |base, ok|
+      if ok
+        Haconiwa::Logger.puts "Port 80 looks ready, yey!!! pid = #{base.pid}"
+      else
+        Haconiwa::Logger.puts "not ready: #{Time.now}"
+      end
     end
 
     config.add_general_hook(:teardown_container) do |b|
