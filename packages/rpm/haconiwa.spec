@@ -1,6 +1,6 @@
 Name: haconiwa
 Epoch: 1
-Version: 0.10.9
+Version: 0.10.10
 Release: 1
 Summary: MRuby on Container
 License: GPLv3+
@@ -49,6 +49,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Thu Oct 24 2019 Uchio Kondo <udzura@udzura.jp> - 1:0.10.10-1
+- Fix and enhance readiness hook
+
 * Thu Oct 17 2019 Uchio Kondo <udzura@udzura.jp> - 1:0.10.9-1
 - Add readiness hooks
 
@@ -63,6 +66,3 @@ fi
 
 * Fri Sep 13 2019 Uchio Kondo <udzura@udzura.jp> - 1:0.10.5-1
 - Change veth creation timing
-
-* Sat Aug 10 2019 Uchio Kondo <udzura@udzura.jp> - 1:0.10.4-1
-- Fix broken cleanup by fibered_worker change

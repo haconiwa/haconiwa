@@ -1,6 +1,11 @@
 ---
-latest: 0.10.9
+latest: 0.10.10
 changelog:
+- version: 0.10.10
+  messages:
+  - Fix and enhance readiness hook
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Thu, 24 Oct 2019 14:27:27 +0900
 - version: 0.10.9
   messages:
   - Add readiness hooks
