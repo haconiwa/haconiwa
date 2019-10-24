@@ -199,7 +199,7 @@ static mrb_value mrb_haconiwa_probe_misc_str(mrb_state *mrb, mrb_value self)
       mrb_sys_fail(mrb, "Failed to setting mrb_value pointer");
     }
   }
-  buf[64] = '\0';
+  buf[63] = '\0';
   DTRACE_PROBE2(haconiwa, probe_misc_str, (long)flag, mrb_str_to_cstr(mrb, arg0));
   return mrb_nil_value();
 }
