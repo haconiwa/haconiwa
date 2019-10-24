@@ -42,7 +42,7 @@ module Haconiwa
           begin
             next unless base.pid
             ::Haconiwa::Logger.debug("Check readiness: pid = #{base.pid}, port = #{hook.readiness_port}")
-            ok = ::Namespace.nsenter(::Namespace::CLONE_NEWNET, :pid => base.pid) {
+            ok = ::Namespace.nsenter(::Namespace::CLONE_NEWNET, pid: base.pid) {
               exit 0 if ::FileListenCheck.new(hook.readiness_ip, hook.readiness_port).listen? || FileListenCheck.new(hook.readiness_ipv6, hook.readiness_port).listen6?
               exit 1
             } rescue nil
