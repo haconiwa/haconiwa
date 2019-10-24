@@ -42,14 +42,21 @@ module Haconiwa
           begin
             next unless base.pid
             ::Haconiwa::Logger.debug("Check readiness: pid = #{base.pid}, port = #{hook.readiness_port}")
-            cmd = "#{hook.nsenter_path} --net --pid --mount -t #{base.pid}"
-            ok = FileListenCheck.new(hook.readiness_ip, hook.readiness_port).listen? || FileListenCheck.new(hook.readiness_ipv6, hook.readiness_port).listen6?
-            blk.call(base, ok)
-            if ok
+            ok = ::Namespace.nsenter(::Namespace::CLONE_NEWNET, pid: base.pid) {
+              exit 0 if ::FileListenCheck.new(hook.readiness_ip, hook.readiness_port).listen? || FileListenCheck.new(hook.readiness_ipv6, hook.readiness_port).listen6?
+              exit 1
+            } rescue nil
+            ret = blk.call(base, ok)
+
+            if ret && ok
               if t = @mainloop.timer_for(sig)
                 ::Haconiwa::Logger.puts("Check hook stopped successfully")
                 t[0].stop
               end
+            end
+
+            if !ret && ok
+              ::Haconiwa::Logger.warning("Listen check seems ok, but final check failed. If it seems strange for you, check the hook itself returns intended true/false by internal logic")
             end
           rescue => e
             ::Haconiwa::Logger.warning("Check hook failed: #{e.class}, #{e.message}")

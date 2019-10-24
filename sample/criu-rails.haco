@@ -38,7 +38,10 @@ Haconiwa.define do |config|
   config.network.veth_host = ::SHA1.sha1_hex(config.name + config.network.container_ip)[0, 8] + '_h'
 
   if ::Haconiwa.current_subcommand != "_restored"
-    # config.add_async_hook msec: 2500 do |base|
+    config.add_readiness_hook(port: 3000, timeout: 10, interval_msec: 250) do |base, ok|
+      if ok
+        Haconiwa::Logger.puts "Port 3000 looks ready, yey!!! pid = #{base.pid}"
+        true
     #   begin
     #     base.checkpoint.dump base
     #   rescue => e
@@ -47,7 +50,10 @@ Haconiwa.define do |config|
     #   else
     #     Haconiwa::Logger.puts "CRIU[hook]: dump OK!!"
     #   end
-    # end
+      else
+        Haconiwa::Logger.puts "not ready: #{Time.now}"
+      end
+    end
   else
     config.add_async_hook msec: 2500, interval_msec: 2500 do |base|
       Haconiwa::Logger.puts "This is a restored process and hooks are available! PID=#{base.pid}"
