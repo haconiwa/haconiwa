@@ -994,13 +994,15 @@ module Haconiwa
   class Rootfs
     def initialize(rootpath, options={})
       @root = rootpath.to_str if rootpath
+      @readonly = true # Default to ro!!
       @owner_uid = options[:owner_uid] || 0
       @owner_gid = options[:owner_gid] || 0
     end
-    attr_accessor :root, :owner_uid, :owner_gid
+    attr_accessor :root, :readonly, :owner_uid, :owner_gid
 
     def to_s;   self.root; end
     def to_str; self.root; end
+    def readonly?; @readonly; end
 
     def to_owner_options
       opts = []
