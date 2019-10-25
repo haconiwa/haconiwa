@@ -482,7 +482,7 @@ module Haconiwa
 
     def apply_filesystem(base)
       unless base.filesystem.use_legacy_chroot
-        Mount.bind_mount base.filesystem.root_path, base.filesystem.root_path
+        Mount.bind_mount base.filesystem.root_path, base.filesystem.root_path, readonly: true
         #Mount.make_private base.filesystem.root_path
         Mount.__mount__("none", base.filesystem.root_path, nil, (Mount::MS_REC | Mount::MS_PRIVATE), nil)
       end

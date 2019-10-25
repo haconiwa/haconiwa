@@ -27,6 +27,7 @@ Haconiwa.define do |conf|
       checkpoint.add_action_script "#{`pwd`.chomp}/sample/test_action.sh"
       checkpoint.criu_service_address = "/var/run/criu_service.socket"
     end
+    #config.add_mount_point '/opt/test-volume', to: '/var/lib/haconiwa-apache001/volume'
 
     config.namespace.unshare "uts"
     config.namespace.unshare "ipc"
