@@ -1,6 +1,6 @@
 Name: haconiwa
 Epoch: 1
-Version: 0.10.10
+Version: 0.11.0
 Release: 1
 Summary: MRuby on Container
 License: GPLv3+
@@ -49,6 +49,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Fri Oct 25 2019 Uchio Kondo <udzura@udzura.jp> - 1:0.11.0-1
+- rootfs default to ro in pivot_root mode. and add rootfs.readonly? opt
+
 * Thu Oct 24 2019 Uchio Kondo <udzura@udzura.jp> - 1:0.10.10-1
 - Fix and enhance readiness hook
 
@@ -63,6 +66,3 @@ fi
 
 * Tue Sep 24 2019 Uchio Kondo <udzura@udzura.jp> - 1:0.10.6-1
 - Support action script, debug hook, hostname customization
-
-* Fri Sep 13 2019 Uchio Kondo <udzura@udzura.jp> - 1:0.10.5-1
-- Change veth creation timing

@@ -1,6 +1,11 @@
 ---
-latest: 0.10.10
+latest: 0.11.0
 changelog:
+- version: 0.11.0
+  messages:
+  - rootfs default to ro in pivot_root mode. and add rootfs.readonly? opt
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Fri, 25 Oct 2019 17:12:02 +0900
 - version: 0.10.10
   messages:
   - Fix and enhance readiness hook

@@ -1,3 +1,9 @@
+haconiwa (0.11.0-1) unstable; urgency=medium
+
+  * rootfs default to ro in pivot_root mode. and add rootfs.readonly? opt
+
+ -- Uchio Kondo <udzura@udzura.jp>  Fri, 25 Oct 2019 17:12:02 +0900
+
 haconiwa (0.10.10-1) unstable; urgency=medium
 
   * Fix and enhance readiness hook
@@ -27,9 +33,3 @@ haconiwa (0.10.6-1) unstable; urgency=medium
   * Support action script, debug hook, hostname customization
 
  -- Uchio Kondo <udzura@udzura.jp>  Tue, 24 Sep 2019 18:21:54 +0900
-
-haconiwa (0.10.5-1) unstable; urgency=medium
-
-  * Change veth creation timing
-
- -- Uchio Kondo <udzura@udzura.jp>  Fri, 13 Sep 2019 15:27:45 +0900
