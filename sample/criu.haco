@@ -10,6 +10,7 @@ Haconiwa.define do |conf|
 
     root = Pathname.new("/var/lib/haconiwa-apache001")
     config.chroot_to root
+    config.rootfs.readonly = true
     config.environ = {
       "PATH" => "#{ENV['PATH']}",
     }
