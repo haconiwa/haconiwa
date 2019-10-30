@@ -1127,7 +1127,7 @@ module Haconiwa
 
     private
     def detect_bridge_ip_mask(brname=@bridge_name)
-      ::IFAddr.get(brname)
+      ::IFAddr.get(brname).split("/")
     end
   end
 
