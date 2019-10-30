@@ -8,6 +8,7 @@ Haconiwa.define do |config|
 
   root = Pathname.new("/var/lib/haconiwa/rails-sample")
   config.chroot_to root
+  config.filesystem.skip_make_rslave_on_host_root = true
   config.workdir = "/u/app/helloworld"
   config.environ = {
     "PATH" => "/usr/local/bundle/bin:/usr/local/bundle/gems/bin:#{ENV['PATH']}",
