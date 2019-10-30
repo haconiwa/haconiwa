@@ -16,6 +16,8 @@ Haconiwa.define do |config|
     "BUNDLE_PATH" => "/usr/local/bundle",
     "BUNDLE_APP_CONFIG" => "/usr/local/bundle"
   }
+  config.add_mount_point "tmpfs", to: "#{root}/u/app/helloworld/tmp", fs: "tmpfs"
+  config.add_mount_point "/var/log/containers", to: "#{root}/u/app/helloworld/log", readonly: false
 
   system "mkdir -p /tmp/criu/images.rails"
 
@@ -33,6 +35,8 @@ Haconiwa.define do |config|
   if ENV['RESTORED_IP']
     config.network.container_ip = ENV['RESTORED_IP']
   else
+    config.network.bridge_name = 'haconiwa0'
+    config.network.netmask = '24'
     config.network.container_ip = "10.0.0.3"
   end
   config.network.veth_host = ::SHA1.sha1_hex(config.name + config.network.container_ip)[0, 8] + '_h'
