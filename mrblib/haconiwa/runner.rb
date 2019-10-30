@@ -677,7 +677,7 @@ module Haconiwa
           Dir.chroot base.filesystem.chroot
           Dir.chdir base.workdir
         else
-          Haconiwa.pivot_root_to base.filesystem.root_path
+          Haconiwa.pivot_root_to base.filesystem.root_path, base.filesystem.skip_make_rslave_on_host_root
           Dir.chdir base.workdir
         end
       else

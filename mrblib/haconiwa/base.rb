@@ -1032,12 +1032,14 @@ module Haconiwa
       @masked_paths = MASKED_PATHS_DEFAULT
       @rootfs = Rootfs.new(nil)
       @use_legacy_chroot = false
+      @skip_make_rslave_on_host_root = false
     end
     attr_accessor :mount_points,
                   :independent_mount_points,
                   :masked_paths,
                   :rootfs,
-                  :use_legacy_chroot
+                  :use_legacy_chroot,
+                  :skip_make_rslave_on_host_root
 
     FS_TO_MOUNT = {
       "procfs" => ["proc", "proc", "/proc"],
