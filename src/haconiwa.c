@@ -58,7 +58,7 @@ int pivot_root(const char *new_root, const char *put_old){
 
 /* This function is written after lxc/conf.c
    https://github.com/lxc/lxc/blob/3695b24384b71662a1225f6cc25f702667fbbe38/src/lxc/conf.c#L1495 */
-static int haconiwa_pivot_root(mrb_state *mrb, const char *rootfs)
+static int haconiwa_pivot_root(mrb_state *mrb, const char *rootfs, int skip_make_rslave)
 {
   int oldroot;
   int newroot = -1, ret = -1;
@@ -104,12 +104,15 @@ static int haconiwa_pivot_root(mrb_state *mrb, const char *rootfs)
 
   /* Make oldroot rslave to make sure our umounts don't propagate to the
    * host.
+   * haconiwa: Skip --make-rslave to remove bottleneck of remount
    */
-  ret = mount("", ".", "", MS_SLAVE | MS_REC, NULL);
-  if (ret < 0) {
-    ret = -1;
-    MRB_SYS_ERROR(mrb, "Failed to make oldroot rslave");
-    goto on_error;
+  if(!skip_make_rslave) {
+    ret = mount("", ".", "", MS_SLAVE | MS_REC, NULL);
+    if (ret < 0) {
+      ret = -1;
+      MRB_SYS_ERROR(mrb, "Failed to make oldroot rslave");
+      goto on_error;
+    }
   }
 
   ret = umount2(".", MNT_DETACH);
@@ -144,9 +147,10 @@ on_error:
 static mrb_value mrb_haconiwa_pivot_root_to(mrb_state *mrb, mrb_value self)
 {
   char *newroot;
-  mrb_get_args(mrb, "z", &newroot);
+  mrb_bool skip_make_rslave = 0;
+  mrb_get_args(mrb, "z|b", &newroot, &skip_make_rslave);
 
-  if(haconiwa_pivot_root(mrb, newroot) < 0) {
+  if(haconiwa_pivot_root(mrb, newroot, (int)skip_make_rslave) < 0) {
     mrb_sys_fail(mrb, "pivot_root failed!!!");
   }
 
@@ -209,7 +213,7 @@ void mrb_haconiwa_gem_init(mrb_state *mrb)
   struct RClass *haconiwa;
   haconiwa = mrb_define_module(mrb, "Haconiwa");
   mrb_define_class_method(mrb, haconiwa, "mrbgem_revisions", mrb_haconiwa_mrgbem_revisions, MRB_ARGS_NONE());
-  mrb_define_class_method(mrb, haconiwa, "pivot_root_to", mrb_haconiwa_pivot_root_to, MRB_ARGS_REQ(1));
+  mrb_define_class_method(mrb, haconiwa, "pivot_root_to", mrb_haconiwa_pivot_root_to, MRB_ARGS_ARG(1,1));
   mrb_define_class_method(mrb, haconiwa, "mkfifo", mrb_haconiwa_mkfifo, MRB_ARGS_ARG(1, 1));
 
   mrb_define_class_method(mrb, haconiwa, "probe_phase_pass", mrb_haconiwa_probe_phase_pass, MRB_ARGS_REQ(2));
