@@ -533,8 +533,8 @@ module Haconiwa
         c.attach
       end
 
-      unless base.cgroupv2.groups.empty?
-        cg = ::CgroupV2.new_group(base.name)
+      if base.cgroupv2.enabled?
+        cg = ::CgroupV2.new_group(base.cgroup_name)
         cg.create
         base.cgroupv2.groups.each do |key, value|
           cg[key.to_s] = value.to_s

@@ -37,7 +37,14 @@ Haconiwa.define do |conf|
 
     config.mount_independent "procfs"
     config.mount_independent "devtmpfs"
+    config.add_mount_point "tmpfs", to: "#{root}/tmp", fs: "tmpfs"
+    config.add_mount_point "tmpfs", to: "#{root}/usr/local/apache2/logs", fs: "tmpfs"
+
     config.capabilities.reset_to_privileged!
+
+    config.cgroup(:v2) do |cg|
+      cg.assign_only = true
+    end
 
     config.add_general_hook :immediately_after_fork_on_parent do |base|
       cpid = base.pid
@@ -61,7 +68,7 @@ Haconiwa.define do |conf|
     end
 
     config.add_general_hook(:teardown_container) do |b|
-      Process.waitpid $pid #rescue nil
+      Process.waitpid $pid if $pid
       Haconiwa::Logger.puts "Exit! #{b.exit_status}"
     end
   end
