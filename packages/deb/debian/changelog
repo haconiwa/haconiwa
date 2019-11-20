@@ -1,3 +1,9 @@
+haconiwa (0.11.1-1) unstable; urgency=medium
+
+  * Add option to just assign cgroup v2, apply eval issue patch
+
+ -- Uchio Kondo <udzura@udzura.jp>  Wed, 20 Nov 2019 19:00:28 +0900
+
 haconiwa (0.11.0-1) unstable; urgency=medium
 
   * rootfs default to ro in pivot_root mode. and add rootfs.readonly? opt
@@ -27,9 +33,3 @@ haconiwa (0.10.7-1) unstable; urgency=medium
   * Include USDTs for performence monitoring
 
  -- Uchio Kondo <udzura@udzura.jp>  Fri, 27 Sep 2019 18:46:13 +0900
-
-haconiwa (0.10.6-1) unstable; urgency=medium
-
-  * Support action script, debug hook, hostname customization
-
- -- Uchio Kondo <udzura@udzura.jp>  Tue, 24 Sep 2019 18:21:54 +0900

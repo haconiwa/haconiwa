@@ -1,6 +1,6 @@
 Name: haconiwa
 Epoch: 1
-Version: 0.11.0
+Version: 0.11.1
 Release: 1
 Summary: MRuby on Container
 License: GPLv3+
@@ -49,6 +49,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Wed Nov 20 2019 Uchio Kondo <udzura@udzura.jp> - 1:0.11.1-1
+- Add option to just assign cgroup v2, apply eval issue patch
+
 * Fri Oct 25 2019 Uchio Kondo <udzura@udzura.jp> - 1:0.11.0-1
 - rootfs default to ro in pivot_root mode. and add rootfs.readonly? opt
 
@@ -63,6 +66,3 @@ fi
 
 * Fri Sep 27 2019 Uchio Kondo <udzura@udzura.jp> - 1:0.10.7-1
 - Include USDTs for performence monitoring
-
-* Tue Sep 24 2019 Uchio Kondo <udzura@udzura.jp> - 1:0.10.6-1
-- Support action script, debug hook, hostname customization

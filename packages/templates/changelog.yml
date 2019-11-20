@@ -1,6 +1,11 @@
 ---
-latest: 0.11.0
+latest: 0.11.1
 changelog:
+- version: 0.11.1
+  messages:
+  - Add option to just assign cgroup v2, apply eval issue patch
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Wed, 20 Nov 2019 19:00:28 +0900
 - version: 0.11.0
   messages:
   - rootfs default to ro in pivot_root mode. and add rootfs.readonly? opt
