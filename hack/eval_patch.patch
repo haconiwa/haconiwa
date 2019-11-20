@@ -1,0 +1,15 @@
+diff --git a/mrbgems/mruby-eval/src/eval.c b/mrbgems/mruby-eval/src/eval.c
+index fa687d62..e470f0dc 100644
+--- a/mrbgems/mruby-eval/src/eval.c
++++ b/mrbgems/mruby-eval/src/eval.c
+@@ -107,8 +107,8 @@ patch_irep(mrb_state *mrb, mrb_irep *irep, int bnest, mrb_irep *top)
+     insn = irep->iseq[i];
+     switch(insn){
+     case OP_EPUSH:
+-      b = PEEK_S(irep->iseq+i+1);
+-      patch_irep(mrb, irep->reps[b], bnest + 1, top);
++      a = PEEK_B(irep->iseq+i+1);
++      patch_irep(mrb, irep->reps[a], bnest + 1, top);
+       break;
+ 
+     case OP_LAMBDA:
