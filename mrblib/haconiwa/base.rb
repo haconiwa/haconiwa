@@ -197,6 +197,8 @@ module Haconiwa
 
     def cgroup(v=nil, &blk)
       cg = if v.to_s == "v2"
+             # Force default to many distro's
+             ::CgroupV2.mount_path = "/sys/fs/cgroup/unified"
              @cgroupv2
            else
              @cgroup
@@ -749,11 +751,17 @@ module Haconiwa
   end
 
   class CGroupV2 < CGroup
+    attr_accessor :assign_only
+
     def []=(key, value)
       @groups[key] = value
       c, *attr = key.split('.')
       raise("Invalid cgroup name #{key}") if attr.empty?
       return value
+    end
+
+    def enabled?
+      self.assign_only || !@groups.empty?
     end
   end
 
