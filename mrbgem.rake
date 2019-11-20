@@ -31,6 +31,7 @@ MRuby::Gem::Specification.new('haconiwa') do |spec|
   spec.add_dependency 'mruby-apparmor'  , :github => 'haconiwa/mruby-apparmor'
 
   spec.add_dependency 'mruby-onig-regexp', :github => 'mattn/mruby-onig-regexp'
+  spec.add_dependency 'mruby-require',    :github => 'mattn/mruby-require'
   spec.add_dependency 'mruby-argtable'  , :github => 'udzura/mruby-argtable', :branch => 'static-link-argtable3'
   spec.add_dependency 'mruby-exec'      , :github => 'haconiwa/mruby-exec'
   spec.add_dependency 'mruby-mount'     , :github => 'haconiwa/mruby-mount'
