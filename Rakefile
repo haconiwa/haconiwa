@@ -21,6 +21,10 @@ file :mruby do
     fail "Invalid MRUBY_VERSION spec: #{MRUBY_VERSION}"
   end
   sh cmd
+
+  unless ENV['SKIP_EVAL_PATCH']
+    sh "cd mruby && patch -p1 < ../hack/eval_patch.patch"
+  end
 end
 
 APP_NAME=ENV["APP_NAME"] || "haconiwa"
