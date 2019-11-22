@@ -579,6 +579,11 @@ module Haconiwa
         c = CG_MAPPING[controller].new(base.cgroup_name)
         c.delete
       end
+
+      if base.cgroupv2.enabled?
+        cg = ::CgroupV2.new_group(base.cgroup_name)
+        cg.delete
+      end
     end
 
     # TODO: check inheritable
