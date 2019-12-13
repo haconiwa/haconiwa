@@ -1,6 +1,6 @@
 module Haconiwa
   class WaitLoop
-    def initialize(wait_interval=5)
+    def initialize(wait_interval=30 * 1000)
       @mainloop = FiberedWorker::MainLoop.new(interval: wait_interval)
       @wait_interval = wait_interval
     end

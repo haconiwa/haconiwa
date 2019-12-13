@@ -84,7 +84,7 @@ module Haconiwa
       @async_hooks = []
       @readiness_hooks = []
       @cgroup_hooks = []
-      @wait_interval = 5
+      @wait_interval = 30 * 1000
       @environ = {}
       @lxcfs_root = nil
       @signal_handler = SignalHandler.new
