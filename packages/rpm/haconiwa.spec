@@ -1,6 +1,6 @@
 Name: haconiwa
 Epoch: 1
-Version: 0.11.1
+Version: 0.11.2
 Release: 1
 Summary: MRuby on Container
 License: GPLv3+
@@ -49,6 +49,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Fri Dec 13 2019 Uchio Kondo <udzura@udzura.jp> - 1:0.11.2-1
+- Reduce CPU usage on busyloop
+
 * Wed Nov 20 2019 Uchio Kondo <udzura@udzura.jp> - 1:0.11.1-1
 - Add option to just assign cgroup v2, apply eval issue patch
 
@@ -63,6 +66,3 @@ fi
 
 * Mon Oct  7 2019 Uchio Kondo <udzura@udzura.jp> - 1:0.10.8-1
 - Refine probes, check NS before create network
-
-* Fri Sep 27 2019 Uchio Kondo <udzura@udzura.jp> - 1:0.10.7-1
-- Include USDTs for performence monitoring

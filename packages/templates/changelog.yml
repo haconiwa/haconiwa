@@ -1,6 +1,11 @@
 ---
-latest: 0.11.1
+latest: 0.11.2
 changelog:
+- version: 0.11.2
+  messages:
+  - Reduce CPU usage on busyloop
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Fri, 13 Dec 2019 18:30:15 +0900
 - version: 0.11.1
   messages:
   - Add option to just assign cgroup v2, apply eval issue patch

@@ -1,3 +1,9 @@
+haconiwa (0.11.2-1) unstable; urgency=medium
+
+  * Reduce CPU usage on busyloop
+
+ -- Uchio Kondo <udzura@udzura.jp>  Fri, 13 Dec 2019 18:30:15 +0900
+
 haconiwa (0.11.1-1) unstable; urgency=medium
 
   * Add option to just assign cgroup v2, apply eval issue patch
@@ -27,9 +33,3 @@ haconiwa (0.10.8-1) unstable; urgency=medium
   * Refine probes, check NS before create network
 
  -- Uchio Kondo <udzura@udzura.jp>  Mon,  7 Oct 2019 20:23:55 +0900
-
-haconiwa (0.10.7-1) unstable; urgency=medium
-
-  * Include USDTs for performence monitoring
-
- -- Uchio Kondo <udzura@udzura.jp>  Fri, 27 Sep 2019 18:46:13 +0900
