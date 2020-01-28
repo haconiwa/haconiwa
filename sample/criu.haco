@@ -53,8 +53,10 @@ Haconiwa.define do |conf|
       # end
     end
 
-    config.add_async_hook(sec: 10, interval_msec: 10 * 1000) do
-      Haconiwa::Logger.puts "Hi! #{`date`}"
+    config.add_async_hook(sec: 10, interval_msec: 500, limit_count: 10) do
+      @cnt ||= 0
+      Haconiwa::Logger.puts "Hi! #{`date`} #{@cnt}"
+      @cnt += 1
     end
 
     config.add_readiness_hook(port: 80, timeout: 10, interval_msec: 250) do |base, ok|
