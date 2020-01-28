@@ -1,3 +1,9 @@
+haconiwa (0.11.3-1) unstable; urgency=medium
+
+  * Add loop limit and current_timer
+
+ -- Uchio Kondo <udzura@udzura.jp>  Tue, 28 Jan 2020 17:41:55 +0900
+
 haconiwa (0.11.2-1) unstable; urgency=medium
 
   * Reduce CPU usage on busyloop
@@ -27,9 +33,3 @@ haconiwa (0.10.9-1) unstable; urgency=medium
   * Add readiness hooks
 
  -- Uchio Kondo <udzura@udzura.jp>  Thu, 17 Oct 2019 16:09:42 +0900
-
-haconiwa (0.10.8-1) unstable; urgency=medium
-
-  * Refine probes, check NS before create network
-
- -- Uchio Kondo <udzura@udzura.jp>  Mon,  7 Oct 2019 20:23:55 +0900

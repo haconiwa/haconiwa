@@ -1,6 +1,11 @@
 ---
-latest: 0.11.2
+latest: 0.11.3
 changelog:
+- version: 0.11.3
+  messages:
+  - Add loop limit and current_timer
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Tue, 28 Jan 2020 17:41:55 +0900
 - version: 0.11.2
   messages:
   - Reduce CPU usage on busyloop

@@ -1,6 +1,6 @@
 Name: haconiwa
 Epoch: 1
-Version: 0.11.2
+Version: 0.11.3
 Release: 1
 Summary: MRuby on Container
 License: GPLv3+
@@ -49,6 +49,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Tue Jan 28 2020 Uchio Kondo <udzura@udzura.jp> - 1:0.11.3-1
+- Add loop limit and current_timer
+
 * Fri Dec 13 2019 Uchio Kondo <udzura@udzura.jp> - 1:0.11.2-1
 - Reduce CPU usage on busyloop
 
@@ -63,6 +66,3 @@ fi
 
 * Thu Oct 17 2019 Uchio Kondo <udzura@udzura.jp> - 1:0.10.9-1
 - Add readiness hooks
-
-* Mon Oct  7 2019 Uchio Kondo <udzura@udzura.jp> - 1:0.10.8-1
-- Refine probes, check NS before create network

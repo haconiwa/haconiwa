@@ -15,11 +15,11 @@ RUN apt-get -qq -y install libprotobuf-dev libprotobuf-c0-dev \
     protobuf-c-compiler protobuf-compiler python-protobuf \
     libnl-3-dev libnet1-dev libcap-dev pkg-config asciidoc xmlto
 
-ENV VERSION 0.11.2
-ENV VERSION_TILDE 0.11.2
+ENV VERSION 0.11.3
+ENV VERSION_TILDE 0.11.3
 ENV USER root
-ENV SRC_PKG_NAME haconiwa_0.11.2-1_amd64.deb
-ENV DST_PKG_NAME haconiwa_0.11.2-1+bionic_amd64.deb
+ENV SRC_PKG_NAME haconiwa_0.11.3-1_amd64.deb
+ENV DST_PKG_NAME haconiwa_0.11.3-1+bionic_amd64.deb
 VOLUME /out
 
 RUN mkdir -p /libexec
