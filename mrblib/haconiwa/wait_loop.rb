@@ -1,4 +1,12 @@
 module Haconiwa
+  def self.current_timer=(t)
+    @current_timer = t
+  end
+
+  def self.current_timer
+    @current_timer
+  end
+
   class WaitLoop
     def initialize(wait_interval=30 * 1000)
       @mainloop = FiberedWorker::MainLoop.new(interval: wait_interval)
@@ -14,7 +22,9 @@ module Haconiwa
         @mainloop.register_timer(hook.signal, hook.timing, hook.interval) do
           ::Haconiwa::Logger.debug("Async hook starting...")
           begin
+            ::Haconiwa.current_timer = @mainloop.timer_for(hook.signal)
             blk.call(base)
+            ::Haconiwa.current_timer = nil
             cnt += 1
             if hook.interval > 0 && (hook.limit_count && cnt >= hook.limit_count)
               if t = @mainloop.timer_for(hook.signal)
