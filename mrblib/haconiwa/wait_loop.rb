@@ -1,4 +1,12 @@
 module Haconiwa
+  def self.current_timer=(t)
+    @current_timer = t
+  end
+
+  def self.current_timer
+    @current_timer
+  end
+
   class WaitLoop
     def initialize(wait_interval=30 * 1000)
       @mainloop = FiberedWorker::MainLoop.new(interval: wait_interval)
@@ -10,10 +18,20 @@ module Haconiwa
       base.async_hooks.each do |hook|
         hook.set_signal!
         blk = hook.proc
+        cnt = 0
         @mainloop.register_timer(hook.signal, hook.timing, hook.interval) do
           ::Haconiwa::Logger.debug("Async hook starting...")
           begin
+            ::Haconiwa.current_timer = @mainloop.timer_for(hook.signal)
             blk.call(base)
+            ::Haconiwa.current_timer = nil
+            cnt += 1
+            if hook.interval > 0 && (hook.limit_count && cnt >= hook.limit_count)
+              if t = @mainloop.timer_for(hook.signal)
+                ::Haconiwa::Logger.puts("Asuyc hook stopped due to count limit")
+                t[0].stop
+              end
+            end
           rescue => e
             ::Haconiwa::Logger.warning("Async hook failed: #{e.class}, #{e.message}")
           end
@@ -149,8 +167,9 @@ module Haconiwa
         @proc = b
         @id = UUID.secure_uuid
         @signal = nil
+        @limit_count = timing[:limit_count]
       end
-      attr_reader :timing, :interval, :proc, :id, :signal
+      attr_reader :timing, :interval, :proc, :id, :signal, :limit_count
 
       # This method has a race problem, should be called serially
       def set_signal!
