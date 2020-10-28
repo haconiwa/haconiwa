@@ -137,6 +137,10 @@ module Haconiwa
       end
     end
 
+    def block_signals(signals)
+      FiberedWorker.sigprocmask(signals.map { |v| FiberedWorker.obj2signo(v) })
+    end
+
     def run_and_wait(pid)
       # Haconiwa supervisor waits just 1 process
       @mainloop.pid = pid
