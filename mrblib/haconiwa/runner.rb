@@ -81,6 +81,8 @@ module Haconiwa
         end
         done, kick_ok = IO.pipe
         Haconiwa.probe_phase_pass(PHASE_START_FORK, hpid)
+
+        base.waitloop.block_signals([:CHLD])
         pid = Process.fork do
           Haconiwa.probe_phase_pass(PHASE_CONTAINER_START, hpid)
           invoke_general_hook(:after_fork, base)
