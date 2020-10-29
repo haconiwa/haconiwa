@@ -1,6 +1,6 @@
 Name: haconiwa
 Epoch: 1
-Version: 0.11.3
+Version: 0.11.4
 Release: 1
 Summary: MRuby on Container
 License: GPLv3+
@@ -49,6 +49,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Thu Oct 29 2020 Uchio Kondo <udzura@udzura.jp> - 1:0.11.4-1
+- Block SIGCHLD in early container setup phase to avoid defunct
+
 * Tue Jan 28 2020 Uchio Kondo <udzura@udzura.jp> - 1:0.11.3-1
 - Add loop limit and current_timer
 
@@ -63,6 +66,3 @@ fi
 
 * Thu Oct 24 2019 Uchio Kondo <udzura@udzura.jp> - 1:0.10.10-1
 - Fix and enhance readiness hook
-
-* Thu Oct 17 2019 Uchio Kondo <udzura@udzura.jp> - 1:0.10.9-1
-- Add readiness hooks

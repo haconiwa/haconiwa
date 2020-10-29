@@ -1,3 +1,9 @@
+haconiwa (0.11.4-1) unstable; urgency=medium
+
+  * Block SIGCHLD in early container setup phase to avoid defunct
+
+ -- Uchio Kondo <udzura@udzura.jp>  Thu, 29 Oct 2020 11:59:33 +0900
+
 haconiwa (0.11.3-1) unstable; urgency=medium
 
   * Add loop limit and current_timer
@@ -27,9 +33,3 @@ haconiwa (0.10.10-1) unstable; urgency=medium
   * Fix and enhance readiness hook
 
  -- Uchio Kondo <udzura@udzura.jp>  Thu, 24 Oct 2019 14:27:27 +0900
-
-haconiwa (0.10.9-1) unstable; urgency=medium
-
-  * Add readiness hooks
-
- -- Uchio Kondo <udzura@udzura.jp>  Thu, 17 Oct 2019 16:09:42 +0900
