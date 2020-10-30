@@ -1,3 +1,9 @@
+haconiwa (0.11.5-1) unstable; urgency=medium
+
+  * Important: Fix blocking SIGCHLD after container is created
+
+ -- Uchio Kondo <udzura@udzura.jp>  Fri, 30 Oct 2020 14:22:54 +0900
+
 haconiwa (0.11.4-1) unstable; urgency=medium
 
   * Block SIGCHLD in early container setup phase to avoid defunct
@@ -27,9 +33,3 @@ haconiwa (0.11.0-1) unstable; urgency=medium
   * rootfs default to ro in pivot_root mode. and add rootfs.readonly? opt
 
  -- Uchio Kondo <udzura@udzura.jp>  Fri, 25 Oct 2019 17:12:02 +0900
-
-haconiwa (0.10.10-1) unstable; urgency=medium
-
-  * Fix and enhance readiness hook
-
- -- Uchio Kondo <udzura@udzura.jp>  Thu, 24 Oct 2019 14:27:27 +0900

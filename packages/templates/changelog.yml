@@ -1,6 +1,11 @@
 ---
-latest: 0.11.4
+latest: 0.11.5
 changelog:
+- version: 0.11.5
+  messages:
+  - 'Important: Fix blocking SIGCHLD after container is created'
+  author: Uchio Kondo <udzura@udzura.jp>
+  date: Fri, 30 Oct 2020 14:22:54 +0900
 - version: 0.11.4
   messages:
   - Block SIGCHLD in early container setup phase to avoid defunct
