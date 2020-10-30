@@ -84,6 +84,7 @@ module Haconiwa
 
         base.waitloop.block_signals([:CHLD])
         pid = Process.fork do
+          Haconiwa.unblock_signal([FiberedWorker.obj2signo(:CHLD)]) # hotfix
           Haconiwa.probe_phase_pass(PHASE_CONTAINER_START, hpid)
           invoke_general_hook(:after_fork, base)
 
