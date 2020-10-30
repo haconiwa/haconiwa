@@ -11,6 +11,7 @@
 #include <string.h>
 #include <errno.h>
 #include <time.h>
+#include <signal.h>
 
 #include <mruby.h>
 #include <mruby/string.h>
@@ -208,6 +209,36 @@ static mrb_value mrb_haconiwa_probe_misc_str(mrb_state *mrb, mrb_value self)
   return mrb_nil_value();
 }
 
+
+
+static mrb_value mrb_haconiwa_unblock_signal(mrb_state *mrb, mrb_value self)
+{
+  mrb_value *signals;
+  mrb_int siglen;
+  mrb_get_args(mrb, "a", &signals, &siglen);
+  int i;
+  sigset_t current_set;
+  if (sigemptyset(&current_set) < 0) {
+    mrb_sys_fail(mrb, "sigemptyset");
+  }
+
+  for (i = 0; i < siglen; i++) {
+    int signo = mrb_fixnum(signals[i]);
+    if (signo < 0 || signo >= SIGRTMAX) {
+      mrb_sys_fail(mrb, "invalid signal number");
+    }
+    if (sigaddset(&current_set, signo) < 0) {
+      mrb_sys_fail(mrb, "sigaddset");
+    }
+  }
+
+  if (sigprocmask(SIG_UNBLOCK, &current_set, NULL) < 0) {
+    mrb_sys_fail(mrb, "sigprocmask");
+  }
+
+  return mrb_fixnum_value(siglen);
+}
+
 void mrb_haconiwa_gem_init(mrb_state *mrb)
 {
   struct RClass *haconiwa;
@@ -219,6 +250,8 @@ void mrb_haconiwa_gem_init(mrb_state *mrb)
   mrb_define_class_method(mrb, haconiwa, "probe_phase_pass", mrb_haconiwa_probe_phase_pass, MRB_ARGS_REQ(2));
   mrb_define_class_method(mrb, haconiwa, "probe", mrb_haconiwa_probe_misc, MRB_ARGS_REQ(2));
   mrb_define_class_method(mrb, haconiwa, "probe_str", mrb_haconiwa_probe_misc_str, MRB_ARGS_REQ(2));
+
+  mrb_define_class_method(mrb, haconiwa, "unblock_signal", mrb_haconiwa_unblock_signal, MRB_ARGS_REQ(1));
 
   DONE;
 }
