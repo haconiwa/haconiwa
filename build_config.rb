@@ -1,3 +1,8 @@
+LIBCAP_VERSION = "2.32"
+LIBCAP_TAG = "libcap-#{LIBCAP_VERSION}"
+LIBCAP_TARGET_COMMIT = "4afef829cbe366a2339cb095edc614afb9b1aa72"
+LIBCAP_CHECKOUT_URL = "https://kernel.googlesource.com/pub/scm/linux/kernel/git/morgan/libcap.git"
+
 def gem_config(conf)
   # If your haconiwa must check runner and hacofile's owner, please uncomment
   # conf.cc.defines << "HACONIWA_SECURE_RUN"
