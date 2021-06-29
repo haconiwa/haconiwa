@@ -8,11 +8,11 @@ module Haconiwa
   end
 
   class WaitLoop
-    def initialize(wait_interval=30 * 1000)
-      @mainloop = FiberedWorker::MainLoop.new(interval: wait_interval)
+    def initialize(wait_interval=30 * 1000, use_legacy_watchdog=false)
+      @mainloop = FiberedWorker::MainLoop.new(interval: wait_interval, use_legacy_watchdog: use_legacy_watchdog)
       @wait_interval = wait_interval
     end
-    attr_accessor :mainloop, :wait_interval
+    attr_accessor :mainloop, :wait_interval, :use_legacy_watchdog
 
     def register_hooks(base)
       base.async_hooks.each do |hook|
@@ -144,6 +144,7 @@ module Haconiwa
     def run_and_wait(pid)
       # Haconiwa supervisor waits just 1 process
       @mainloop.pid = pid
+      @mainloop.use_legacy_watchdog = self.use_legacy_watchdog
       ret = @mainloop.run
       p, s = *(ret.first)
       Haconiwa::Logger.puts "Container[Host PID=#{p}] finished: #{s.inspect}"
