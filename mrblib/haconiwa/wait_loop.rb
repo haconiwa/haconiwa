@@ -10,6 +10,7 @@ module Haconiwa
   class WaitLoop
     def initialize(wait_interval=30 * 1000, use_legacy_watchdog=false)
       @mainloop = FiberedWorker::MainLoop.new(interval: wait_interval, use_legacy_watchdog: use_legacy_watchdog)
+      @use_legacy_watchdog = use_legacy_watchdog
       @wait_interval = wait_interval
     end
     attr_accessor :mainloop, :wait_interval, :use_legacy_watchdog
