@@ -22,6 +22,7 @@ module Haconiwa
                   :readiness_hooks,
                   :cgroup_hooks,
                   :wait_interval,
+                  :use_legacy_watchdog,
                   :environ,
                   :lxcfs_root,
                   :attached_capabilities,
@@ -85,6 +86,7 @@ module Haconiwa
       @readiness_hooks = []
       @cgroup_hooks = []
       @wait_interval = 30 * 1000
+      @use_legacy_watchdog = false
       @environ = {}
       @lxcfs_root = nil
       @signal_handler = SignalHandler.new
@@ -488,6 +490,7 @@ module Haconiwa
         :@readiness_hooks,
         :@cgroup_hooks,
         :@wait_interval,
+        :@use_legacy_watchdog,
         :@environ,
         :@lxcfs_root,
         :@signal_handler,
